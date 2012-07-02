@@ -32,7 +32,5 @@ $(OBJECTS): %$(OBJEND): %.$(SRCEXT)
 -include $(DEPS)
 clean:
 	rm -f src/*.o src/*.d src/*.wo $(EXE) bin/$(EXE) *.zip
-	touch Makefile
-	touch src/*
 install:
 	cp $(EXE) ~/bin/$(EXE)
