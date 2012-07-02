@@ -31,6 +31,8 @@ $(OBJECTS): %$(OBJEND): %.$(SRCEXT)
 	@sed -i -e '1s,\($*\)\.o[ :]*,\1.o $*.d: ,' $*.d
 -include $(DEPS)
 clean:
+	touch src/*
+	touch Makefile
 	rm -f src/*.o src/*.d src/*.wo $(EXE) bin/$(EXE) *.zip
 install:
 	cp $(EXE) ~/bin/$(EXE)
