@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
 	if(argc < 2) {
-		printf("Useage: %s <filename>\n",argv[0]);
+		printf("Usage: %s <filename>\n",argv[0]);
 		exit(1);
 	}
 	// Read the story file into ram.
