@@ -96,13 +96,11 @@ void op_errnop() {
 
 void op_get_child() {
 	store(getchild(operand[0]));
-	printf("Child of %u: %u\n", operand[0], getchild(operand[0]));
 	branch(getchild(operand[0]));
 }
 
 void op_get_parent() {
 	store(getparent(operand[0]));
-	printf("Parent of %u: %u\n", operand[0], getparent(operand[0]));
 }
 
 void op_get_prop() {
@@ -127,7 +125,6 @@ void op_get_prop_addr() {
 
 void op_get_sibling() {
 	store(getsibling(operand[0]));
-	printf("Sibling of %u: %u\n", operand[0], getsibling(operand[0]));
 	branch(getsibling(operand[0]));
 }
 
@@ -146,7 +143,6 @@ void op_remove_obj();
 void op_insert_obj() {
 	op_remove_obj();
 	uint16_t child = getchild(operand[1]);
-	printf("Child of %u: %u\n Inserting %u.\n", operand[1], child, operand[0]);
 	setsibling(operand[0], child);
 	setparent(operand[0], operand[1]);
 	setchild(operand[1],operand[0]);
@@ -274,18 +270,14 @@ void op_read() {
 
 void op_remove_obj() {
 	uint16_t parent = getparent(operand[0]);
-	printf("Parent of %u: %u\n", operand[0], parent);
 	if(parent != 0) {
 		if(getchild(parent) == operand[0]) {
-			printf("First child, sibling is: %u\n",getsibling(operand[0]));
 			setchild(parent, getsibling(operand[0]));
 		} else {
 			uint16_t last = getchild(parent);
 			while(getsibling(last) != operand[0])
 				last = getsibling(last);
-			printf("Last sibling is: %u\n", last);
 			setsibling(last, getsibling(operand[0]));
-			printf("Next sibling is: %u\n", getsibling(operand[0]));
 		}
 	}
 	setparent(operand[0], 0);
@@ -293,7 +285,6 @@ void op_remove_obj() {
 }
 void op_ret() {
 	popframe();
-	printf("retvar is: %i\n", current_frame->retvar);
 	if(current_frame->retvar == 1)
 		setvar(getbyte(current_frame->PC++), operand[0]);
 	current_frame->retvar = 1;
@@ -341,7 +332,6 @@ void op_test() {
 }
 
 void op_test_attr() {
-	printf("Flag %u of %u is: %u\n",operand[1],operand[0],getobjflag(operand[0], operand[1]));
 	branch(getobjflag(operand[0], operand[1]));
 }
 
