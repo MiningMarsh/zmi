@@ -72,15 +72,18 @@ void op_clear_attr() {
 	setobjflag(operand[0], operand[1], 0);
 }
 
+// Decrement a variable.
 void op_dec() {
 	setvar(operand[0],getvar(operand[0]) - 1);
 }
 
+// Decrement a variable and branch if its greater than a value.
 void op_dec_chk() {
 	setvar(operand[0],getvar(operand[0]) - 1);
 	branch(getvar(operand[0]) < operand[1]);
 }
 
+// Signed division.
 void op_div() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
@@ -91,20 +94,24 @@ void op_div() {
 	store((uint16_t)(num1 / num2)&0xFFFF);
 }
 
+// Woops! something shouldn't have happened!
 void op_errnop() {
 	fputs("Error, tried to execute nonexistant opcode.\n",stderr);
 	exit(1);
 }
 
+// Get the child of an object.
 void op_get_child() {
 	store(getchild(operand[0]));
 	branch(getchild(operand[0]));
 }
 
+// Get the parent of an object.
 void op_get_parent() {
 	store(getparent(operand[0]));
 }
 
+// Get a property of an object.
 void op_get_prop() {
 	uint16_t adr = getpropadr(operand[0],operand[1]);
 	if(adr != 0) {
