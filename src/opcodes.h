@@ -237,15 +237,12 @@ void op_or() {
 
 void op_print() {
 	char* str = getstring();
-	uint32_t ptr = 0;
-	while(str[ptr] != 0) {
-		putchar(str[ptr++]);
-	}
+	printf("%s",str);
 	free(str);
 }
 
 void op_print_char() {
-	printf("%u",operand[0]);
+	printf("%c",operand[0]);
 }
 
 void op_print_num() {
