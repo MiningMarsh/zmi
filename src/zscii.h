@@ -1,5 +1,5 @@
 #ifndef ZSCII_H
-#define ZSCII_h
+#define ZSCII_H
 
 #include <stdint.h>
 #include <stdlib.h>

@@ -1,3 +1,5 @@
+#ifndef OPCODES_H
+#define OPCODES_H
 // Signed 16-bit addition.
 void op_add() {
 	int16_t num1 = (int16_t)operand[0];
@@ -354,3 +356,4 @@ void op_throw() {
 		popframe();
 	op_ret();
 }
+#endif
