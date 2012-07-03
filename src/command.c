@@ -33,7 +33,7 @@ void initZM() {
 	current_frame->PC = getword(0x06);
 	current_frame->locals = NULL;
 	current_frame->stack = NULL;
-	current_frame->retvar=0;
+	current_frame->retvar=1;
 	if(Z_REV == 6) {
 	}
 	for(int i = 0; i < 256; i++)

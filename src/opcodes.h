@@ -293,6 +293,7 @@ void op_remove_obj() {
 }
 void op_ret() {
 	popframe();
+	printf("retvar is: %i\n", current_frame->retvar);
 	if(current_frame->retvar == 1)
 		setvar(getbyte(current_frame->PC++), operand[0]);
 	current_frame->retvar = 1;
