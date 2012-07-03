@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "memory.h"
+#include "globalvars.h"
 
 uint32_t* getzchar(uint16_t adr) {
 	uint32_t size = 1024;
@@ -75,6 +76,8 @@ char* tozscii(uint32_t* buffer) {
 					break;
 				}
 				if(buffer[0]) {
+					if(strindir)
+						zscii[ptr++] = '<';
 					uint16_t adr = 32*(zchar-1)
 						+ buffer[buffc - buffer[0]-- + 1];
 					adr = getword(getword(0x18) + adr*2)*2;
@@ -84,6 +87,8 @@ char* tozscii(uint32_t* buffer) {
 					while(append[i])
 						zscii[ptr++] = append[i++];
 					free(append);
+					if(strindir)
+						zscii[ptr++] = '>';
 					recurseabr--;
 				}
 				break;
