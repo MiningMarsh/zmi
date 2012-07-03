@@ -8,6 +8,7 @@
 #include "zscii.h"
 #include "input.h"
 #include "exit.h"
+#include "globalvars.h"
 
 uint8_t extop = 0;
 uint16_t operand[8];
@@ -26,7 +27,7 @@ void initZM() {
 	atexit(clean);
 	current_frame = malloc(sizeof(struct stack_frame));
 	if(current_frame == NULL) {
-		fputs("Unable to allocate first frame.", stderr);
+		fputs("Unable to allocate first frame.\n", stderr);
 		exit(1);
 	}
 	current_frame->old_frame = NULL;
@@ -112,7 +113,8 @@ void execNextInstruction() {
 						Omitted,
 						Omitted};
 	uint8_t op = getbyte(current_frame->PC++);
-	printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
+	if(verbose_Debug >= 4)
+		printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
 	if(op < 128) { // Extract argument types based on the opcode.
 		optype[0] = ((op >> 6 & 1)+1);
 		optype[1] = ((op >> 5 & 1)+1);
@@ -146,16 +148,19 @@ void execNextInstruction() {
 			case LargeConstant:
 				operand[i] = getword(current_frame->PC);
 				current_frame->PC += 2;
-				printf("Large: %u\n", operand[i]);
+				if(verbose_Debug >= 4)
+					printf("Large: %u\n", operand[i]);
 				break;
 			case SmallConstant:
 				operand[i] = getbyte(current_frame->PC++);
-				printf("Small: %u\n", operand[i]);
+				if(verbose_Debug >= 4)
+					printf("Small: %u\n", operand[i]);
 				break;
 			case Variable: {
 				uint8_t var = getbyte(current_frame->PC++);
 				operand[i] = getvar(var);
-				printf("Var %u: %u\n", var, operand[i]);
+				if(verbose_Debug >= 4)
+					printf("Var %u: %u\n", var, operand[i]);
 				break; }
 		}
 	}

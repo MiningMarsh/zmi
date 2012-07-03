@@ -30,7 +30,6 @@ uint16_t getobjflag(uint16_t obj, uint16_t flag) {
 	if(objadr == 0)
 		return 0;
 	uint8_t adr = getbyte(objadr+(flag/8));
-	printf("Flag byte: %u\n",adr);
 	return ((adr>>(flag - (flag/8)*8))&1);
 }
 

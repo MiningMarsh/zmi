@@ -10,6 +10,8 @@
 int main(int argc, char** argv) {
 	char filefound = 0;
 	char * filename;
+	verbose_Debug = 0;
+	strindir = 0;
 	if(argc < 2) {
 		printf("Usage: %s <filename> [OPTS]     (try --help)\n",argv[0]);
 		exit(1);
