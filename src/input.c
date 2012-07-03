@@ -4,12 +4,28 @@
 #include <time.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include "memory.h"
 #include "command.h"
 
 static struct termios term_settings;
-
+int w,h;
 void initin() {
+	w = 80;
+    h = 24;
+
+#ifdef TIOCGSIZE
+    struct ttysize ts;
+    ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
+    w = ts.ts_cols;
+    h = ts.ts_lines;
+#elif defined(TIOCGWINSZ)
+    struct winsize ts;
+    ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
+    w = ts.ws_col;
+    h = ts.ws_row;
+#endif /* TIOCGSIZE */
+
 	tcgetattr(STDIN_FILENO,&term_settings);
 	struct termios term = term_settings;
 	term.c_lflag &= ~(ICANON|ECHO);
@@ -28,6 +44,7 @@ char readchar(){
 
 void readstr() {
 	unsigned int maxsz = getbyte(operand[0]);
+	maxsz = maxsz>w? w:maxsz;
 	if(Z_REV < 5)
 		maxsz--;
 	printf("maxsz is %u\n",maxsz);
@@ -76,7 +93,7 @@ void readstr() {
 				strptr--;
 				printf("\x1b[D");
 			}else{
-			c=0;
+				c=0;
 			}
 		}
 		if(c == 126){
@@ -128,5 +145,4 @@ void readstr() {
 	}
 	line[mxpos+1] = 0;
 	line[mxpos+2] = 0;
-	printf("\n%s\n",line);
 }

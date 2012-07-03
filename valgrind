@@ -1,0 +1,54 @@
+==15231== Invalid read of size 1
+==15231==    at 0x40417B: tozscii (zscii.c:84)
+==15231==    by 0x401CAC: op_print (opcodes.h:232)
+==15231==    by 0x401056: main (main.c:78)
+==15231==  Address 0x51da0f4 is 0 bytes after a block of size 4 alloc'd
+==15231==    at 0x4C29D52: realloc (vg_replace_malloc.c:525)
+==15231==    by 0x404161: tozscii (zscii.c:82)
+==15231==    by 0x401CAC: op_print (opcodes.h:232)
+==15231==    by 0x401056: main (main.c:78)
+==15231== 
+ZORK I: The Great Underground Empire
+==15231== Invalid read of size 1
+==15231==    at 0x401CD5: op_print (opcodes.h:234)
+==15231==    by 0x401056: main (main.c:78)
+==15231==  Address 0x51dcf52 is 0 bytes after a block of size 82 alloc'd
+==15231==    at 0x4C29D52: realloc (vg_replace_malloc.c:525)
+==15231==    by 0x401CAC: op_print (opcodes.h:232)
+==15231==    by 0x401056: main (main.c:78)
+==15231== 
+Copyright (c) 1981, 1982, 1983 Infocom, Inc. All rights reserved.
+ZORK is a registered trademark of Infocom, Inc.
+Revision 88 / Serial number 565248555054
+
+==15231== Invalid read of size 1
+==15231==    at 0x40417B: tozscii (zscii.c:84)
+==15231==    by 0x401C7F: op_print_obj (opcodes.h:251)
+==15231==    by 0x401056: main (main.c:78)
+==15231==  Address 0x51e3543 is 0 bytes after a block of size 3 alloc'd
+==15231==    at 0x4C29D52: realloc (vg_replace_malloc.c:525)
+==15231==    by 0x404161: tozscii (zscii.c:82)
+==15231==    by 0x401C7F: op_print_obj (opcodes.h:251)
+==15231==    by 0x401056: main (main.c:78)
+==15231== 
+==15231== Invalid read of size 1
+==15231==    at 0x4C2C314: strchrnul (mc_replace_strmem.c:847)
+==15231==    by 0x4E75AAE: vfprintf (in /lib64/libc-2.14.1.so)
+==15231==    by 0x4F205DC: __printf_chk (in /lib64/libc-2.14.1.so)
+==15231==    by 0x401C91: op_print_obj (stdio2.h:105)
+==15231==    by 0x401056: main (main.c:78)
+==15231==  Address 0x51e359d is 0 bytes after a block of size 13 alloc'd
+==15231==    at 0x4C29D52: realloc (vg_replace_malloc.c:525)
+==15231==    by 0x401C7F: op_print_obj (opcodes.h:251)
+==15231==    by 0x401056: main (main.c:78)
+==15231== 
+==15231== Invalid read of size 1
+==15231==    at 0x4E75C7E: vfprintf (in /lib64/libc-2.14.1.so)
+==15231==    by 0x4F205DC: __printf_chk (in /lib64/libc-2.14.1.so)
+==15231==    by 0x401C91: op_print_obj (stdio2.h:105)
+==15231==    by 0x401056: main (main.c:78)
+==15231==  Address 0x51e359d is 0 bytes after a block of size 13 alloc'd
+==15231==    at 0x4C29D52: realloc (vg_replace_malloc.c:525)
+==15231==    by 0x401C7F: op_print_obj (opcodes.h:251)
+==15231==    by 0x401056: main (main.c:78)
+==15231== 
