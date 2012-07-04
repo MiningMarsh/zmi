@@ -7,6 +7,7 @@
 #include "object.h"
 #include "zscii.h"
 #include "input.h"
+#include "output.h"
 #include "exit.h"
 #include "globalvars.h"
 
@@ -24,6 +25,7 @@ enum OperandType {
 
 void initZM() {
 	initin();
+	initout();
 	atexit(clean);
 	current_frame = malloc(sizeof(struct stack_frame));
 	if(current_frame == NULL) {

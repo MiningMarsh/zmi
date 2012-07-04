@@ -48,8 +48,8 @@ int main(int argc, char** argv) {
 				strindir=1;
 			}else
 			{
-				printf("%s is not a valid command\n",cmd);
-				exit(1);
+				printf("%s is not a valid switch.\n",cmd);
+				exit(0);
 			}
 		}else
 		{
@@ -69,10 +69,9 @@ int main(int argc, char** argv) {
 	// Read the story file into ram.
 	printf("MM's minimalistic Z-Machine interpreter.\n");
 	printf("Revision 2 for platform PC and standard 1.0\n");
-	for(int i = 0; i < 200;i++)
-		printf("\n");
 	loadRAM(filename);
 	initZM();
+	printf("%c[2J,%c[0;0H",27,27);
 	fflush(stdout);
 	while(1)
 		execNextInstruction();

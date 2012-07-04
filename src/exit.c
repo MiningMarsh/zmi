@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "input.h"
+#include "output.h"
 #include "memory.h"
 #include "globalvars.h"
 uint8_t* RAM; // Holds the file.
@@ -8,8 +9,9 @@ uint8_t* RAM; // Holds the file.
 void clean() {
 	printf("Exiting...\n");
 	if(verbose_Debug)
-	printf("Reverting input modes...\n");
+	printf("Reverting IO modes...\n");
 	cleanin();
+	cleanout();
 	if(verbose_Debug)
 	printf("Cleaning RAM...\n");
 	free(RAM);

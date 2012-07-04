@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-void cistream(uint16_t str);
-void readstr(uint16_t adr);
+void print(char* str);
+void initout();
+void cleanout();
 
 #endif
