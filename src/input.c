@@ -7,23 +7,23 @@
 #include <sys/ioctl.h>
 #include "memory.h"
 #include "command.h"
-
+#include "input.h"
 static struct termios term_settings;
 int w,h;
 void initin() {
 	w = 80;
-    h = 24;
+	h = 24;
 
 #ifdef TIOCGSIZE
-    struct ttysize ts;
-    ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-    w = ts.ts_cols;
-    h = ts.ts_lines;
+	struct ttysize ts;
+	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
+	w = ts.ts_cols;
+	h = ts.ts_lines;
 #elif defined(TIOCGWINSZ)
-    struct winsize ts;
-    ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-    w = ts.ws_col;
-    h = ts.ws_row;
+	struct winsize ts;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
+	w = ts.ws_col;
+	h = ts.ws_row;
 #endif /* TIOCGSIZE */
 
 	tcgetattr(STDIN_FILENO,&term_settings);
@@ -47,7 +47,8 @@ void readstr() {
 	maxsz = maxsz>w? w:maxsz;
 	if(Z_REV < 5)
 		maxsz--;
-	printf("maxsz is %u\n",maxsz);
+	if(verbose_Debug >=4)
+		printf("maxsz is %u\n",maxsz);
 	char* line = NULL;
 	line = calloc(sizeof(char), maxsz+ 2);
 	int loop = 1;
