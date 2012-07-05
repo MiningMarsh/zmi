@@ -69,12 +69,14 @@ void readstr() {
 						//down
 						break;
 					case 'C':
+						//right
 						if(strptr < maxsz-1){
 							printf("\x1b[C");
 							strptr++;
 						}
 						break;
 					case 'D':
+						//left
 						if(strptr > 0){
 							printf("\x1b[D");
 							strptr--;
