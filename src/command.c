@@ -115,7 +115,7 @@ void execNextInstruction() {
 						Omitted,
 						Omitted};
 	uint8_t op = getbyte(current_frame->PC++);
-	if(verbose_Penis >= 4)
+	if(verbose_Debug >= 4)
 		printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
 	if(op < 128) { // Extract argument types based on the opcode.
 		optype[0] = ((op >> 6 & 1)+1);
@@ -150,18 +150,18 @@ void execNextInstruction() {
 			case LargeConstant:
 				operand[i] = getword(current_frame->PC);
 				current_frame->PC += 2;
-				if(verbose_Penis >= 4)
+				if(verbose_Debug >= 4)
 					printf("Large: %u\n", operand[i]);
 				break;
 			case SmallConstant:
 				operand[i] = getbyte(current_frame->PC++);
-				if(verbose_Penis >= 4)
+				if(verbose_Debug >= 4)
 					printf("Small: %u\n", operand[i]);
 				break;
 			case Variable: {
 				uint8_t var = getbyte(current_frame->PC++);
 				operand[i] = getvar(var);
-				if(verbose_Penis >= 4)
+				if(verbose_Debug >= 4)
 					printf("Var %u: %u\n", var, operand[i]);
 				break; }
 		}

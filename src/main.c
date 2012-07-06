@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
 	char filefound = 0;
 	char * filename;
-	verbose_Penis = 0;
+	verbose_Debug = 0;
 	strindir = 0;
 	if(argc < 2) {
 		printf("Usage: %s <filename> [OPTS]     (try --help)\n",argv[0]);
@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
 					exit(1);
 				}
 				i++;
-				verbose_Penis = argv[i][0]-'0';
-				if(verbose_Penis > 8 || strlen(argv[i]) > 1){
+				verbose_Debug = argv[i][0]-'0';
+				if(verbose_Debug > 8 || strlen(argv[i]) > 1){
 					printf("%s expects a value 0-8\n",cmd);
 					exit(1);
 				}

@@ -8,14 +8,14 @@ uint8_t* RAM; // Holds the file.
 
 void clean() {
 	printf("Exiting...\n");
-	if(verbose_Penis)
+	if(verbose_Debug)
 	printf("Reverting IO modes...\n");
 	cleanin();
 	cleanout();
-	if(verbose_Penis)
+	if(verbose_Debug)
 	printf("Cleaning RAM...\n");
 	free(RAM);
-	if(verbose_Penis >= 6) {
+	if(verbose_Debug >= 6) {
 		stacktrace();
 		while(current_frame->old_frame != NULL) {
 			printf("Cleaning frame...\n");

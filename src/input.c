@@ -47,7 +47,7 @@ void readstr() {
 	maxsz = maxsz>w? w:maxsz;
 	if(Z_REV < 5)
 		maxsz--;
-	if(verbose_Penis >=4)
+	if(verbose_Debug >=4)
 		printf("maxsz is %u\n",maxsz);
 	char* line = NULL;
 	line = calloc(sizeof(char), maxsz+ 2);
