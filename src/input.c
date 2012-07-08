@@ -45,6 +45,7 @@ char readchar(){
 void readstr() {
 	unsigned int maxsz = getbyte(operand[0]);
 	maxsz = maxsz>w? w:maxsz;
+	maxsz--;
 	if(Z_REV < 5)
 		maxsz--;
 	if(verbose_Debug >=4)
@@ -58,9 +59,9 @@ void readstr() {
 		char c = 0;
 		int i = read(STDIN_FILENO,&c,1);
 		if (c==0x1b){
-			read(STDIN_FILENO,&c,1);
+			int trash = read(STDIN_FILENO,&c,1);
 			if (c=='['){
-				read(STDIN_FILENO,&c,1);
+				trash = read(STDIN_FILENO,&c,1);
 				switch(c){
 					case 'A':
 						//up
@@ -148,4 +149,5 @@ void readstr() {
 	}
 	line[mxpos+1] = 0;
 	line[mxpos+2] = 0;
+	printf("\n");
 }
