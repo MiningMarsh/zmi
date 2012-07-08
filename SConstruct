@@ -22,4 +22,10 @@ if(GetOption("debug")):
 	env.Append(CCFLAGS='-ggdb')
 
 #compile
-env.Program('zmi', sources)
+zmi = env.Program('zmi', sources)
+
+#install
+env.Install("/usr/bin",zmi)
+
+#aliases
+env.Alias('install',['/usr/bin'])
