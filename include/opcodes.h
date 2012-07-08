@@ -253,7 +253,7 @@ void op_print_obj() {
 	uint16_t adr = getproptableadr(operand[0]);
 	adr++;
 	char* name = tozscii(getzchar(adr));
-	printf(name);
+	printf("%s",name);
 	free(name);
 }
 

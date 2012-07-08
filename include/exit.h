@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void clean();
+void clean(); 
 
 #endif
