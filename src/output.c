@@ -64,4 +64,12 @@ void print(char* str, ...) {
 		}
 		strsz++;
 	}
+	if(pos + wordsz > w)
+	{
+		pos = 0;
+		putchar('\n');
+	}
+	word[wordsz]=0;
+	wordsz--;
+	printf("%s", word);
 }
