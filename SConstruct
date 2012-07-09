@@ -29,4 +29,4 @@ env.Install("/usr/bin",zmi)
 
 #aliases
 env.Alias('install',['/usr/bin'])
-env.Alias('timestamp',env.Command('timestamp.dummy',[],'touch src/*; touch include/*; touch Makefile; touch SConstruct'))
+env.Alias('timestamp',env.Command('timestamp.dummy',[],'touch src/*; touch include/*; touch SConstruct'))

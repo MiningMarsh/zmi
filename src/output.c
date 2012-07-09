@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <string.h>
 #include "memory.h"
 #include "command.h"
 
@@ -31,9 +32,10 @@ void cleanout() {
 void print(char* str, ...) {
 	static int pos = 0;
 	int strsz = 0;
+	int length = strlen(str);
 	char word[1024];
 	int wordsz = 0;
-	while(str[strsz]) {
+	while(strsz<length) {
 		switch(str[strsz]) {
 			case '%':
 			break;
