@@ -23,6 +23,8 @@ if(GetOption("debug")):
 if(env.GetOption('clean')):
 	print("touch src/* ; touch include/* ; touch SConstruct")
 	os.system("touch src/* ; touch include/* ; touch SConstruct")
+	print("rm src/*.d")
+	os.system("rm src/*.d")
 #compile
 zmi = env.Program('zmi', sources)
 #install
