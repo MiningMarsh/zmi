@@ -12,18 +12,18 @@
 int w,h;
 void initout() {
 	w = 80;
-    h = 24;
+	h = 24;
 
 #ifdef TIOCGSIZE
-    struct ttysize ts;
-    ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-    w = ts.ts_cols;
-    h = ts.ts_lines;
+	struct ttysize ts;
+	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
+	w = ts.ts_cols;
+	h = ts.ts_lines;
 #elif defined(TIOCGWINSZ)
-    struct winsize ts;
-    ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-    w = ts.ws_col;
-    h = ts.ws_row;
+	struct winsize ts;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
+	w = ts.ws_col;
+	h = ts.ws_row;
 #endif /* TIOCGSIZE */
 }
 void cleanout() {
@@ -34,7 +34,7 @@ void print(char* str, ...) {
 	char word[1024];
 	int wordsz = 0;
 	while(str[strsz]) {
-		switch(str[strsz++]) {
+		switch(str[strsz]) {
 			case '%':
 			case '\n':
 			case '\r':
@@ -58,6 +58,7 @@ void print(char* str, ...) {
 			default:
 				word[wordsz++] = str[strsz - 1];
 				break;
+		}
+		strsz++;
 	}
-	free(str);
 }
