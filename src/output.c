@@ -36,6 +36,7 @@ void print(char* str, ...) {
 	while(str[strsz]) {
 		switch(str[strsz]) {
 			case '%':
+			break;
 			case '\n':
 			case '\r':
 				pos = 0;
@@ -50,13 +51,15 @@ void print(char* str, ...) {
 					pos = 0;
 					putchar('\n');
 				}
-				word[wordsz--] = 0;
-				printf("%s",word);
+				word[wordsz] = 0;
+				wordsz--;
+				printf("%s ",word);
 				pos += wordsz;
 				wordsz = 0;
 				break;
 			default:
-				word[wordsz++] = str[strsz - 1];
+				word[wordsz] = str[strsz];
+				wordsz++;
 				break;
 		}
 		strsz++;
