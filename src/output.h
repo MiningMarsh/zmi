@@ -2,8 +2,9 @@
 #define OUTPUT_H
 
 #include <stdint.h>
+#include <stdarg.h>
 
-void print(char* str);
+void printw(char* str, ...);
 void initout();
 void cleanout();
 

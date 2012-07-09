@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <time.h>
 #include <termios.h>
 #include <unistd.h>
@@ -27,6 +28,36 @@ void initout() {
 }
 void cleanout() {
 }
-void print() {
+void print(char* str, ...) {
 	static int pos = 0;
+	int strsz = 0;
+	char word[1024];
+	int wordsz = 0;
+	while(str[strsz]) {
+		switch(str[strsz++]) {
+			case '%':
+			case '\n':
+			case '\r':
+				pos = 0;
+				putchar(str[strsz]);
+				break;
+			case '\b':
+				pos--;
+				putchar('\b');
+				break;
+			case ' ':
+				if(pos + wordsz > w) {
+					pos = 0;
+					putchar('\n');
+				}
+				word[wordsz--] = 0;
+				printf("%s",word);
+				pos += wordsz;
+				wordsz = 0;
+				break;
+			default:
+				word[wordsz++] = str[strsz - 1];
+				break;
+	}
+	free(str);
 }

@@ -228,7 +228,7 @@ void op_nop() {
 }
 
 void op_new_line() {
-	printf("\n");
+	print("\n");
 }
 
 void op_or() {
@@ -237,7 +237,7 @@ void op_or() {
 
 void op_print() {
 	char* str = getstring();
-	printf("%s",str);
+	print(str);
 	free(str);
 }
 
@@ -253,7 +253,7 @@ void op_print_obj() {
 	uint16_t adr = getproptableadr(operand[0]);
 	adr++;
 	char* name = tozscii(getzchar(adr));
-	printf(name);
+	print(name);
 	free(name);
 }
 
