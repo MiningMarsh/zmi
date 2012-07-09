@@ -20,13 +20,13 @@ env.Append(CPPPATH=incdirs)
 #option reading
 if(GetOption("debug")):
 	env.Append(CCFLAGS='-ggdb')
-
+if(env.GetOption('clean')):
+	print("touch src/* ; touch include/* ; touch SConstruct")
+	os.system("touch src/* ; touch include/* ; touch SConstruct")
 #compile
 zmi = env.Program('zmi', sources)
-env.Depends(zmi,env.Alias('timestamp'))
 #install
 env.Install("/usr/bin",zmi)
 
 #aliases
 env.Alias('install',['/usr/bin'])
-env.Alias('timestamp',env.Command('timestamp.dummy',[],'touch src/*; touch include/*; touch SConstruct'))
