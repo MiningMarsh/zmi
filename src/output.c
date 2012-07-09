@@ -32,10 +32,9 @@ void cleanout() {
 void print(char* str, ...) {
 	static int pos = 0;
 	int strsz = 0;
-	int length = strlen(str);
 	char word[1024];
 	int wordsz = 0;
-	while(strsz<length) {
+	while(str[strsz]) {
 		switch(str[strsz]) {
 			case '%':
 			break;
@@ -55,7 +54,7 @@ void print(char* str, ...) {
 				}
 				word[wordsz] = 0;
 				printf("%s ",word);
-				pos += wordsz;
+				pos += wordsz + 1;
 				wordsz = 0;
 				break;
 			default:
@@ -65,6 +64,7 @@ void print(char* str, ...) {
 		}
 		strsz++;
 	}
+	if(wordsz) {
 	if(pos + wordsz > w)
 	{
 		pos = 0;
@@ -74,4 +74,5 @@ void print(char* str, ...) {
 	wordsz--;
 	printf("%s", word);
 	pos += wordsz;
+	}
 }
