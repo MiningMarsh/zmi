@@ -253,7 +253,11 @@ void op_print_obj() {
 	uint16_t adr = getproptableadr(operand[0]);
 	adr++;
 	char* name = tozscii(getzchar(adr));
+<<<<<<< HEAD:src/opcodes.h
 	print(name);
+=======
+	printf("%s",name);
+>>>>>>> 5928ad9af1b45a72c3c303493053442a902eb72d:include/opcodes.h
 	free(name);
 }
 

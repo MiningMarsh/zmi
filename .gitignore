@@ -5,3 +5,4 @@ zmi
 *.z*
 *.d
 *.swp
+.sconsign.dblite

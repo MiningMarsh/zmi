@@ -186,7 +186,7 @@ void stacktrace() {
 	struct stack_frame* frame = current_frame;
 	while(frame != NULL) {
 		printf("   Frame %u\n",framenum(frame));
-		printf("      PC: %p\n",frame->PC);
+		printf("      PC: %u\n",frame->PC);
 		printf("      Arguments passed: %u\n",frame->nargs);
 		printf("      Return: %s.\n", frame->retvar ? "Yes" : "No");
 		if(!(frame->stack == NULL || frame->stack[0] < 1)) {
