@@ -23,9 +23,15 @@ if(GetOption("debug")):
 
 #compile
 zmi = env.Program('zmi', sources)
-
+env.Depends(zmi,env.Alias('timestamp'))
 #install
 env.Install("/usr/bin",zmi)
 
+#timestamping
+timestamper = Builder(action='touch include/* ; touch src/* ; touch Makefile ; touch SConstruct ')
+
+env.Append(BUILDERS={'Timestamp':timestamper})
+timestamp=env.Timestamp()
 #aliases
 env.Alias('install',['/usr/bin'])
+env.Alias('timestamp',env.Command('timestamp.dummy',[],'touch src/*; touch include/*; touch Makefile; touch SConstruct'))
