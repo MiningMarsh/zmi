@@ -54,7 +54,6 @@ void print(char* str, ...) {
 					putchar('\n');
 				}
 				word[wordsz] = 0;
-				wordsz--;
 				printf("%s ",word);
 				pos += wordsz;
 				wordsz = 0;
@@ -74,4 +73,5 @@ void print(char* str, ...) {
 	word[wordsz]=0;
 	wordsz--;
 	printf("%s", word);
+	pos += wordsz;
 }
