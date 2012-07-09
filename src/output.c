@@ -40,8 +40,10 @@ void print(char* str, ...) {
 			break;
 			case '\n':
 			case '\r':
+				word[wordsz] = 0;
+				printf("%s\n",word);
+				wordsz = 0;
 				pos = 0;
-				putchar(str[strsz]);
 				break;
 			case '\b':
 				pos--;
