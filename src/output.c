@@ -36,8 +36,17 @@ void print(char* str, ...) {
 	int wordsz = 0;
 	while(str[strsz]) {
 		switch(str[strsz]) {
-			case '%':
-			break;
+			case '%': {
+				char word[1024];
+				int wordsz = 0;
+				strsz++;
+				switch(str[strsz]) {
+					case 's':
+						break;
+					default:
+						printf("Invalid expansion passed to print.\n");
+				}
+			break; }
 			case '\n':
 			case '\r':
 				word[wordsz] = 0;

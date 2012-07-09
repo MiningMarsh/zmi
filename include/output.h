@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-void printw(char* str, ...);
+#define printf print
+
+void print(char* str, ...);
 void initout();
 void cleanout();
 
