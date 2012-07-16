@@ -257,6 +257,12 @@ void op_print_obj() {
 	free(name);
 }
 
+void op_print_paddr() {
+	char* str = tozscii(getzchar(exPAdr(operand[0])));
+	print(str);
+	free(str);
+}
+
 void op_pull() {
 	setvar(operand[0],pop());
 }

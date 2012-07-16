@@ -3,12 +3,10 @@
 #include <stdint.h>
 #include "memory.h"
 // Functions to manipulate the object tree.
-
+#define objectTable getword(0x0a);
 // Get the address of an object.
 uint32_t getobjadr(uint16_t obj) {
-	if(obj == 0)
-		return 0;
-	if(Z_REV < 4 && obj > 255) {
+	if(Z_REV < 4 && obj > 255) { // Version 3 and down only have 255 objects.
 		char str[256];
 		sprintf(str, "%u", obj);
 		fputs("Tried to get nonexistant object ", stderr);
@@ -16,19 +14,17 @@ uint32_t getobjadr(uint16_t obj) {
 		fputs(".\n", stderr);
 		exit(1);
 	}
-	uint32_t baseadr = getword(0x0a) + 62;
+	uint32_t baseadr = objectTable;
 	if(Z_REV > 3)
-		baseadr += 64 + 14*(obj - 1);
+		baseadr += 63*2 + 14*(obj - 1);
 	else
-		baseadr += 9*(obj - 1);
+		baseadr += 31*2 + 9*(obj - 1);
 	return baseadr;
 }
 
 // Get a flag off an object
 uint16_t getobjflag(uint16_t obj, uint16_t flag) {
 	uint32_t objadr = getobjadr(obj);
-	if(objadr == 0)
-		return 0;
 	uint8_t adr = getbyte(objadr+(flag/8));
 	return ((adr>>(flag - (flag/8)*8))&1);
 }

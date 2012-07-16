@@ -88,6 +88,7 @@ void initZM() {
 		callop[138+16*i] = &op_print_obj;
 		callop[139+16*i] = &op_ret;
 		callop[140+16*i] = &op_jump;
+		callop[141+16*i] = &op_print_paddr;
 		callop[176+16*i] = &op_rtrue;
 		callop[177+16*i] = &op_rfalse;
 		callop[178+16*i] = &op_print;
