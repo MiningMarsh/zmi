@@ -26,7 +26,7 @@ if(env.GetOption('clean')):
 	print("rm src/*.d")
 	os.system("rm src/*.d")
 #compile
-zmi = env.Program('zmi', sources)
+zmi = env.Program('build/zmi', sources)
 #install
 env.Install("/usr/bin",zmi)
 

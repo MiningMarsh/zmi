@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 			if(!strcmp(cmd,"--help") || !strcmp(cmd,"-h"))
 			{
 				printf("Usage %s <filename> [OPTS]\n"
-						"-h      --help                     Displays this dialoge\n"
+						"-h      --help                     Displays this dialogue\n"
 						"-v [n]  --verbosity [n]            Displays intensive debugging\n"
 						"-s      --show-string-indirection  shows string indirection\n"
 						"\n"
