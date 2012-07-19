@@ -1,5 +1,6 @@
 #ifndef OPCODES_H
 #define OPCODES_H
+
 // Signed 16-bit addition.
 void op_add() {
 	int16_t num1 = (int16_t)operand[0];
@@ -12,7 +13,7 @@ void op_and() {
 	store(operand[0]&operand[1]);
 }
 
-// Arithmatic shift
+// Arithmetic shift
 void op_art_shift() {
 	int16_t num = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
@@ -57,12 +58,12 @@ void op_catch() {
 	store(framenum(current_frame));
 }
 
-// Branch if a given number of arguemnts have been provided.
+// Branch if a given number of arguments have been provided.
 void op_check_arg_count() {
 	branch(operand[0] - 1 <= current_frame->old_frame->nargs);
 }
 
-// Tell the program we cant do unicode.
+// Tell the program we can't do unicode.
 void op_check_unicode() {
 	store(0);
 }
@@ -122,6 +123,7 @@ void op_get_prop() {
 	}
 }
 
+// Get the property address of a property.
 void op_get_prop_addr() {
 	uint16_t adr = getpropadr(operand[0],operand[1]);
 	if(adr) {
@@ -132,15 +134,18 @@ void op_get_prop_addr() {
 	}
 }
 
+// Get the sibling of an object and store it.
 void op_get_sibling() {
 	store(getsibling(operand[0]));
 	branch(getsibling(operand[0]));
 }
 
+// Increment a variable.
 void op_inc() {
 	setvar(operand[0],getvar(operand[0]) + 1);
 }
 
+// Increment a variable and branch if it is greater than a value.
 void op_inc_chk() {
 	int16_t val;
 	val = getvar(operand[0]);
@@ -148,6 +153,7 @@ void op_inc_chk() {
 	branch(val > operand[1]);
 }
 
+// Insert an object somewhere in the object tree.
 void op_remove_obj();
 void op_insert_obj() {
 	op_remove_obj();
@@ -157,30 +163,37 @@ void op_insert_obj() {
 	setchild(operand[1],operand[0]);
 }
 
+// Branch if equal.
 void op_je() {
 	branch(operand[0] == operand[1]);
 }
 
+// Branch if greater than.
 void op_jg() {
 	branch(operand[0] > operand[1]);
 }
 
+// Branch if an object is inside another.
 void op_jin() {
 	branch(getparent(operand[0]) == operand[1]);
 }
 
+// Jump unconditionally.
 void op_jump() {
 	current_frame->PC += (int16_t)operand[0] - 2;
 }
 
+// Branch if less than.
 void op_jl() {
 	branch(operand[0] < operand[1]);
 }
 
+// Branch if zero.
 void op_jz() {
 	branch((int16_t)operand[0] == 0);
 }
 
+// Get a byte from memory and store it.
 void op_loadb() {
 	if(operand[0]+operand[1] > 0xffff) {
 		printf("Error trying to loadb from high memory.\n",stderr);
@@ -189,6 +202,7 @@ void op_loadb() {
 	store(getbyte(operand[0]+operand[1]));
 }
 
+// Get a word from memory and store it.
 void op_loadw() {
 	if(operand[0]+2*operand[1] > 0xffff) {
 		printf("Error trying to loadw from high memory.\n",stderr);
@@ -197,7 +211,7 @@ void op_loadw() {
 	store(getword(operand[0]+2*operand[1]));
 }
 
-// Arithmatic shift
+// Log shift
 void op_log_shift() {
 	uint16_t num = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
@@ -208,6 +222,7 @@ void op_log_shift() {
 	store(num);
 }
 
+// Modulus.
 void op_mod() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
@@ -218,37 +233,46 @@ void op_mod() {
 	store((uint16_t)(num1 % num2)&0xFFFF);
 }
 
+// Multiply.
 void op_mul() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
 	store((uint16_t)(num1 * num2)&0xFFFF);
 }
 
+// No operation.
 void op_nop() {
 }
 
+
+// Print a newline.
 void op_new_line() {
 	print("\n");
 }
 
+// Logical or.
 void op_or() {
 	store(operand[0] | operand[1]);
 }
 
+// Print a string stored after the operation.
 void op_print() {
 	char* str = getstring();
 	print(str);
 	free(str);
 }
 
+// Print a z-character.
 void op_print_char() {
 	printf("%c",operand[0]);
 }
 
+// Print a number
 void op_print_num() {
 	printf("%i",operand[0]);
 }
 
+// Print an objects name.
 void op_print_obj() {
 	uint16_t adr = getproptableadr(operand[0]);
 	adr++;
@@ -257,25 +281,31 @@ void op_print_obj() {
 	free(name);
 }
 
+// Print a string stored at a padded address.
 void op_print_paddr() {
 	char* str = tozscii(getzchar(exPAdr(operand[0])));
 	print(str);
 	free(str);
 }
 
+// Pop from the current local stack.
 void op_pull() {
 	setvar(operand[0],pop());
 }
+
+// Push to the current local stack.
 void op_push() {
 	push(operand[0]);
 }
 
+// Set the value of a property.
 void op_put_prop() {
 	uint16_t adr = getpropadr(operand[0],operand[1]);
 	unsigned int mode = getbyte(adr++);
 	mode == 1 ? setbyte(adr,operand[2]) : setword(adr, operand[2]);
 }
 
+// Read a string from the user.
 void op_read() {
 	readstr(0);
 }
