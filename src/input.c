@@ -10,7 +10,8 @@
 #include "input.h"
 static struct termios term_settings;
 int w,h;
-void initin() {
+void initin()
+{
 	w = 80;
 	h = 24;
 
@@ -33,16 +34,20 @@ void initin() {
 	term.c_cc[VMIN] = 0;
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&term);
 }
-void cleanin() {
+void cleanin()
+{
 	tcsetattr(STDIN_FILENO,TCSANOW,&term_settings);
 }
-void printstat() {
+void printstat()
+{
 }
-char readchar(){
+char readchar()
+{
 	return 0;
 }
 
-void readstr() {
+void readstr()
+{
 	unsigned int maxsz = getbyte(operand[0]);
 	maxsz = maxsz>w? w:maxsz;
 	maxsz = maxsz<20? 20:maxsz;
@@ -56,14 +61,18 @@ void readstr() {
 	int loop = 1;
 	int pos = 0;
 	int strptr=0;
-	while(loop) {
+	while(loop)
+	{
 		char c = 0;
 		int i = read(STDIN_FILENO,&c,1);
-		if (c==0x1b){
+		if (c==0x1b)
+		{
 			int trash = read(STDIN_FILENO,&c,1);
-			if (c=='['){
+			if (c=='[')
+			{
 				trash = read(STDIN_FILENO,&c,1);
-				switch(c){
+				switch(c)
+				{
 					case 'A':
 						//up
 						break;
@@ -72,14 +81,16 @@ void readstr() {
 						break;
 					case 'C':
 						//right
-						if(strptr < maxsz-1){
+						if(strptr < maxsz-1)
+						{
 							printf("\x1b[C");
 							strptr++;
 						}
 						break;
 					case 'D':
 						//left
-						if(strptr > 0){
+						if(strptr > 0)
+						{
 							printf("\x1b[D");
 							strptr--;
 						}
@@ -88,22 +99,28 @@ void readstr() {
 			}
 			c = 0;
 		}
-		if(c == 10){
+		if(c == 10)
+		{
 			loop = 0;
 			c = 0;
 		}
-		if(c == 127){
-			if(strptr>0){
+		if(c == 127)
+		{
+			if(strptr>0)
+			{
 				c = 126;
 				strptr--;
 				printf("\x1b[D");
-			}else{
+			}else
+			{
 				c=0;
 			}
 		}
-		if(c == 126){
+		if(c == 126)
+		{
 			int x;
-			for(x = strptr; x < maxsz-1; x++){
+			for(x = strptr; x < maxsz-1; x++)
+			{
 				line[x] = line[x+1];
 				char v = line[x];
 				if(v==0)
@@ -112,20 +129,25 @@ void readstr() {
 			}
 			line[maxsz-1]=0;
 			printf("\x1b[C\x08 ");
-			for(x = strptr; x < maxsz; x++){
+			for(x = strptr; x < maxsz; x++)
+			{
 				printf("\x1b[D");
 			}
 			c=0;
 		}
-		if(c != 0){
-			if(line[maxsz-1] == 0){
+		if(c != 0)
+		{
+			if(line[maxsz-1] == 0)
+			{
 				int x;
-				for(x = maxsz -1; x > strptr; x--){
+				for(x = maxsz -1; x > strptr; x--)
+				{
 					line[x] = line[x-1];
 					printf("\x1b[C");
 				}
 				printf("\x1b[C");
-				for(x = maxsz-1; x >strptr; x--){
+				for(x = maxsz-1; x >strptr; x--)
+				{
 					char v = line[x];
 					if(v==0)
 						v=32;
@@ -136,13 +158,15 @@ void readstr() {
 				strptr++;
 			}
 		}
-		if(i == 0) {
+		if(i == 0)
+		{
 		}
 		fflush(stdout);
 	}
 	int i;
 	int mxpos=0;
-	for(i = 0; i < maxsz; i++){
+	for(i = 0; i < maxsz; i++)
+	{
 		if(line[i] != 0)
 			mxpos = i;
 		else
