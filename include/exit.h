@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+// Clean up the machine.
 void clean(); 
 
-#endif
+#endif /* exit.h */

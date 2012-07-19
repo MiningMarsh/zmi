@@ -4,10 +4,13 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define printf print
-
+// Printf for the Z-Machine.
 void print(char* str, ...);
+
+// Initiate output modes for the terminal and Z-Machine.
 void initout();
+
+// Revert terminal output modes.
 void cleanout();
 
-#endif
+#endif /* output.h */
