@@ -65,7 +65,8 @@ int main(int argc, char** argv) {
 		printf("Usage: %s <filename> [OPTS]\n",argv[0]);
 		exit(1);
 	}
-	
+	printf("Using file %s.\n",filename);
+
 	// Read the story file into ram.
 	printf("MM's minimalistic Z-Machine interpreter.\n");
 	printf("Revision 2 for platform PC and standard 1.0\n");

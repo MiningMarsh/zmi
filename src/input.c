@@ -48,6 +48,8 @@ char readchar()
 
 void readstr()
 {
+	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
+	exit(1);
 	unsigned int maxsz = getbyte(operand[0]);
 	maxsz = maxsz>w? w:maxsz;
 	maxsz = maxsz<20? 20:maxsz;
