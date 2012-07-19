@@ -45,6 +45,7 @@ char readchar(){
 void readstr() {
 	unsigned int maxsz = getbyte(operand[0]);
 	maxsz = maxsz>w? w:maxsz;
+	maxsz = maxsz<20? 20:maxsz;
 	maxsz--;
 	if(Z_REV < 5)
 		maxsz--;
@@ -150,4 +151,6 @@ void readstr() {
 	line[mxpos+1] = 0;
 	line[mxpos+2] = 0;
 	printf("\n");
+	//THE FOLLOWING FREE IS TEMPORARY
+	free(line);
 }
