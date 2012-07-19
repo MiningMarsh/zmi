@@ -1,7 +1,6 @@
 #imports
 import sys, os
-
-#source directories
+#source directories 
 sources = Glob("src/*.c")
 
 #include directories
