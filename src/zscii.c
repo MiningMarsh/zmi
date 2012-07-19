@@ -157,6 +157,7 @@ char* tozscii(uint32_t* buffer) {
 		}
 	}
 	free(buffer);
-	zscii = realloc(zscii,ptr*sizeof(char));
+	zscii = realloc(zscii,ptr*sizeof(char)+1);
+	zscii[ptr]=0;
 	return zscii;
 }
