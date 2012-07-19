@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "memory.h"
+
 // Functions to manipulate the object tree.
 #define objectTable getword(0x0a);
+
 // Get the address of an object.
 uint32_t getobjadr(uint16_t obj) {
 	if(Z_REV < 4 && obj > 255) { // Version 3 and down only have 255 objects.
