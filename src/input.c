@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "command.h"
 #include "input.h"
+#define Z_REV getbyte(0)
 static struct termios term_settings;
 int w,h;
 void initin()
