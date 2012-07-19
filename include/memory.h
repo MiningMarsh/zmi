@@ -4,9 +4,7 @@
 #include <stdint.h>
 
 // Allow Z_REV to get the current story file z-code revision.
-#ifndef Z_REV
-# define Z_REV getbyte(0)
-#endif
+#define Z_REV getbyte(0)
 
 // Holds the current routine state. Holds: PC, stack, local variables,
 // and return information for routine handling.
