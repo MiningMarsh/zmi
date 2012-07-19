@@ -53,7 +53,7 @@ void op_call_throw() {
 	op_call();
 }
 
-// Return current stack frame pointer.
+// Return the current number of stack frames.
 void op_catch() {
 	store(framenum(current_frame));
 }
@@ -310,6 +310,7 @@ void op_read() {
 	readstr(0);
 }
 
+// Remove an object from the object tree.
 void op_remove_obj() {
 	uint16_t parent = getparent(operand[0]);
 	if(parent != 0) {
@@ -325,6 +326,8 @@ void op_remove_obj() {
 	setparent(operand[0], 0);
 	setsibling(operand[0], 0);
 }
+
+// REturn from a routine, returning a value if needed.
 void op_ret() {
 	popframe();
 	if(current_frame->retvar == 1)
@@ -332,51 +335,62 @@ void op_ret() {
 	current_frame->retvar = 1;
 }
 
+// Pop from the stack and return that value.
 void op_ret_popped() {
 	operand[0] = pop();
 	op_ret();
 }
 
+// Return false.
 void op_rfalse() {
 	operand[0] = 0;
 	op_ret();
 }
 
+// Return true.
 void op_rtrue() {
 	operand[0] = 1;
 	op_ret();
 }
 
+// Set the flag of an object to on.
 void op_set_attr() {
 	setobjflag(operand[0], operand[1], 1);
 }
 
+// Store a value in a variable.
 void op_store() {
 	setvar(operand[0],operand[1]);
 }
 
+// Set a byte in memory.
 void op_storeb() {
 	setbyte(operand[0]+operand[1], operand[2]);
 }
 
+// Set a word in memory.
 void op_storew() {
 	setword(operand[0]+2*operand[1], operand[2]);
 }
 
+//  Subtract.
 void op_sub() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
 	store((uint16_t)(num1 - num2)&0xFFFF);
 }
 
+// Test to see if a bitmask is set.
 void op_test() {
-	branch(operand[0] & operand[1] == operand[1]);
+	branch((operand[0] & operand[1]) == operand[1]);
 }
 
+// Find is a flag of an object is set to on.
 void op_test_attr() {
 	branch(getobjflag(operand[0], operand[1]));
 }
 
+// Throw away some stack frames, until the desired number is reached.
 void op_throw() {
 	if(operand[1] > framenum(current_frame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);
@@ -386,4 +400,5 @@ void op_throw() {
 		popframe();
 	op_ret();
 }
-#endif
+
+#endif /* OPCODES_H */

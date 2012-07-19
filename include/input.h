@@ -16,4 +16,4 @@ char readchar();
 // Read a string from the terminal. Optionally parse it and execute a command to handle it.
 void readstr();
 
-#endif
+#endif /* input.h */

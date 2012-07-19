@@ -35,4 +35,4 @@ uint16_t getsibling(uint16_t obj);
 // Get the property table address of an object. This is a bit useless outside of hte other object functions.
 uint16_t getproptableadr(uint16_t obj);
 
-#endif
+#endif /* object.h */

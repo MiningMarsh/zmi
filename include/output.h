@@ -13,4 +13,4 @@ void initout();
 // Revert terminal output modes.
 void cleanout();
 
-#endif
+#endif /* output.h */
