@@ -11,9 +11,16 @@
 #include "exit.h"
 #include "globalvars.h"
 
+// Is this an extended operation code?
 uint8_t extop = 0;
+
+// Holds the operands to the operation being executed.
 uint16_t operand[8];
+
+// Better than a switches. Each cell contains a pointer to a function to execute its opcode. callop[20]() executes operation 20.
 void (*callop[256])(void) = {NULL};
+
+// Used for easy identification of operand types.
 enum OperandType {
 	LargeConstant = 0,
 	SmallConstant = 1,
@@ -21,12 +28,18 @@ enum OperandType {
 	Omitted = 3
 };
 
+// Include the operation code functions.
 #include "opcodes.h"
 
+// Initiate the machine with a default set of values.
 void initZM() {
+	// Initiate input.
 	initin();
+	// Initiate output.
 	initout();
+	// Clean if an error occurs, don't leave it to the OS. This may also display a stacktrace and other debug things.
 	atexit(clean);
+	// Create the initial stack frame.
 	current_frame = malloc(sizeof(struct stack_frame));
 	if(current_frame == NULL) {
 		fputs("Unable to allocate first frame.\n", stderr);
@@ -37,8 +50,8 @@ void initZM() {
 	current_frame->locals = NULL;
 	current_frame->stack = NULL;
 	current_frame->retvar=1;
-	if(Z_REV == 6) {
-	}
+
+	// Populate the operation index.
 	for(int i = 0; i < 256; i++)
 		callop[i] = &op_errnop;
 	for(int i = 0; i < 7; i++) {
@@ -107,6 +120,7 @@ void initZM() {
 }
 
 void execNextInstruction() {
+	// Clean the operands.
 	uint8_t optype[8] = {Omitted,
 						Omitted,
 						Omitted,
@@ -115,10 +129,13 @@ void execNextInstruction() {
 						Omitted,
 						Omitted,
 						Omitted};
+	// Get the next operation and advance the PC.
 	uint8_t op = getbyte(current_frame->PC++);
+	// Print the operand in debug mode.
 	if(verbose_Debug >= 4)
 		printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
-	if(op < 128) { // Extract argument types based on the opcode.
+	 // Extract argument types based on the opcode.
+	if(op < 128) {
 		optype[0] = ((op >> 6 & 1)+1);
 		optype[1] = ((op >> 5 & 1)+1);
 	} else if(op < 192 && (op != 190)) {
@@ -140,6 +157,9 @@ void execNextInstruction() {
 		optype[6] = args[1] >> 2 & 3;
 		optype[7] = args[1] & 3;
 	}
+
+	// Find the number of operands that have been extracted, then
+	// populate them depending on their type. Print them if in debug mode.
 	current_frame->nargs = 8;
 	for(int i = 0; i < 8; i++) {
 		switch(optype[i]) {
@@ -167,5 +187,6 @@ void execNextInstruction() {
 				break; }
 		}
 	}
+	// Execute the operation.
 	callop[op]();
 }
