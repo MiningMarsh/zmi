@@ -30,6 +30,8 @@ void initout() {
 void cleanout() {
 }
 void print(char* str, ...) {
+	if(w<20)
+		w=20;
 	static int pos = 0;
 	int strsz = 0;
 	char word[1024];

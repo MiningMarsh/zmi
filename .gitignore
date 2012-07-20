@@ -6,3 +6,5 @@ zmi
 *.d
 *.swp
 .sconsign.dblite
+.*
+!.gitignore
