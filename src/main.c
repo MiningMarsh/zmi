@@ -6,6 +6,7 @@
 #include "memory.h"
 #include "command.h"
 #include "globalvars.h"
+#include "output.h"
 
 int main(int argc, char** argv) {
 	char filefound = 0;

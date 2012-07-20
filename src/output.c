@@ -30,6 +30,8 @@ void initout() {
 void cleanout() {
 }
 void print(char* str, ...) {
+	va_list args;
+	va_start(args,str);
 	if(!w)
 		w=20;
 	static int pos = 0;
@@ -39,12 +41,21 @@ void print(char* str, ...) {
 	while(str[strsz]) {
 		switch(str[strsz]) {
 			case '%': {
-				char word[1024];
-				int wordsz = 0;
 				strsz++;
 				switch(str[strsz]) {
-					case 's':
-						break;
+					case 's': {
+						char *exstr;
+						exstr = va_arg(args,char*);
+						int p = 0;
+						while(exstr[p]) {
+							word[wordsz] = exstr[p];
+							p++;
+							wordsz++;
+						}
+						break; }
+					case 'i': {
+
+					}
 					default:
 						printf("Invalid expansion passed to print.\n");
 				}
@@ -88,4 +99,5 @@ void print(char* str, ...) {
 	printf("%s", word);
 	pos += wordsz;
 	}
+	va_end(args);
 }
