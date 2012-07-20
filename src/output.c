@@ -30,7 +30,7 @@ void initout() {
 void cleanout() {
 }
 void print(char* str, ...) {
-	if(w<20)
+	if(!w)
 		w=20;
 	static int pos = 0;
 	int strsz = 0;
