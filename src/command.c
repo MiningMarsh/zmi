@@ -117,6 +117,8 @@ void initZM() {
 	callop[230] = &op_print_num;
 	callop[232] = &op_push;
 	callop[233] = &op_pull;
+	// By this time, should be okay to clear the screen.
+	printf("%c[2J,%c[0;0H",27,27);
 }
 
 void execNextInstruction() {
