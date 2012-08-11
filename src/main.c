@@ -12,8 +12,8 @@
 int main(int argc, char** argv) {
 	char filefound = 0;
 	char * filename;
-	verbose_Debug = 0;
-	string_Indirection = 0;
+	VerboseDebug = 0;
+	StrIndirection = 0;
 	if(argc < 2) {
 		printf("Usage: %s <filename> [OPTS]     (try --help)\n",argv[0]);
 		exit(1);
@@ -41,14 +41,14 @@ int main(int argc, char** argv) {
 					exit(1);
 				}
 				i++;
-				verbose_Debug = argv[i][0]-'0';
-				if(verbose_Debug > 8 || strlen(argv[i]) > 1){
+				VerboseDebug = argv[i][0]-'0';
+				if(VerboseDebug > 8 || strlen(argv[i]) > 1){
 					printf("%s expects a value 0-8\n",cmd);
 					exit(1);
 				}
 			}else if(!strcmp(cmd,"-s") || !strcmp(cmd,"--show-string-indirection"))
 			{
-				string_Indirection=1;
+				StrIndirection=1;
 			}else if(!strcmp(cmd,"-f") || !strcmp(cmd,"--file"))
 			{
 				if(i==argc-1)

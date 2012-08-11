@@ -18,7 +18,7 @@ struct stack_frame {
 };
 
 // The current stack frame.
-struct stack_frame* current_frame;
+struct stack_frame* CurrentZFrame;
 
 // Load a story file into ram.
 void loadRAM(char* file);

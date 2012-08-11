@@ -9,28 +9,28 @@ uint8_t* RAM; // Holds the file.
 // Clean things instead of letting the OS do it.
 void clean() {
 	printf("Exiting...\n");
-	if(verbose_Debug)
+	if(VerboseDebug)
 		printf("Reverting IO modes...\n");
 	// Revert input.
 	cleanInput();
 	// Revert output.
 	cleanOutput();
-	if(verbose_Debug)
+	if(VerboseDebug)
 		printf("Cleaning RAM...\n");
 	// Free the storyfile from ram.
 	free(RAM);
 	// Print a stacktrace in debug mode.
-	if(verbose_Debug >= 6)
+	if(VerboseDebug >= 6)
 		traceZStack();
-	while(current_frame->old_frame != NULL) {
-		if(verbose_Debug)
+	while(CurrentZFrame->old_frame != NULL) {
+		if(VerboseDebug)
 			printf("Cleaning frame...\n");
 		popZFrame();
 	}
 	// Pop the final frame manually. (popframe() wont let us.)
-	if(verbose_Debug)
+	if(VerboseDebug)
 		printf("Cleaning final frame...\n");
-	free(current_frame->locals);
-	free(current_frame->stack);
-	free(current_frame);
+	free(CurrentZFrame->locals);
+	free(CurrentZFrame->stack);
+	free(CurrentZFrame);
 }

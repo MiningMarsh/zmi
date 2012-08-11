@@ -2,9 +2,9 @@
 #define GLOBALVARS_H
 
 // Are we in debug mode?
-char verbose_Debug;
+char VerboseDebug;
 
 // Should we show string pointers in <>?
-char string_Indirection;
+char StrIndirection;
 
 #endif /* globalvars.h */

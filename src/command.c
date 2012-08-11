@@ -11,20 +11,18 @@
 #include "exit.h"
 #include "globalvars.h"
 
-
-// TODO: Still not resolving getZRev() properly
-
 // Is this an extended operation code?
-uint8_t extop = 0;
+uint8_t IsExtOpCode = 0;
 
 // Holds the operands to the operation being executed.
-uint16_t operand[8];
+uint16_t Operand[8];
 
-// Better than a switches. Each cell contains a pointer to a function to execute its opcode. callop[20]() executes operation 20.
-void (*callop[256])(void) = {NULL};
+// Better than a switch. Each cell contains a pointer to a function to execute its opcode.
+// callop[20]() executes operation 20.
+void (*CallOpCode[256])(void) = {NULL};
 
 // Used for easy identification of operand types.
-enum OperandType {
+enum operand_type {
 	LargeConstant = 0,
 	SmallConstant = 1,
 	Variable = 2,
@@ -43,90 +41,90 @@ void initZM() {
 	// Clean if an error occurs, don't leave it to the OS. This may also display a stacktrace and other debug things.
 	atexit(clean);
 	// Create the initial stack frame.
-	current_frame = malloc(sizeof(struct stack_frame));
-	if(current_frame == NULL) {
+	CurrentZFrame = malloc(sizeof(struct stack_frame));
+	if(CurrentZFrame == NULL) {
 		fputs("Unable to allocate first frame.\n", stderr);
 		exit(1);
 	}
-	current_frame->old_frame = NULL;
-	current_frame->PC = getWord(0x06);
-	current_frame->locals = NULL;
-	current_frame->stack = NULL;
-	current_frame->retvar=1;
+	CurrentZFrame->old_frame = NULL;
+	CurrentZFrame->PC = getWord(0x06);
+	CurrentZFrame->locals = NULL;
+	CurrentZFrame->stack = NULL;
+	CurrentZFrame->retvar=1;
 
 	// Populate the operation index.
-	for(int i = 0; i < 256; i++)
-		callop[i] = &op_errnop;
-	for(int i = 0; i < 7; i++) {
-		callop[1+32*i] = &op_je;
-		callop[2+32*i] = &op_jl;
-		callop[3+32*i] = &op_jg;
-		callop[4+32*i] = &op_dec_chk;
-		callop[5+32*i] = &op_inc_chk;
-		callop[6+32*i] = &op_jin;
-		callop[7+32*i] = &op_test;
-		callop[8+32*i] = &op_or;
-		callop[9+32*i] = &op_and;
-		callop[10+32*i] = &op_test_attr;
-		callop[11+32*i] = &op_set_attr;
-		callop[12+32*i] = &op_clear_attr;
-		callop[13+32*i] = &op_store;
-		callop[14+32*i] = &op_insert_obj;
-		callop[15+32*i] = &op_loadw;
-		callop[16+32*i] = &op_loadb;
-		callop[17+32*i] = &op_get_prop;
-		callop[18+32*i] = &op_get_prop_addr;
-		callop[20+32*i] = &op_add;
-		callop[21+32*i] = &op_sub;
-		callop[22+32*i] = &op_mul;
-		callop[23+32*i] = &op_div;
-		callop[24+32*i] = &op_mod;
+	for(int I = 0; I < 256; I++)
+		CallOpCode[I] = &op_errnop;
+	for(int I = 0; I < 7; I++) {
+		CallOpCode[1+32*I] = &op_je;
+		CallOpCode[2+32*I] = &op_jl;
+		CallOpCode[3+32*I] = &op_jg;
+		CallOpCode[4+32*I] = &op_dec_chk;
+		CallOpCode[5+32*I] = &op_inc_chk;
+		CallOpCode[6+32*I] = &op_jin;
+		CallOpCode[7+32*I] = &op_test;
+		CallOpCode[8+32*I] = &op_or;
+		CallOpCode[9+32*I] = &zOpAnd;
+		CallOpCode[10+32*I] = &op_test_attr;
+		CallOpCode[11+32*I] = &op_set_attr;
+		CallOpCode[12+32*I] = &op_clear_attr;
+		CallOpCode[13+32*I] = &op_store;
+		CallOpCode[14+32*I] = &op_insert_obj;
+		CallOpCode[15+32*I] = &op_loadw;
+		CallOpCode[16+32*I] = &op_loadb;
+		CallOpCode[17+32*I] = &op_get_prop;
+		CallOpCode[18+32*I] = &op_get_prop_addr;
+		CallOpCode[20+32*I] = &zOpAdd;
+		CallOpCode[21+32*I] = &op_sub;
+		CallOpCode[22+32*I] = &op_mul;
+		CallOpCode[23+32*I] = &op_div;
+		CallOpCode[24+32*I] = &op_mod;
 		if(getZRev() >= 4)
-			callop[25+32*i] = &op_call;
+			CallOpCode[25+32*I] = &op_call;
 		if(getZRev() >= 5)
-			callop[26+32*i] = &op_call_throw;
+			CallOpCode[26+32*I] = &op_call_throw;
 		if(getZRev() == 5 || getZRev() == 6)
-			callop[28+32*i] = &op_throw;
+			CallOpCode[28+32*I] = &op_throw;
 	}
-	for(int i = 0; i  < 32; i++) {
-		callop[i+32*4] = &op_errnop;
-		callop[i+32*5] = &op_errnop;
+	for(int I = 0; I  < 32; I++) {
+		CallOpCode[I+32*4] = &op_errnop;
+		CallOpCode[I+32*5] = &op_errnop;
 	}
-	for(int i = 0; i < 3; i++) {
-		callop[128+16*i] = &op_jz;
-		callop[129+16*i] = &op_get_sibling;
-		callop[130+16*i] = &op_get_child;
-		callop[131+16*i] = &op_get_parent;
-		callop[133+16*i] = &op_inc;
-		callop[134+16*i] = &op_dec;
+	for(int I = 0; I < 3; I++) {
+		CallOpCode[128+16*I] = &op_jz;
+		CallOpCode[129+16*I] = &op_get_sibling;
+		CallOpCode[130+16*I] = &op_get_child;
+		CallOpCode[131+16*I] = &op_get_parent;
+		CallOpCode[133+16*I] = &op_inc;
+		CallOpCode[134+16*I] = &op_dec;
 		if(getZRev() >= 4)
-			callop[136+16*i] = &op_call;
-		callop[138+16*i] = &op_print_obj;
-		callop[139+16*i] = &op_ret;
-		callop[140+16*i] = &op_jump;
-		callop[141+16*i] = &op_print_paddr;
-		callop[176+16*i] = &op_rtrue;
-		callop[177+16*i] = &op_rfalse;
-		callop[178+16*i] = &op_print;
-		callop[184+16*i] = &op_ret_popped;
-		callop[187+16*i] = &op_new_line;
+			CallOpCode[136+16*I] = &op_call;
+		CallOpCode[138+16*I] = &op_print_obj;
+		CallOpCode[139+16*I] = &op_ret;
+		CallOpCode[140+16*I] = &op_jump;
+		CallOpCode[141+16*I] = &op_print_paddr;
+		CallOpCode[176+16*I] = &op_rtrue;
+		CallOpCode[177+16*I] = &op_rfalse;
+		CallOpCode[178+16*I] = &op_print;
+		CallOpCode[184+16*I] = &op_ret_popped;
+		CallOpCode[187+16*I] = &op_new_line;
 	}
-	callop[224] = &op_call;
-	callop[225] = &op_storew;
-	callop[226] = &op_storeb;
-	callop[227] = &op_put_prop;
-	callop[228] = &op_read;
-	callop[229] = &op_print_char;
-	callop[230] = &op_print_num;
-	callop[232] = &op_push;
-	callop[233] = &op_pull;
+	CallOpCode[224] = &op_call;
+	CallOpCode[225] = &op_storew;
+	CallOpCode[226] = &op_storeb;
+	CallOpCode[227] = &op_put_prop;
+	CallOpCode[228] = &op_read;
+	CallOpCode[229] = &op_print_char;
+	CallOpCode[230] = &op_print_num;
+	CallOpCode[232] = &op_push;
+	CallOpCode[233] = &op_pull;
 	// By this time, should be okay to clear the screen.
 	printf("%c[2J,%c[0;0H",27,27);
 }
 
 void execNextInstruction() {
 	// Clean the operands.
-	uint8_t optype[8] = {Omitted,
+	uint8_t OperandType[8] = {Omitted,
 						Omitted,
 						Omitted,
 						Omitted,
@@ -135,63 +133,63 @@ void execNextInstruction() {
 						Omitted,
 						Omitted};
 	// Get the next operation and advance the PC.
-	uint8_t op = getByte(current_frame->PC++);
+	uint8_t op = getByte(CurrentZFrame->PC++);
 	// Print the operand in debug mode.
-	if(verbose_Debug >= 4)
-		printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
+	if(VerboseDebug >= 4)
+		printf("\nPC: %5u OP: %3u\n", CurrentZFrame->PC - 1, op);
 	 // Extract argument types based on the opcode.
 	if(op < 128) {
-		optype[0] = ((op >> 6 & 1)+1);
-		optype[1] = ((op >> 5 & 1)+1);
+		OperandType[0] = ((op >> 6 & 1)+1);
+		OperandType[1] = ((op >> 5 & 1)+1);
 	} else if(op < 192 && (op != 190)) {
-		optype[0] = (op >> 4 & 3);
+		OperandType[0] = (op >> 4 & 3);
 	} else {
 		if(op == 190)
-			extop = getByte(current_frame->PC++);
+			IsExtOpCode = getByte(CurrentZFrame->PC++);
 		int8_t args[2] = {0, 255};
-		args[0] = getByte(current_frame->PC++);
+		args[0] = getByte(CurrentZFrame->PC++);
 		if(op == 236 || op == 260) {
-			args[1] = getByte(current_frame->PC++);
+			args[1] = getByte(CurrentZFrame->PC++);
 		}
-		optype[0] = args[0] >> 6 & 3;
-		optype[1] = args[0] >> 4 & 3;
-		optype[2] = args[0] >> 2 & 3;
-		optype[3] = args[0] & 3;
-		optype[4] = args[1] >> 6 & 3;
-		optype[5] = args[1] >> 4 & 3;
-		optype[6] = args[1] >> 2 & 3;
-		optype[7] = args[1] & 3;
+		OperandType[0] = args[0] >> 6 & 3;
+		OperandType[1] = args[0] >> 4 & 3;
+		OperandType[2] = args[0] >> 2 & 3;
+		OperandType[3] = args[0] & 3;
+		OperandType[4] = args[1] >> 6 & 3;
+		OperandType[5] = args[1] >> 4 & 3;
+		OperandType[6] = args[1] >> 2 & 3;
+		OperandType[7] = args[1] & 3;
 	}
 
 	// Find the number of operands that have been extracted, then
 	// populate them depending on their type. Print them if in debug mode.
-	current_frame->nargs = 8;
+	CurrentZFrame->nargs = 8;
 	for(int i = 0; i < 8; i++) {
-		switch(optype[i]) {
+		switch(OperandType[i]) {
 			case Omitted:
-				if(current_frame->nargs > i)
-					current_frame->nargs = i;
-				operand[i] = 0;
+				if(CurrentZFrame->nargs > i)
+					CurrentZFrame->nargs = i;
+				Operand[i] = 0;
 				break;
 			case LargeConstant:
-				operand[i] = getWord(current_frame->PC);
-				current_frame->PC += 2;
-				if(verbose_Debug >= 4)
-					printf("Large: %u\n", operand[i]);
+				Operand[i] = getWord(CurrentZFrame->PC);
+				CurrentZFrame->PC += 2;
+				if(VerboseDebug >= 4)
+					printf("Large: %u\n", Operand[i]);
 				break;
 			case SmallConstant:
-				operand[i] = getByte(current_frame->PC++);
-				if(verbose_Debug >= 4)
-					printf("Small: %u\n", operand[i]);
+				Operand[i] = getByte(CurrentZFrame->PC++);
+				if(VerboseDebug >= 4)
+					printf("Small: %u\n", Operand[i]);
 				break;
 			case Variable: {
-				uint8_t var = getByte(current_frame->PC++);
-				operand[i] = getZVar(var);
-				if(verbose_Debug >= 4)
-					printf("Var %u: %u\n", var, operand[i]);
+				uint8_t var = getByte(CurrentZFrame->PC++);
+				Operand[i] = getZVar(var);
+				if(VerboseDebug >= 4)
+					printf("Var %u: %u\n", var, Operand[i]);
 				break; }
 		}
 	}
 	// Execute the operation.
-	callop[op]();
+	CallOpCode[op]();
 }

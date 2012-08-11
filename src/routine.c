@@ -7,28 +7,28 @@
 #include "zscii.h"
 
 void zStore(uint16_t value) {
-	setZVar(getByte(current_frame->PC++),value);
+	setZVar(getByte(CurrentZFrame->PC++),value);
 }
 
 char* zGetStringFromPC() {
-	uint32_t* buffer = getZChars(current_frame->PC);
-	current_frame->PC += (buffer[0]/3)*2;
+	uint32_t* buffer = getZChars(CurrentZFrame->PC);
+	CurrentZFrame->PC += (buffer[0]/3)*2;
 	return zCharsToZSCII(buffer);
 }
 
 void zBranch(bool condition) {
-	uint8_t bdat = getByte(current_frame->PC++);
+	uint8_t bdat = getByte(CurrentZFrame->PC++);
 	uint16_t offset = bdat&63;
 	if((bdat&64) != 64)
-		offset = (offset<<8)+getByte(current_frame->PC++);
+		offset = (offset<<8)+getByte(CurrentZFrame->PC++);
 	if(condition ^ (!((bdat>>7)&1))) {
 		if(offset > 1) {
-			current_frame->PC += (offset > 8191 ? offset - 16384 : offset) - 2;
+			CurrentZFrame->PC += (offset > 8191 ? offset - 16384 : offset) - 2;
 		} else {
 			popZFrame();
-			if(current_frame->retvar == 1)
-				setZVar(getByte(current_frame->PC++), offset);
-			current_frame->retvar = 1;
+			if(CurrentZFrame->retvar == 1)
+				setZVar(getByte(CurrentZFrame->PC++), offset);
+			CurrentZFrame->retvar = 1;
 		}
 	}
 }

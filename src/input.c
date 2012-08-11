@@ -51,13 +51,13 @@ void readString()
 {
 	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
 	exit(1);
-	unsigned int maxsz = getByte(operand[0]);
+	unsigned int maxsz = getByte(Operand[0]);
 	maxsz = maxsz>w? w:maxsz;
 	maxsz = maxsz<20? 20:maxsz;
 	maxsz--;
 	if(getZRev() < 5)
 		maxsz--;
-	if(verbose_Debug >=4)
+	if(VerboseDebug >=4)
 		printf("maxsz is %u\n",maxsz);
 	char* line = NULL;
 	line = calloc(sizeof(char), maxsz+ 2);

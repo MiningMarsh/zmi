@@ -15,7 +15,7 @@ struct stack_frame { // Holds the current routine state.
 	uint8_t nargs;
 };
 
-struct stack_frame* current_frame;
+struct stack_frame* CurrentZFrame;
 int size;
 
 void loadRAM(char* file)
@@ -134,36 +134,36 @@ uint32_t exPadAdr(uint16_t padr)
 // Pop from the stack.
 uint16_t popZStack()
 {
-	if(current_frame->stack == NULL || current_frame->stack[0] < 1)
+	if(CurrentZFrame->stack == NULL || CurrentZFrame->stack[0] < 1)
 	{
 		fputs("Tried POPing empty stack.\n", stderr);
 		exit(1);
 	}
-	current_frame->stack[0]--;
-	return current_frame->stack[current_frame->stack[0] + 1];
+	CurrentZFrame->stack[0]--;
+	return CurrentZFrame->stack[CurrentZFrame->stack[0] + 1];
 }
 // Push to the stack.
 void pushZStack(uint16_t val)
 {
-	if(current_frame->stack == NULL)
+	if(CurrentZFrame->stack == NULL)
 	{
-		current_frame->stack = malloc(sizeof(uint16_t)*1024);
-		current_frame->stack[0] = 0;
+		CurrentZFrame->stack = malloc(sizeof(uint16_t)*1024);
+		CurrentZFrame->stack[0] = 0;
 	}
-	current_frame->stack[0]++;
-	if(current_frame->stack == NULL)
+	CurrentZFrame->stack[0]++;
+	if(CurrentZFrame->stack == NULL)
 	{
 		fputs("Error PUSHing stack.\n", stderr);
 		exit(1);
 	}
-	current_frame->stack[current_frame->stack[0]] = val;
+	CurrentZFrame->stack[CurrentZFrame->stack[0]] = val;
 }
 // Get the value of variable reference var.
 uint16_t getZVar(uint8_t var)
 {
 	if(var > 15)
 		return getWord(getWord(0x06*2) + 2*(var - 16));
-	return var > 0 ? current_frame->locals[var] : popZStack();
+	return var > 0 ? CurrentZFrame->locals[var] : popZStack();
 }
 void setZVar(uint8_t var, uint16_t val) {
 	if(var > 15)
@@ -171,7 +171,7 @@ void setZVar(uint8_t var, uint16_t val) {
 	else if(var == 0)
 		pushZStack(val);
 	else
-		current_frame->locals[var] = val;
+		CurrentZFrame->locals[var] = val;
 }
 
 // Push a copy of the current routine (stack frame).
@@ -183,24 +183,24 @@ void pushZFrame()
 		fputs("Not enough memory to PUSH a stack frame.\n",stderr);
 		exit(1);
 	}
-	new_frame->old_frame = current_frame;
-	current_frame = new_frame;
-	current_frame->locals = NULL;
-	current_frame->stack = NULL;
-	current_frame->retvar = 1;
+	new_frame->old_frame = CurrentZFrame;
+	CurrentZFrame = new_frame;
+	CurrentZFrame->locals = NULL;
+	CurrentZFrame->stack = NULL;
+	CurrentZFrame->retvar = 1;
 }
 // Pop a stack frame.
 void popZFrame()
 {
-	if(current_frame->old_frame == NULL)
+	if(CurrentZFrame->old_frame == NULL)
 	{
 		fputs("Attempted to POP main stack frame.\n", stderr);
 		exit(1);
 	}
-	free(current_frame->locals);
-	free(current_frame->stack);
-	struct stack_frame* dead_frame = current_frame;
-	current_frame = dead_frame->old_frame;
+	free(CurrentZFrame->locals);
+	free(CurrentZFrame->stack);
+	struct stack_frame* dead_frame = CurrentZFrame;
+	CurrentZFrame = dead_frame->old_frame;
 	free(dead_frame); //Summon Cthulhu to take the soul of the dead frame to the place of ultimate evil
 }
 uint16_t zFrameNumber(struct stack_frame* frame)
@@ -216,7 +216,7 @@ uint16_t zFrameNumber(struct stack_frame* frame)
 void traceZStack()
 {
 	printf("--- Stacktrace ---\n");
-	struct stack_frame* frame = current_frame;
+	struct stack_frame* frame = CurrentZFrame;
 	while(frame != NULL)
 	{
 		printf("   Frame %u\n",zFrameNumber(frame));

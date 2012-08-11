@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // The operands to the operation.
-uint16_t operand[8];
+uint16_t Operand[8];
 
 // Execute the instruction pointed at by the PC and advance it to the next available instruction.
 void execNextInstruction();

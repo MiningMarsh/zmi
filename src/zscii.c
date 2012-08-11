@@ -90,7 +90,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 				}
 				if(buffer[0])
 				{
-					if(string_Indirection)
+					if(StrIndirection)
 						zscii[ptr++] = '<';
 					uint16_t adr = 32*(zchar-1)
 						+ buffer[buffc - buffer[0]-- + 1];
@@ -101,7 +101,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 					while(append[i])
 						zscii[ptr++] = append[i++];
 					free(append);
-					if(string_Indirection)
+					if(StrIndirection)
 						zscii[ptr++] = '>';
 					recurseabr--;
 				}
