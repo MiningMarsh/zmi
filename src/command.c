@@ -11,6 +11,9 @@
 #include "exit.h"
 #include "globalvars.h"
 
+
+// TODO: Still not resolving getZRev() properly
+
 // Is this an extended operation code?
 uint8_t extop = 0;
 
@@ -46,7 +49,7 @@ void initZM() {
 		exit(1);
 	}
 	current_frame->old_frame = NULL;
-	current_frame->PC = getword(0x06);
+	current_frame->PC = getWord(0x06);
 	current_frame->locals = NULL;
 	current_frame->stack = NULL;
 	current_frame->retvar=1;
@@ -78,11 +81,11 @@ void initZM() {
 		callop[22+32*i] = &op_mul;
 		callop[23+32*i] = &op_div;
 		callop[24+32*i] = &op_mod;
-		if(Z_REV >= 4)
+		if(getZRev() >= 4)
 			callop[25+32*i] = &op_call;
-		if(Z_REV >= 5)
+		if(getZRev() >= 5)
 			callop[26+32*i] = &op_call_throw;
-		if(Z_REV == 5 || Z_REV == 6)
+		if(getZRev() == 5 || getZRev() == 6)
 			callop[28+32*i] = &op_throw;
 	}
 	for(int i = 0; i  < 32; i++) {
@@ -96,7 +99,7 @@ void initZM() {
 		callop[131+16*i] = &op_get_parent;
 		callop[133+16*i] = &op_inc;
 		callop[134+16*i] = &op_dec;
-		if(Z_REV >= 4)
+		if(getZRev() >= 4)
 			callop[136+16*i] = &op_call;
 		callop[138+16*i] = &op_print_obj;
 		callop[139+16*i] = &op_ret;
@@ -132,7 +135,7 @@ void execNextInstruction() {
 						Omitted,
 						Omitted};
 	// Get the next operation and advance the PC.
-	uint8_t op = getbyte(current_frame->PC++);
+	uint8_t op = getByte(current_frame->PC++);
 	// Print the operand in debug mode.
 	if(verbose_Debug >= 4)
 		printf("\nPC: %5u OP: %3u\n", current_frame->PC - 1, op);
@@ -144,11 +147,11 @@ void execNextInstruction() {
 		optype[0] = (op >> 4 & 3);
 	} else {
 		if(op == 190)
-			extop = getbyte(current_frame->PC++);
+			extop = getByte(current_frame->PC++);
 		int8_t args[2] = {0, 255};
-		args[0] = getbyte(current_frame->PC++);
+		args[0] = getByte(current_frame->PC++);
 		if(op == 236 || op == 260) {
-			args[1] = getbyte(current_frame->PC++);
+			args[1] = getByte(current_frame->PC++);
 		}
 		optype[0] = args[0] >> 6 & 3;
 		optype[1] = args[0] >> 4 & 3;
@@ -171,19 +174,19 @@ void execNextInstruction() {
 				operand[i] = 0;
 				break;
 			case LargeConstant:
-				operand[i] = getword(current_frame->PC);
+				operand[i] = getWord(current_frame->PC);
 				current_frame->PC += 2;
 				if(verbose_Debug >= 4)
 					printf("Large: %u\n", operand[i]);
 				break;
 			case SmallConstant:
-				operand[i] = getbyte(current_frame->PC++);
+				operand[i] = getByte(current_frame->PC++);
 				if(verbose_Debug >= 4)
 					printf("Small: %u\n", operand[i]);
 				break;
 			case Variable: {
-				uint8_t var = getbyte(current_frame->PC++);
-				operand[i] = getvar(var);
+				uint8_t var = getByte(current_frame->PC++);
+				operand[i] = getZVar(var);
 				if(verbose_Debug >= 4)
 					printf("Var %u: %u\n", var, operand[i]);
 				break; }

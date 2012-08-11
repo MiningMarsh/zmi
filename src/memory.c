@@ -81,23 +81,28 @@ void loadRAM(char* file)
 }
 
 // Get the word beginning at ram address adr.
-uint16_t getword(int adr)
+uint16_t getWord(int adr)
 {
 	return RAM[adr+1]|(RAM[adr]<<8);
 }
 
 // Get the byte beginning at ram address adr.
-uint8_t getbyte(int adr)
+uint8_t getByte(int adr)
 {
 	return RAM[adr];
 }
 
+// Get the current story file revision.
+uint8_t getZRev() {
+	return RAM[0];
+}
+
 // Set the word beginning at ram address adr to value.
-void setword(int adr, int16_t value)
+void setWord(int adr, int16_t value)
 {
 	if(adr == 0)
 	{
-		fputs("Tried to set Z_REV.\n",stderr);
+		fputs("Tried to set getZRev().\n",stderr);
 		exit(1);
 	}
 	RAM[adr+1] = value&0xFF;
@@ -105,20 +110,20 @@ void setword(int adr, int16_t value)
 }
 
 // Set the byte beginning at ram address adr to value.
-void setbyte(int adr, int8_t value)
+void setByte(int adr, int8_t value)
 {
 	if(adr == 0)
 	{
-		fputs("Tried to set Z_REV.\n",stderr);
+		fputs("Tried to set getZRev().\n",stderr);
 		exit(1);
 	}
 	RAM[adr] = value&0xFF;
 }
 
 // Return the expanded packed address depending on the machine.
-uint32_t exPAdr(uint16_t padr)
+uint32_t exPadAdr(uint16_t padr)
 {
-	unsigned int machine = getbyte(0);
+	unsigned int machine = getByte(0);
 	if(machine <= 3)
 		return 2*padr;
 	if(machine <=7)
@@ -127,7 +132,7 @@ uint32_t exPAdr(uint16_t padr)
 }
 
 // Pop from the stack.
-uint16_t pop()
+uint16_t popZStack()
 {
 	if(current_frame->stack == NULL || current_frame->stack[0] < 1)
 	{
@@ -138,7 +143,7 @@ uint16_t pop()
 	return current_frame->stack[current_frame->stack[0] + 1];
 }
 // Push to the stack.
-void push(uint16_t val)
+void pushZStack(uint16_t val)
 {
 	if(current_frame->stack == NULL)
 	{
@@ -154,23 +159,23 @@ void push(uint16_t val)
 	current_frame->stack[current_frame->stack[0]] = val;
 }
 // Get the value of variable reference var.
-uint16_t getvar(uint8_t var)
+uint16_t getZVar(uint8_t var)
 {
 	if(var > 15)
-		return getword(getword(0x06*2) + 2*(var - 16));
-	return var > 0 ? current_frame->locals[var] : pop();
+		return getWord(getWord(0x06*2) + 2*(var - 16));
+	return var > 0 ? current_frame->locals[var] : popZStack();
 }
-void setvar(uint8_t var, uint16_t val) {
+void setZVar(uint8_t var, uint16_t val) {
 	if(var > 15)
-		setword(getword(0x06*2) + 2*(var - 16), val);
+		setWord(getWord(0x06*2) + 2*(var - 16), val);
 	else if(var == 0)
-		push(val);
+		pushZStack(val);
 	else
 		current_frame->locals[var] = val;
 }
 
 // Push a copy of the current routine (stack frame).
-void pushframe()
+void pushZFrame()
 {
 	struct stack_frame* new_frame = malloc(sizeof(struct stack_frame));
 	if(new_frame == NULL)
@@ -185,7 +190,7 @@ void pushframe()
 	current_frame->retvar = 1;
 }
 // Pop a stack frame.
-void popframe()
+void popZFrame()
 {
 	if(current_frame->old_frame == NULL)
 	{
@@ -198,7 +203,7 @@ void popframe()
 	current_frame = dead_frame->old_frame;
 	free(dead_frame); //Summon Cthulhu to take the soul of the dead frame to the place of ultimate evil
 }
-uint16_t framenum(struct stack_frame* frame)
+uint16_t zFrameNumber(struct stack_frame* frame)
 {
 	uint16_t frames = 0;
 	while(frame != NULL)
@@ -208,13 +213,13 @@ uint16_t framenum(struct stack_frame* frame)
 	}
 	return frames;
 }
-void stacktrace()
+void traceZStack()
 {
 	printf("--- Stacktrace ---\n");
 	struct stack_frame* frame = current_frame;
 	while(frame != NULL)
 	{
-		printf("   Frame %u\n",framenum(frame));
+		printf("   Frame %u\n",zFrameNumber(frame));
 		printf("      PC: %u\n",frame->PC);
 		printf("      Arguments passed: %u\n",frame->nargs);
 		printf("      Return: %s.\n", frame->retvar ? "Yes" : "No");

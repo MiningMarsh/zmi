@@ -28,14 +28,14 @@ void op_art_shift() {
 // Call a routine and store the result.
 void op_ret();
 void op_call() {
-	pushframe();
-	current_frame->PC = exPAdr(operand[0]);
-	uint8_t lclsz = getbyte(current_frame->PC++);
+	pushZFrame();
+	current_frame->PC = exPadAdr(operand[0]);
+	uint8_t lclsz = getByte(current_frame->PC++);
 	current_frame->locals = calloc(sizeof(uint16_t),lclsz+1);
 	current_frame->locals[0] = lclsz;
-	if(Z_REV < 4)
+	if(getZRev() < 4)
 		for(int i = 1; i < current_frame->locals[0] + 1; i++){
-			current_frame->locals[i] = getword(current_frame->PC);
+			current_frame->locals[i] = getWord(current_frame->PC);
 			current_frame->PC += 2;
 		}
 	for(int i = 1; i < current_frame->old_frame->nargs;i++) {
@@ -55,7 +55,7 @@ void op_call_throw() {
 
 // Return the current number of stack frames.
 void op_catch() {
-	store(framenum(current_frame));
+	store(zFrameNumber(current_frame));
 }
 
 // Branch if a given number of arguments have been provided.
@@ -75,13 +75,13 @@ void op_clear_attr() {
 
 // Decrement a variable.
 void op_dec() {
-	setvar(operand[0],getvar(operand[0]) - 1);
+	setZVar(operand[0],getZVar(operand[0]) - 1);
 }
 
 // Decrement a variable and branch if its greater than a value.
 void op_dec_chk() {
-	setvar(operand[0],getvar(operand[0]) - 1);
-	branch(getvar(operand[0]) < operand[1]);
+	setZVar(operand[0],getZVar(operand[0]) - 1);
+	branch(getZVar(operand[0]) < operand[1]);
 }
 
 // Signed division.
@@ -116,10 +116,10 @@ void op_get_parent() {
 void op_get_prop() {
 	uint16_t adr = getpropadr(operand[0],operand[1]);
 	if(adr != 0) {
-		unsigned int mode = getbyte(adr++);
-		store(mode == 1 ? getbyte(adr) : getword(adr));
+		unsigned int mode = getByte(adr++);
+		store(mode == 1 ? getByte(adr) : getWord(adr));
 	} else {
-		store(getword(getword(0x0a) + (2*operand[1])));
+		store(getWord(getWord(0x0a) + (2*operand[1])));
 	}
 }
 
@@ -142,14 +142,14 @@ void op_get_sibling() {
 
 // Increment a variable.
 void op_inc() {
-	setvar(operand[0],getvar(operand[0]) + 1);
+	setZVar(operand[0],getZVar(operand[0]) + 1);
 }
 
 // Increment a variable and branch if it is greater than a value.
 void op_inc_chk() {
 	int16_t val;
-	val = getvar(operand[0]);
-	setvar(operand[0],++val);
+	val = getZVar(operand[0]);
+	setZVar(operand[0],++val);
 	branch(val > operand[1]);
 }
 
@@ -199,7 +199,7 @@ void op_loadb() {
 		printf("Error trying to loadb from high memory.\n",stderr);
 		exit(1);
 	}
-	store(getbyte(operand[0]+operand[1]));
+	store(getByte(operand[0]+operand[1]));
 }
 
 // Get a word from memory and store it.
@@ -208,7 +208,7 @@ void op_loadw() {
 		printf("Error trying to loadw from high memory.\n",stderr);
 		exit(1);
 	}
-	store(getword(operand[0]+2*operand[1]));
+	store(getWord(operand[0]+2*operand[1]));
 }
 
 // Log shift
@@ -283,26 +283,26 @@ void op_print_obj() {
 
 // Print a string stored at a padded address.
 void op_print_paddr() {
-	char* str = tozscii(getzchar(exPAdr(operand[0])));
+	char* str = tozscii(getzchar(exPadAdr(operand[0])));
 	print(str);
 	free(str);
 }
 
 // Pop from the current local stack.
 void op_pull() {
-	setvar(operand[0],pop());
+	setZVar(operand[0],popZStack());
 }
 
 // Push to the current local stack.
 void op_push() {
-	push(operand[0]);
+	pushZStack(operand[0]);
 }
 
 // Set the value of a property.
 void op_put_prop() {
 	uint16_t adr = getpropadr(operand[0],operand[1]);
-	unsigned int mode = getbyte(adr++);
-	mode == 1 ? setbyte(adr,operand[2]) : setword(adr, operand[2]);
+	unsigned int mode = getByte(adr++);
+	mode == 1 ? setByte(adr,operand[2]) : setWord(adr, operand[2]);
 }
 
 // Read a string from the user.
@@ -329,15 +329,15 @@ void op_remove_obj() {
 
 // REturn from a routine, returning a value if needed.
 void op_ret() {
-	popframe();
+	popZFrame();
 	if(current_frame->retvar == 1)
-		setvar(getbyte(current_frame->PC++), operand[0]);
+		setZVar(getByte(current_frame->PC++), operand[0]);
 	current_frame->retvar = 1;
 }
 
 // Pop from the stack and return that value.
 void op_ret_popped() {
-	operand[0] = pop();
+	operand[0] = popZStack();
 	op_ret();
 }
 
@@ -360,17 +360,17 @@ void op_set_attr() {
 
 // Store a value in a variable.
 void op_store() {
-	setvar(operand[0],operand[1]);
+	setZVar(operand[0],operand[1]);
 }
 
 // Set a byte in memory.
 void op_storeb() {
-	setbyte(operand[0]+operand[1], operand[2]);
+	setByte(operand[0]+operand[1], operand[2]);
 }
 
 // Set a word in memory.
 void op_storew() {
-	setword(operand[0]+2*operand[1], operand[2]);
+	setWord(operand[0]+2*operand[1], operand[2]);
 }
 
 //  Subtract.
@@ -392,12 +392,12 @@ void op_test_attr() {
 
 // Throw away some stack frames, until the desired number is reached.
 void op_throw() {
-	if(operand[1] > framenum(current_frame)) {
+	if(operand[1] > zFrameNumber(current_frame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);
 		exit(1);
 	}
-	while(operand[1] < framenum(current_frame))
-		popframe();
+	while(operand[1] < zFrameNumber(current_frame))
+		popZFrame();
 	op_ret();
 }
 

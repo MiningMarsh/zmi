@@ -21,11 +21,11 @@ void clean() {
 	free(RAM);
 	// Print a stacktrace in debug mode.
 	if(verbose_Debug >= 6)
-		stacktrace();
+		traceZStack();
 	while(current_frame->old_frame != NULL) {
 		if(verbose_Debug)
 			printf("Cleaning frame...\n");
-		popframe();
+		popZFrame();
 	}
 	// Pop the final frame manually. (popframe() wont let us.)
 	if(verbose_Debug)

@@ -1,10 +1,10 @@
+// Allow getZRev() to get the current story file z-code revision.
+
 #ifndef MEMORY_H
 #define MEMORY_H
 
 #include <stdint.h>
 
-// Allow Z_REV to get the current story file z-code revision.
-#define Z_REV getbyte(0)
 
 // Holds the current routine state. Holds: PC, stack, local variables,
 // and return information for routine handling.
@@ -24,42 +24,44 @@ struct stack_frame* current_frame;
 void loadRAM(char* file);
 
 // Print a simple stacktrace of the stack frames.
-void stacktrace();
+void traceZStack();
 
 // Expand a padded address.
-uint32_t exPAdr(uint16_t padr);
+uint32_t exPadAdr(uint16_t padr);
 
 // Get a word from a ram address.
-uint16_t getword(int adr);
+uint16_t getWord(int adr);
 
 // Get a byte from a ram address.
-uint8_t getbyte(int adr);
+uint8_t getByte(int adr);
 
 // Set a word at a ram address.
-void setword(int adr, int16_t value);
+void setWord(int adr, int16_t value);
 
 // Set a byte at a ram address.
-void setbyte(int adr, int8_t value);
+void setByte(int adr, int8_t value);
 
 // Get a variable from a variable reference.
-uint16_t getvar(uint8_t var);
+uint16_t getZVar(uint8_t var);
 
 // Set a variable reference to a value.
-void setvar(uint8_t var, uint16_t val);
+void setZVar(uint8_t var, uint16_t val);
 
 // Push a value to the local stack.
-void push(uint16_t val);
+void pushZStack(uint16_t val);
 
 // Pop a value from the local stack.
-uint16_t pop();
+uint16_t popZStack();
 
 // Get the current number of stack frames.
-uint16_t framenum();
+uint16_t zFrameNumber();
 
 // Pop a stack frame (return).
-void popframe();
+void popZFrame();
 
 // Push a stack frame, and assign it some default values (call).
-void pushframe();
+void pushZFrame();
+
+uint8_t getZRev();
 
 #endif /* memory.h */

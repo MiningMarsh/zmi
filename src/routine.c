@@ -7,7 +7,7 @@
 #include "zscii.h"
 
 void store(uint16_t value) {
-	setvar(getbyte(current_frame->PC++),value);
+	setZVar(getByte(current_frame->PC++),value);
 }
 
 char* getstring() {
@@ -17,17 +17,17 @@ char* getstring() {
 }
 
 void branch(bool condition) {
-	uint8_t bdat = getbyte(current_frame->PC++);
+	uint8_t bdat = getByte(current_frame->PC++);
 	uint16_t offset = bdat&63;
 	if((bdat&64) != 64)
-		offset = (offset<<8)+getbyte(current_frame->PC++);
+		offset = (offset<<8)+getByte(current_frame->PC++);
 	if(condition ^ (!((bdat>>7)&1))) {
 		if(offset > 1) {
 			current_frame->PC += (offset > 8191 ? offset - 16384 : offset) - 2;
 		} else {
-			popframe();
+			popZFrame();
 			if(current_frame->retvar == 1)
-				setvar(getbyte(current_frame->PC++), offset);
+				setZVar(getByte(current_frame->PC++), offset);
 			current_frame->retvar = 1;
 		}
 	}

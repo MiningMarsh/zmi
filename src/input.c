@@ -8,7 +8,7 @@
 #include "memory.h"
 #include "command.h"
 #include "input.h"
-#define Z_REV getbyte(0)
+#define getZRev() getByte(0)
 static struct termios term_settings;
 int w,h;
 void initin()
@@ -51,11 +51,11 @@ void readstr()
 {
 	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
 	exit(1);
-	unsigned int maxsz = getbyte(operand[0]);
+	unsigned int maxsz = getByte(operand[0]);
 	maxsz = maxsz>w? w:maxsz;
 	maxsz = maxsz<20? 20:maxsz;
 	maxsz--;
-	if(Z_REV < 5)
+	if(getZRev() < 5)
 		maxsz--;
 	if(verbose_Debug >=4)
 		printf("maxsz is %u\n",maxsz);
