@@ -37,9 +37,9 @@ enum OperandType {
 // Initiate the machine with a default set of values.
 void initZM() {
 	// Initiate input.
-	initin();
+	initInput();
 	// Initiate output.
-	initout();
+	initOutput();
 	// Clean if an error occurs, don't leave it to the OS. This may also display a stacktrace and other debug things.
 	atexit(clean);
 	// Create the initial stack frame.

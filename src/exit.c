@@ -12,9 +12,9 @@ void clean() {
 	if(verbose_Debug)
 		printf("Reverting IO modes...\n");
 	// Revert input.
-	cleanin();
+	cleanInput();
 	// Revert output.
-	cleanout();
+	cleanOutput();
 	if(verbose_Debug)
 		printf("Cleaning RAM...\n");
 	// Free the storyfile from ram.

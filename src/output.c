@@ -11,7 +11,7 @@
 #include "command.h"
 
 int w,h;
-void initout() {
+void initOutput() {
 	w = 80;
 	h = 24;
 
@@ -27,9 +27,9 @@ void initout() {
 	h = ts.ws_row;
 #endif /* TIOCGSIZE */
 }
-void cleanout() {
+void cleanOutput() {
 }
-void print(char* str, ...) {
+void zPrint(char* str, ...) {
 	va_list args;
 	va_start(args,str);
 	if(!w)

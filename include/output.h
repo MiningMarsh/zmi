@@ -5,12 +5,12 @@
 #include <stdarg.h>
 
 // Printf for the Z-Machine.
-void print(char* str, ...);
+void zPrint(char* str, ...);
 
 // Initiate output modes for the terminal and Z-Machine.
-void initout();
+void initOutput();
 
 // Revert terminal output modes.
-void cleanout();
+void cleanOutput();
 
 #endif /* output.h */

@@ -5,7 +5,7 @@
 #include "memory.h"
 #include "globalvars.h"
 
-uint32_t* getzchar(uint16_t adr)
+uint32_t* getZChars(uint16_t adr)
 {
 	uint32_t size = 1024;
 	uint32_t* buffer = malloc(sizeof(uint8_t)*size);
@@ -41,7 +41,7 @@ uint32_t* getzchar(uint16_t adr)
 }
 
 bool recurseabr = 0;
-char* tozscii(uint32_t* buffer)
+char* zCharsToZSCII(uint32_t* buffer)
 {
 	if(recurseabr > 1)
 	{
@@ -90,18 +90,18 @@ char* tozscii(uint32_t* buffer)
 				}
 				if(buffer[0])
 				{
-					if(strindir)
+					if(string_Indirection)
 						zscii[ptr++] = '<';
 					uint16_t adr = 32*(zchar-1)
 						+ buffer[buffc - buffer[0]-- + 1];
 					adr = getWord(getWord(0x18) + adr*2)*2;
 					recurseabr++;
-					char* append = tozscii(getzchar(adr));
+					char* append = zCharsToZSCII(getZChars(adr));
 					int i = 0;
 					while(append[i])
 						zscii[ptr++] = append[i++];
 					free(append);
-					if(strindir)
+					if(string_Indirection)
 						zscii[ptr++] = '>';
 					recurseabr--;
 				}

@@ -5,12 +5,12 @@
 void op_add() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
-	store((uint16_t)(num1 + num2)&0xFFFF);
+	zStore((uint16_t)(num1 + num2)&0xFFFF);
 }
 
 // Bitwise and.
 void op_and() {
-	store(operand[0]&operand[1]);
+	zStore(operand[0]&operand[1]);
 }
 
 // Arithmetic shift
@@ -21,7 +21,7 @@ void op_art_shift() {
 		num = num<<num2;
 	else
 		num = num>>(num2*(0-1));
-	store(num);
+	zStore(num);
 }
 
 
@@ -55,22 +55,22 @@ void op_call_throw() {
 
 // Return the current number of stack frames.
 void op_catch() {
-	store(zFrameNumber(current_frame));
+	zStore(zFrameNumber(current_frame));
 }
 
 // Branch if a given number of arguments have been provided.
 void op_check_arg_count() {
-	branch(operand[0] - 1 <= current_frame->old_frame->nargs);
+	zBranch(operand[0] - 1 <= current_frame->old_frame->nargs);
 }
 
 // Tell the program we can't do unicode.
 void op_check_unicode() {
-	store(0);
+	zStore(0);
 }
 
 // Make object not have an attribute
 void op_clear_attr() {
-	setobjflag(operand[0], operand[1], 0);
+	setObjectFlagValue(operand[0], operand[1], 0);
 }
 
 // Decrement a variable.
@@ -81,7 +81,7 @@ void op_dec() {
 // Decrement a variable and branch if its greater than a value.
 void op_dec_chk() {
 	setZVar(operand[0],getZVar(operand[0]) - 1);
-	branch(getZVar(operand[0]) < operand[1]);
+	zBranch(getZVar(operand[0]) < operand[1]);
 }
 
 // Signed division.
@@ -92,7 +92,7 @@ void op_div() {
 		fputs("Divide by zero error.\n", stderr);
 		exit(1);
 	}
-	store((uint16_t)(num1 / num2)&0xFFFF);
+	zStore((uint16_t)(num1 / num2)&0xFFFF);
 }
 
 // Woops! something shouldn't have happened!
@@ -103,41 +103,41 @@ void op_errnop() {
 
 // Get the child of an object.
 void op_get_child() {
-	store(getchild(operand[0]));
-	branch(getchild(operand[0]));
+	zStore(getChild(operand[0]));
+	zBranch(getChild(operand[0]));
 }
 
 // Get the parent of an object.
 void op_get_parent() {
-	store(getparent(operand[0]));
+	zStore(getParent(operand[0]));
 }
 
 // Get a property of an object.
 void op_get_prop() {
-	uint16_t adr = getpropadr(operand[0],operand[1]);
+	uint16_t adr = getPropertyAdr(operand[0],operand[1]);
 	if(adr != 0) {
 		unsigned int mode = getByte(adr++);
-		store(mode == 1 ? getByte(adr) : getWord(adr));
+		zStore(mode == 1 ? getByte(adr) : getWord(adr));
 	} else {
-		store(getWord(getWord(0x0a) + (2*operand[1])));
+		zStore(getWord(getWord(0x0a) + (2*operand[1])));
 	}
 }
 
 // Get the property address of a property.
 void op_get_prop_addr() {
-	uint16_t adr = getpropadr(operand[0],operand[1]);
+	uint16_t adr = getPropertyAdr(operand[0],operand[1]);
 	if(adr) {
 		adr++;
-		store(adr);
+		zStore(adr);
 	} else {
-		store(0);
+		zStore(0);
 	}
 }
 
 // Get the sibling of an object and store it.
 void op_get_sibling() {
-	store(getsibling(operand[0]));
-	branch(getsibling(operand[0]));
+	zStore(getSibling(operand[0]));
+	zBranch(getSibling(operand[0]));
 }
 
 // Increment a variable.
@@ -150,32 +150,32 @@ void op_inc_chk() {
 	int16_t val;
 	val = getZVar(operand[0]);
 	setZVar(operand[0],++val);
-	branch(val > operand[1]);
+	zBranch(val > operand[1]);
 }
 
 // Insert an object somewhere in the object tree.
 void op_remove_obj();
 void op_insert_obj() {
 	op_remove_obj();
-	uint16_t child = getchild(operand[1]);
-	setsibling(operand[0], child);
-	setparent(operand[0], operand[1]);
-	setchild(operand[1],operand[0]);
+	uint16_t child = getChild(operand[1]);
+	setSibling(operand[0], child);
+	setParent(operand[0], operand[1]);
+	setChild(operand[1],operand[0]);
 }
 
 // Branch if equal.
 void op_je() {
-	branch(operand[0] == operand[1]);
+	zBranch(operand[0] == operand[1]);
 }
 
 // Branch if greater than.
 void op_jg() {
-	branch(operand[0] > operand[1]);
+	zBranch(operand[0] > operand[1]);
 }
 
 // Branch if an object is inside another.
 void op_jin() {
-	branch(getparent(operand[0]) == operand[1]);
+	zBranch(getParent(operand[0]) == operand[1]);
 }
 
 // Jump unconditionally.
@@ -185,12 +185,12 @@ void op_jump() {
 
 // Branch if less than.
 void op_jl() {
-	branch(operand[0] < operand[1]);
+	zBranch(operand[0] < operand[1]);
 }
 
 // Branch if zero.
 void op_jz() {
-	branch((int16_t)operand[0] == 0);
+	zBranch((int16_t)operand[0] == 0);
 }
 
 // Get a byte from memory and store it.
@@ -199,7 +199,7 @@ void op_loadb() {
 		printf("Error trying to loadb from high memory.\n",stderr);
 		exit(1);
 	}
-	store(getByte(operand[0]+operand[1]));
+	zStore(getByte(operand[0]+operand[1]));
 }
 
 // Get a word from memory and store it.
@@ -208,7 +208,7 @@ void op_loadw() {
 		printf("Error trying to loadw from high memory.\n",stderr);
 		exit(1);
 	}
-	store(getWord(operand[0]+2*operand[1]));
+	zStore(getWord(operand[0]+2*operand[1]));
 }
 
 // Log shift
@@ -219,7 +219,7 @@ void op_log_shift() {
 		num = num<<num2;
 	else
 		num = num>>(num2*(-1));
-	store(num);
+	zStore(num);
 }
 
 // Modulus.
@@ -230,14 +230,14 @@ void op_mod() {
 		fputs("Divide by zero error.\n", stderr);
 		exit(1);
 	}
-	store((uint16_t)(num1 % num2)&0xFFFF);
+	zStore((uint16_t)(num1 % num2)&0xFFFF);
 }
 
 // Multiply.
 void op_mul() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
-	store((uint16_t)(num1 * num2)&0xFFFF);
+	zStore((uint16_t)(num1 * num2)&0xFFFF);
 }
 
 // No operation.
@@ -247,18 +247,18 @@ void op_nop() {
 
 // Print a newline.
 void op_new_line() {
-	print("\n");
+	zPrint("\n");
 }
 
 // Logical or.
 void op_or() {
-	store(operand[0] | operand[1]);
+	zStore(operand[0] | operand[1]);
 }
 
 // Print a string stored after the operation.
 void op_print() {
-	char* str = getstring();
-	print(str);
+	char* str = zGetStringFromPC();
+	zPrint(str);
 	free(str);
 }
 
@@ -274,17 +274,17 @@ void op_print_num() {
 
 // Print an objects name.
 void op_print_obj() {
-	uint16_t adr = getproptableadr(operand[0]);
+	uint16_t adr = getPropertyTableAdr(operand[0]);
 	adr++;
-	char* name = tozscii(getzchar(adr));
-	print(name);
+	char* name = zCharsToZSCII(getZChars(adr));
+	zPrint(name);
 	free(name);
 }
 
 // Print a string stored at a padded address.
 void op_print_paddr() {
-	char* str = tozscii(getzchar(exPadAdr(operand[0])));
-	print(str);
+	char* str = zCharsToZSCII(getZChars(exPadAdr(operand[0])));
+	zPrint(str);
 	free(str);
 }
 
@@ -300,31 +300,31 @@ void op_push() {
 
 // Set the value of a property.
 void op_put_prop() {
-	uint16_t adr = getpropadr(operand[0],operand[1]);
+	uint16_t adr = getPropertyAdr(operand[0],operand[1]);
 	unsigned int mode = getByte(adr++);
 	mode == 1 ? setByte(adr,operand[2]) : setWord(adr, operand[2]);
 }
 
 // Read a string from the user.
 void op_read() {
-	readstr(0);
+	readString(0);
 }
 
 // Remove an object from the object tree.
 void op_remove_obj() {
-	uint16_t parent = getparent(operand[0]);
+	uint16_t parent = getParent(operand[0]);
 	if(parent != 0) {
-		if(getchild(parent) == operand[0]) {
-			setchild(parent, getsibling(operand[0]));
+		if(getChild(parent) == operand[0]) {
+			setChild(parent, getSibling(operand[0]));
 		} else {
-			uint16_t last = getchild(parent);
-			while(getsibling(last) != operand[0])
-				last = getsibling(last);
-			setsibling(last, getsibling(operand[0]));
+			uint16_t last = getChild(parent);
+			while(getSibling(last) != operand[0])
+				last = getSibling(last);
+			setSibling(last, getSibling(operand[0]));
 		}
 	}
-	setparent(operand[0], 0);
-	setsibling(operand[0], 0);
+	setParent(operand[0], 0);
+	setSibling(operand[0], 0);
 }
 
 // REturn from a routine, returning a value if needed.
@@ -355,7 +355,7 @@ void op_rtrue() {
 
 // Set the flag of an object to on.
 void op_set_attr() {
-	setobjflag(operand[0], operand[1], 1);
+	setObjectFlagValue(operand[0], operand[1], 1);
 }
 
 // Store a value in a variable.
@@ -377,17 +377,17 @@ void op_storew() {
 void op_sub() {
 	int16_t num1 = (int16_t)operand[0];
 	int16_t num2 = (int16_t)operand[1];
-	store((uint16_t)(num1 - num2)&0xFFFF);
+	zStore((uint16_t)(num1 - num2)&0xFFFF);
 }
 
 // Test to see if a bitmask is set.
 void op_test() {
-	branch((operand[0] & operand[1]) == operand[1]);
+	zBranch((operand[0] & operand[1]) == operand[1]);
 }
 
 // Find is a flag of an object is set to on.
 void op_test_attr() {
-	branch(getobjflag(operand[0], operand[1]));
+	zBranch(getObjectFlag(operand[0], operand[1]));
 }
 
 // Throw away some stack frames, until the desired number is reached.

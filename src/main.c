@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 	char filefound = 0;
 	char * filename;
 	verbose_Debug = 0;
-	strindir = 0;
+	string_Indirection = 0;
 	if(argc < 2) {
 		printf("Usage: %s <filename> [OPTS]     (try --help)\n",argv[0]);
 		exit(1);
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 				}
 			}else if(!strcmp(cmd,"-s") || !strcmp(cmd,"--show-string-indirection"))
 			{
-				strindir=1;
+				string_Indirection=1;
 			}else if(!strcmp(cmd,"-f") || !strcmp(cmd,"--file"))
 			{
 				if(i==argc-1)

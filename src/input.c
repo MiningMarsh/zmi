@@ -11,7 +11,7 @@
 #define getZRev() getByte(0)
 static struct termios term_settings;
 int w,h;
-void initin()
+void initInput()
 {
 	w = 80;
 	h = 24;
@@ -35,19 +35,19 @@ void initin()
 	term.c_cc[VMIN] = 0;
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&term);
 }
-void cleanin()
+void cleanInput()
 {
 	tcsetattr(STDIN_FILENO,TCSANOW,&term_settings);
 }
 void printstat()
 {
 }
-char readchar()
+char readChar()
 {
 	return 0;
 }
 
-void readstr()
+void readString()
 {
 	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
 	exit(1);

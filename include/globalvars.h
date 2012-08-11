@@ -5,6 +5,6 @@
 char verbose_Debug;
 
 // Should we show string pointers in <>?
-char strindir;
+char string_Indirection;
 
 #endif /* globalvars.h */

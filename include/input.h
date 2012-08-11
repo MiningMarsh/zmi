@@ -5,15 +5,15 @@
 #include <globalvars.h>
 
 // Initiate the input modes of the Z-Machine and terminal.
-void initin();
+void initInput();
 
 // Revert the input modes of the terminal.
-void cleanin();
+void cleanInput();
 
 // Read the next pressed key from the terminal.
-char readchar();
+char readChar();
 
 // Read a string from the terminal. Optionally parse it and execute a command to handle it.
-void readstr();
+void readString();
 
 #endif /* input.h */
