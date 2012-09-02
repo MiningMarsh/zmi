@@ -1,8 +1,5 @@
 *.o
-zork*.z3
-zork*.z5
 zmi
-*.z*
 *.d
 *.swp
 .sconsign.dblite
