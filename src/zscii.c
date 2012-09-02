@@ -5,11 +5,13 @@
 #include "memory.h"
 #include "globalvars.h"
 
+const uint32_t default_string_size = 64;
+
 // Return a buffer of z-characters, read from a series of compressed character packets at adr.
 uint32_t* getZChars(uint16_t adr)
 {
-	uint32_t size = 1024; // Default size of the string buffer is 1kb.
-	uint32_t* buffer = malloc(sizeof(uint8_t)*size); // Get the string buffer.
+	uint32_t size = default_string_size; // Default size of the string buffer is 1kb.
+	uint32_t* buffer = malloc(sizeof(uint32_t)*size); // Get the string buffer.
 	if(buffer == NULL)
 	{ // No memory.
 		fputs("No memory to get ZSCII characters.\n",stderr);
@@ -20,7 +22,7 @@ uint32_t* getZChars(uint16_t adr)
 	while(!(cell&32768)) // Read until the end of stream flag is set in a cahracter packet.
 	{
 		buffer[0] +=3; // There are 3 characters per packet.
-		if(buffer[0] + 1> size)
+		if(buffer[0] +1 > size)
 		{
 			size *= 2; // Double the size of the buffer if it runs out (this plays nice with malloc).
 			buffer = realloc(buffer, sizeof(uint32_t)*size);
@@ -43,32 +45,49 @@ uint32_t* getZChars(uint16_t adr)
 
 char* zCharsToZSCII(uint32_t* buffer)
 {
+	if(buffer == NULL)
+	{ // Null buffer passed.
+		fputs("tried to get ASCII characters from NULL stream.\n",stderr);
+		free(buffer);
+		exit(1);
+	}
 	static bool recurseabr = 0; // The standard bans recursive string redirection, so we track it,
 	if(recurseabr > 1)			// and spit an error if it is more than 1 recursion.
 	{
 		fputs("Nested abbreviation detected.\n",stderr);
 		exit(1);
 	}
+	uint32_t buffc = buffer[0]; // Total size of the buffer.
+	uint32_t size = default_string_size;
+	while(size < buffc)
+		size *= 2;
 	uint8_t lalpha = 0; // Locked alpha mode.
 	uint8_t nalpha = 0; // Next alpha mode.
-	//TODO: I am bad with the zscii buffer, there is a buffer overflow exploit in this function. To my knowledge,
-	// there are no actual programs that target this interpreter to attack with this exploit :P
-	// On the other hand, superlong strings will either crash, or abuse the exploit on accident.
-	char* zscii = calloc(sizeof(char),1024); // Holds the converted ascii characters.
-	uint32_t ptr= 0; // Pointer to the next free cell in the ascii buffer.
-	if(buffer == NULL)
+	char* zscii = malloc(sizeof(char)*size); // Holds the converted ascii characters.
+	if(zscii == NULL)
 	{ // No memory.
-		fputs("No memory to convert ZSCII characters.\n",stderr);
+		fputs("Not enough memory to convert zscii string.\n",stderr);
 		free(buffer);
 		exit(1);
 	}
-	uint32_t buffc = buffer[0]; // Total size of the buffer.
+	uint32_t ptr= 0; // Pointer to the next free cell in the ascii buffer.
 	while(buffer[0] != 0) // Loop until all the buffer had ben read.
 	{
 		uint8_t calpha = nalpha; // Set the current alpha to the next alpha mode in line.
 		nalpha = lalpha; // Next alpha is locked alpha.
 		uint8_t zchar = buffer[buffc - buffer[0] + 1]; // Get the next zcharacter to convert.
 		buffer[0]--; // decrease the buffer size by one.
+		if(ptr + 2 >= size) {
+			size *= 2;
+			printf("\ntest\n");
+			zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
+			if(zscii == NULL)
+			{ // No memory.
+				fputs("Not enough memory to convert zscii string.\n",stderr);
+				free(buffer);
+				exit(1);
+			}
+		}
 		switch(zchar)
 		{
 			case 0: // 0 is actually space
@@ -104,6 +123,20 @@ char* zCharsToZSCII(uint32_t* buffer)
 					adr = getWord(getWord(0x18) + adr*2)*2;
 					recurseabr++;
 					char* append = zCharsToZSCII(getZChars(adr));
+					int sz = 0;
+					while(append[sz])
+						sz++;
+					if(ptr + 2 + sz >= size) {
+						while(ptr + 2 + sz >= size)
+							size *= 2;
+						zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
+						if(zscii == NULL)
+						{ // No memory.
+							fputs("Not enough memory to convert zscii string.\n",stderr);
+							free(buffer);
+							exit(1);
+						}
+					}
 					int i = 0;
 					while(append[i])
 						zscii[ptr++] = append[i++];
