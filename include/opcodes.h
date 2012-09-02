@@ -2,14 +2,14 @@
 #define OPCODES_H
 
 // Signed 16-bit addition.
-void zOpAdd() {
+void op_add() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	zStore((uint16_t)(num1 + num2)&0xFFFF);
 }
 
 // Bitwise and.
-void zOpAnd() {
+void op_and() {
 	zStore(Operand[0]&Operand[1]);
 }
 

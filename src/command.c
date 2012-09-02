@@ -64,7 +64,7 @@ void initZM() {
 		CallOpCode[6+32*I] = &op_jin;
 		CallOpCode[7+32*I] = &op_test;
 		CallOpCode[8+32*I] = &op_or;
-		CallOpCode[9+32*I] = &zOpAnd;
+		CallOpCode[9+32*I] = &op_and;
 		CallOpCode[10+32*I] = &op_test_attr;
 		CallOpCode[11+32*I] = &op_set_attr;
 		CallOpCode[12+32*I] = &op_clear_attr;
@@ -74,7 +74,7 @@ void initZM() {
 		CallOpCode[16+32*I] = &op_loadb;
 		CallOpCode[17+32*I] = &op_get_prop;
 		CallOpCode[18+32*I] = &op_get_prop_addr;
-		CallOpCode[20+32*I] = &zOpAdd;
+		CallOpCode[20+32*I] = &op_add;
 		CallOpCode[21+32*I] = &op_sub;
 		CallOpCode[22+32*I] = &op_mul;
 		CallOpCode[23+32*I] = &op_div;
