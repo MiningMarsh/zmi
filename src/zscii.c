@@ -77,7 +77,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 		nalpha = lalpha; // Next alpha is locked alpha.
 		uint8_t zchar = buffer[buffc - buffer[0] + 1]; // Get the next zcharacter to convert.
 		buffer[0]--; // decrease the buffer size by one.
-		if(ptr + 2 >= size) {
+		if(ptr + 5 >= size) {
 			size *= 2;
 			printf("\ntest\n");
 			zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
