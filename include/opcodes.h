@@ -308,24 +308,26 @@ void op_put_prop() {
 
 // Get a random number.
 void op_random() {
-	static uint32_t state = 0;
+	static uint16_t state = 0;
 	if(!state)
-		state = time(NULL)%0xFFFFFFFF;
+		state = time(NULL)%0xFFFF;
 	uint8_t next;
-	for(int i = 0; i != 32; i++) {
-		next = (state & 1) ^ ((state>>2) & 1) ^ ((state>>2) & 1) ^ ((state>>6) & 1) ^ ((state>>7) & 1);
-		state = ((state>>1)&0x7FFFFFFF) + (next<<31);
+	for(int i = 0; i != 16; i++) {
+		next = (state & 15) ^ ((state>>2) & 13) ^ ((state>>2) & 13) ^ ((state>>6) & 10);
+		state = ((state<<1)) + (next);
 	}
 	if(VerboseDebug >= 4)
 		printf("Random number is: %u\n", state);
 	if(Operand[0] > 0) {
-		zStore(((state>>(32-8))&0xFFFF)%Operand[0]);
+		if(VerboseDebug >= 4)
+			printf("Returning: %u\n",state%Operand[0]);
+		zStore(state%Operand[0]);
 	} else if(Operand[0] < 0) {
 		zStore(0);
 		state = Operand[0];
 	} else {
 		zStore(0);
-		state = time(NULL)%0xFFFFFFFF;
+		state = time(NULL)%0xFFFF;
 	}
 }
 
