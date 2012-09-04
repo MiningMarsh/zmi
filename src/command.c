@@ -116,6 +116,7 @@ void initZM() {
 	CallOpCode[228] = &op_read;
 	CallOpCode[229] = &op_print_char;
 	CallOpCode[230] = &op_print_num;
+	CallOpCode[231] = &op_random;
 	CallOpCode[232] = &op_push;
 	CallOpCode[233] = &op_pull;
 	// By this time, should be okay to clear the screen.

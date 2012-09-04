@@ -1,5 +1,6 @@
 #ifndef OPCODES_H
 #define OPCODES_H
+#include <time.h>
 
 // Signed 16-bit addition.
 void op_add() {
@@ -303,6 +304,29 @@ void op_put_prop() {
 	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
 	unsigned int mode = getByte(adr++);
 	mode == 1 ? setByte(adr,Operand[2]) : setWord(adr, Operand[2]);
+}
+
+// Get a random number.
+void op_random() {
+	static uint32_t state = 0;
+	if(!state)
+		state = time(NULL)%0xFFFFFFFF;
+	uint8_t next;
+	for(int i = 0; i != 32; i++) {
+		next = (state & 1) ^ ((state>>2) & 1) ^ ((state>>2) & 1) ^ ((state>>6) & 1) ^ ((state>>7) & 1);
+		state = ((state>>1)&0x7FFFFFFF) + (next<<31);
+	}
+	if(VerboseDebug >= 4)
+		printf("Random number is: %u\n", state);
+	if(Operand[0] > 0) {
+		zStore(((state>>(32-8))&0xFFFF)%Operand[0]);
+	} else if(Operand[0] < 0) {
+		zStore(0);
+		state = Operand[0];
+	} else {
+		zStore(0);
+		state = time(NULL)%0xFFFFFFFF;
+	}
 }
 
 // Read a string from the user.
