@@ -313,7 +313,7 @@ void op_random() {
 		state = time(NULL)%0xFFFF;
 	uint8_t next;
 	for(int i = 0; i != 16; i++) {
-		next = (state & 15) ^ ((state>>2) & 13) ^ ((state>>2) & 13) ^ ((state>>6) & 10);
+		next = (state&15)^((state>>2)&13)^((state>>2)&13)^((state>>6)&10);
 		state = ((state<<1)) + (next);
 	}
 	if(VerboseDebug >= 4)

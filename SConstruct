@@ -7,25 +7,32 @@ sources = Glob("src/*.c")
 incdirs=["src","include"]
 
 #options
-AddOption("--gdb", dest="debug", action='store_true', default=False, help="Compile with gdb debug support")
+AddOption("--gdb", dest="debug", action='store_true', default=False, help="Compile a debug release")
+AddOption("--fast", dest="fast", action='store_true', default=False, help="Compile for speed")
+AddOption("--small", dest="small", action='store_true', default=False, help="Compile for a small executable")
 
 #env initialization
 env = Environment()
 
 #env setup
-env.Append(CCFLAGS='-O9 -std=c99')
+env.Append(CCFLAGS='-std=c99')
 env.Append(CPPPATH=incdirs)
 
 #option reading
 if(GetOption("debug")):
 	env.Append(CCFLAGS='-ggdb')
+	zmi = env.Program('debug/zmi', sources)
+else:
+	zmi = env.Program('release/zmi', sources)
 if(env.GetOption('clean')):
-	print("touch src/* ; touch include/* ; touch SConstruct")
 	os.system("touch src/* ; touch include/* ; touch SConstruct")
-	print("rm src/*.d")
-	os.system("rm src/*.d")
+	os.system("rm src/*.d 2>/dev/null")
+	os.system("rm build/* debug/* 2>/dev/null")
+if(GetOption("small")):
+	env.Append(CCFLAGS='-Os')
+if(GetOption("fast")):
+	env.Append(CCFLAGS='-O9')
 #compile
-zmi = env.Program('build/zmi', sources)
 #install
 env.Install("/usr/bin",zmi)
 
