@@ -29,9 +29,9 @@ void zBranch(bool condition) {
 			CurrentZFrame->PC += (offset>8191?offset-16384:offset) - 2;
 		} else {
 			popZFrame();
-			if(CurrentZFrame->retvar == 1)
+			if(CurrentZFrame->ReturnVar == 1)
 				setZVar(getByte(CurrentZFrame->PC++), offset);
-			CurrentZFrame->retvar = 1;
+			CurrentZFrame->ReturnVar = 1;
 		}
 	}
 }

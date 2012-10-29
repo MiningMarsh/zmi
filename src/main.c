@@ -12,8 +12,6 @@
 
 int main(int ArgCount, char** Arguments) {
 
-	LogOpen("./test");
-	LogMessage(MOk,"main()","test.");
 	// We need to grab these from the program arguments.
 	char* Filename = NULL;
 	
@@ -56,6 +54,7 @@ int main(int ArgCount, char** Arguments) {
 			"help","h",
 			"string-indirection","i",
 			"debug","d",
+			"log-file","l",
 			0
 		};
 
@@ -119,6 +118,11 @@ int main(int ArgCount, char** Arguments) {
 			// Turn on string indirection printing.
 			case 'i':
 				g_StrIndirection = 1;
+				break;
+
+			// Open the log file
+			case 'l':
+				LogOpen(Value);
 				break;
 
 			// A bad flg has been passed.

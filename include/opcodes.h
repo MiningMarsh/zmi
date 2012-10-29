@@ -36,16 +36,16 @@ void op_call() {
 		exit(1);
 	}
 	uint8_t lclsz = getByte(CurrentZFrame->PC++);
-	CurrentZFrame->locals = calloc(sizeof(uint16_t),lclsz+1);
-	CurrentZFrame->locals[0] = lclsz;
+	CurrentZFrame->Locals = calloc(sizeof(uint16_t),lclsz+1);
+	CurrentZFrame->Locals[0] = lclsz;
 	if(getZRev() < 4)
-		for(int i = 1; i < CurrentZFrame->locals[0] + 1; i++){
-			CurrentZFrame->locals[i] = getWord(CurrentZFrame->PC);
+		for(int i = 1; i < CurrentZFrame->Locals[0] + 1; i++){
+			CurrentZFrame->Locals[i] = getWord(CurrentZFrame->PC);
 			CurrentZFrame->PC += 2;
 		}
-	for(int i = 1; i < CurrentZFrame->old_frame->nargs;i++) {
+	for(int i = 1; i < CurrentZFrame->OldFrame->PassedArgs;i++) {
 		if(lclsz <= i)
-			CurrentZFrame->locals[i] = Operand[i];
+			CurrentZFrame->Locals[i] = Operand[i];
 	}
 	if(Operand[0] == 0) {
 		op_ret();
@@ -54,18 +54,18 @@ void op_call() {
 
 // Same as op_call, but throws away the result.
 void op_call_throw() {
-	CurrentZFrame->retvar = 0;
+	CurrentZFrame->ReturnVar = 0;
 	op_call();
 }
 
-// Return the current number of stack frames.
+// Return the current number of Stack frames.
 void op_catch() {
 	zStore(zFrameNumber(CurrentZFrame));
 }
 
 // Branch if a given number of arguments have been provided.
 void op_check_arg_count() {
-	zBranch(Operand[0] - 1 <= CurrentZFrame->old_frame->nargs);
+	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
 // Tell the program we can't do unicode.
@@ -307,12 +307,12 @@ void op_print_paddr() {
 	free(str);
 }
 
-// Pop from the current local stack.
+// Pop from the current local Stack.
 void op_pull() {
 	setZVar(Operand[0],popZStack());
 }
 
-// Push to the current local stack.
+// Push to the current local Stack.
 void op_push() {
 	pushZStack(Operand[0]);
 }
@@ -374,12 +374,12 @@ void op_remove_obj() {
 // REturn from a routine, returning a value if needed.
 void op_ret() {
 	popZFrame();
-	if(CurrentZFrame->retvar == 1)
+	if(CurrentZFrame->ReturnVar == 1)
 		setZVar(getByte(CurrentZFrame->PC++), Operand[0]);
-	CurrentZFrame->retvar = 1;
+	CurrentZFrame->ReturnVar = 1;
 }
 
-// Pop from the stack and return that value.
+// Pop from the Stack and return that value.
 void op_ret_popped() {
 	Operand[0] = popZStack();
 	op_ret();
@@ -434,7 +434,7 @@ void op_test_attr() {
 	zBranch(getObjectFlag(Operand[0], Operand[1]));
 }
 
-// Throw away some stack frames, until the desired number is reached.
+// Throw away some Stack frames, until the desired number is reached.
 void op_throw() {
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);

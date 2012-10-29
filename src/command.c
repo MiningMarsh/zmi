@@ -10,6 +10,7 @@
 #include "output.h"
 #include "exit.h"
 #include "globalvars.h"
+#include "log.h"
 
 // Is this an extended operation code?
 uint8_t IsExtOpCode = 0;
@@ -38,19 +39,19 @@ void initZM() {
 	initInput();
 	// Initiate output.
 	initOutput();
-	// Clean if an error occurs, don't leave it to the OS. This may also display a stacktrace and other debug things.
+	// Clean if an error occurs, don't leave it to the OS. This may also display a Stacktrace and other debug things.
 	atexit(clean);
-	// Create the initial stack frame.
-	CurrentZFrame = malloc(sizeof(struct stack_frame));
+	// Create the initial Stack frame.
+	CurrentZFrame = malloc(sizeof(stackframe_t));
 	if(CurrentZFrame == NULL) {
-		fputs("Unable to allocate first frame.\n", stderr);
+		LogMessage(MFatal,"Initlization", "Not enough memory to create stack frame.");
 		exit(1);
 	}
-	CurrentZFrame->old_frame = NULL;
+	CurrentZFrame->OldFrame = NULL;
 	CurrentZFrame->PC = getWord(0x06);
-	CurrentZFrame->locals = NULL;
-	CurrentZFrame->stack = NULL;
-	CurrentZFrame->retvar=1;
+	CurrentZFrame->Locals = NULL;
+	CurrentZFrame->Stack = NULL;
+	CurrentZFrame->ReturnVar=1;
 
 	// Populate the operation index.
 	for(int I = 0; I < 256; I++)
@@ -136,9 +137,12 @@ void execNextInstruction() {
 	// Get the next operation and advance the PC.
 	uint8_t op = getByte(CurrentZFrame->PC++);
 	// Print the operand in debug mode.
-	if(VerboseDebug >= 4)
-		printf("\nPC: %5u OP: %3u\n", CurrentZFrame->PC - 1, op);
-	 // Extract argument types based on the opcode.
+		char* Message = NULL;
+	if(g_VerboseDebug >= 10) {
+		sprintf(Message,"\nPC: %5u OP: %3u\n", CurrentZFrame->PC - 1, op);
+		LogMessage(MFatal,"Main loop:", Message);
+	}
+   	// Extract argument types based on the opcode.
 	if(op < 128) {
 		OperandType[0] = ((op >> 6 & 1)+1);
 		OperandType[1] = ((op >> 5 & 1)+1);
@@ -164,19 +168,21 @@ void execNextInstruction() {
 
 	// Find the number of operands that have been extracted, then
 	// populate them depending on their type. Print them if in debug mode.
-	CurrentZFrame->nargs = 8;
+	CurrentZFrame->PassedArgs = 8;
 	for(int i = 0; i < 8; i++) {
 		switch(OperandType[i]) {
 			case Omitted:
-				if(CurrentZFrame->nargs > i)
-					CurrentZFrame->nargs = i;
+				if(CurrentZFrame->PassedArgs > i)
+					CurrentZFrame->PassedArgs = i;
 				Operand[i] = 0;
 				break;
 			case LargeConstant:
 				Operand[i] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
-				if(VerboseDebug >= 4)
-					printf("Large: %u\n", Operand[i]);
+				if(g_VerboseDebug >= 10) {
+					sprintf(Message,"Large: %u\n", Operand[i]);
+					LogMessage(MFatal,"Main loop:", Message);
+				}
 				break;
 			case SmallConstant:
 				Operand[i] = getByte(CurrentZFrame->PC++);
