@@ -8,17 +8,17 @@
 
 // Holds the current routine state. Holds: PC, stack, local variables,
 // and return information for routine handling.
-struct stack_frame {
-	struct stack_frame* old_frame;
+struct stackframe { // Holds the current routine state.
+	struct stack_frame* OldFrame;
 	uint32_t PC;
-	uint16_t* locals;
-	uint16_t* stack;
-	uint8_t retvar;
-	uint8_t nargs;
-};
+	uint16_t* Locals;
+	uint16_t* Stack;
+	uint8_t ReturnVar;
+	uint8_t PassedArgs;
+}; typedef struct stackframe stackframe_t;
 
 // The current stack frame.
-struct stack_frame* CurrentZFrame;
+stackframe_t* CurrentZFrame;
 
 // Load a story file into ram.
 void loadRAM(char* file);

@@ -2,31 +2,29 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "memory.h"
-
+#include "globalvars.h"
 
 #define getZRev() getByte(0)
 
-// TODO: function names may need re-factoring. (Eclipse should handle this.)
+// TODO: function names may need re-factoring.
 // TODO: Why doesn't it resolve getZRev() in this file?
 // TODO: figure out why the white mailbox object wont be displayed in zork.
 // TODO: stop returning 0 on the 0 object, should be handled by the opcodes, not the object manipulators.
 // TODO: include object file format in object.c
-// TODO: include a zork.z* file, preferably .z3
-// The address of the object table. While this is in the header, I am pretty sure this address can
-// be dynamically modified. Leave in the less optimized state for now.
+
+// The address of the object table. While this is in the header, 
+// I am pretty sure this address can be dynamically modified. 
 #define objectTable getWord(0x0a);
 
-// Get the address of an object.
+// Get the z-address of an object
 uint32_t getobjadr(uint16_t obj)
 {
-
-	if(getZRev() < 4 && obj > 255) // Version 3 and down only have 255 objects.
+	// Version 3 and down only have 255 objects.
+	if(getZRev() < 4 && obj > 255)
 	{
 		char str[256];
-		sprintf(str, "%u", obj);
-		fputs("Tried to get non-existent object ", stderr);
+		sprintf(str, "FATAL: getting address of bad object %u.\n", obj);
 		fputs(str, stderr);
-		fputs(".\n", stderr);
 		exit(1);
 	}
 	uint32_t baseadr = objectTable;
@@ -40,12 +38,12 @@ uint32_t getobjadr(uint16_t obj)
 // Get a flag off an object
 uint16_t getObjectFlag(uint16_t obj, uint16_t flag)
 {
-
-	// The flags seem to be gotten fine, after checking a disassemble. Further bug
-	// testing may be needed though.
+	// Get the address of the object.
 	uint32_t objadr = getobjadr(obj);
+	// The flags are a series of bytes at the beggining of the object in
+	// the format 7.6.5.4.3.2.1.0 15.14.13.12.11.10.9.8 ...
 	uint8_t adr = getByte(objadr+(flag/8)); //calculate the flag byte.
-	return ((adr>>(flag - (flag/8)*8))&1); // get the flag from the flag byte.
+	return ((adr>>(flag - (flag/8)*8))&1);
 }
 
 // Set a flag on an object.
@@ -63,7 +61,8 @@ void setObjectFlagValue(uint16_t obj, uint16_t flag, uint16_t val)
 
 uint16_t getpsc(uint16_t obj, uint16_t psc)
 {
-	// May be the cause of mailbox bug, though bug testing seemed to show parents and sisters were being detected fine.
+	// May be the cause of mailbox bug, though bug testing seemed to 
+	// show parents and sisters were being detected fine.
 	// major bug testing needed here.
 	uint32_t objadr = getobjadr(obj) + 4;
 

@@ -6,10 +6,13 @@
 #include "command.h"
 #include "zscii.h"
 
+// Store commands use the next byte as the variable to store into.
+// all store commans execute this to store things.
 void zStore(uint16_t value) {
 	setZVar(getByte(CurrentZFrame->PC++),value);
 }
 
+// Grab a string from the PC stream.
 char* zGetStringFromPC() {
 	uint32_t* buffer = getZChars(CurrentZFrame->PC);
 	CurrentZFrame->PC += (buffer[0]/3)*2;
@@ -23,7 +26,7 @@ void zBranch(bool condition) {
 		offset = (offset<<8)+getByte(CurrentZFrame->PC++);
 	if(condition ^ (!((bdat>>7)&1))) {
 		if(offset > 1) {
-			CurrentZFrame->PC += (offset > 8191 ? offset - 16384 : offset) - 2;
+			CurrentZFrame->PC += (offset>8191?offset-16384:offset) - 2;
 		} else {
 			popZFrame();
 			if(CurrentZFrame->retvar == 1)

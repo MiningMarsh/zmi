@@ -7,95 +7,143 @@
 #include "command.h"
 #include "globalvars.h"
 #include "output.h"
+#include "log.h"
 
 
-int main(int argc, char** argv) {
-	char filefound = 0;
-	char * filename;
+int main(int ArgCount, char** Arguments) {
+
+	LogOpen("./test");
+	LogMessage(MOk,"main()","test.");
+	// We need to grab these from the program arguments.
+	char* Filename = NULL;
+	
+	// By default print no debug messages.
 	VerboseDebug = 0;
+	// Don't print <> around string pointers.
 	StrIndirection = 0;
-	if(argc < 2) {
-		printf("Usage: %s <filename> [OPTS]     (try --help)\n",argv[0]);
-		exit(1);
-	}
-	for(int i = 0; i < argc; i++)
-	{
-		if(argv[i][0]=='-')
-		{
-			char * cmd = argv[i];
-			if(!strcmp(cmd,"--help") || !strcmp(cmd,"-h"))
-			{
-				printf("Usage %s <filename> [OPTS]\n"
-						"-h      --help                     Displays this dialogue\n"
-						"-v <n>  --verbosity <n>            Displays intensive debugging\n"
-						"-s      --show-string-indirection  shows string indirection\n"
-						"-f		 --file <filename>			Load <filename>\n"
-						"\n"
-						,argv[0]);
-				exit(1);
 
-			}else if(!strcmp(cmd,"-v") || !strcmp(cmd,"--verbosity"))
-			{
-				if(i == argc-1){
-					printf("%s expects a value.\n",cmd);
+	// Loop through all the arguments.
+	while(--ArgCount) {
+		// The switch to set.
+		char Flag = 0;
+		// Holds everything after the '=' of the argument.
+		char* Value = Arguments[ArgCount];
+		// Holds everything befor the '=' of the argument.
+		char* Key = Arguments[ArgCount];
+		// The type of argument being passed (name, switch, or full).
+		int ArgType = 0;
+
+		// Get rid of the preceding '-'s
+		while(*Key == '-') {
+			Key++;
+			// We tell the type by the amount of preceding '-'.
+			ArgType++;
+		}
+
+		// Set the keys value to everything after the '='
+		// if it exists. Otherwise the value is null.
+		while(*Value != 0 && *Value != '=')
+			Value++;
+
+		// seperate the key and value, but not if it is a filename.
+		if(*Value != 0 && ArgType) {
+			*Value = 0;	
+			Value++;
+		}
+
+		// A lookup table mapping long options to flags.
+		const char LookupTable[][30] = {
+			"help","h",
+			"string-indirection","i",
+			"debug","d",
+			0
+		};
+
+		switch(ArgType) {
+			// We are dealing with a flag.
+			case 1:
+				Flag = *Key;
+				break;
+
+			// We are dealing with a long option, an need to convert it
+			// to a flag with the lookup table.
+			case 2: {
+				int LookupIndex = 0;
+				// The table is null terminated.
+				while(LookupTable[LookupIndex][0] != 0) {
+					if(!strcmp(Key,LookupTable[LookupIndex])) {
+						Flag = LookupTable[1+LookupIndex][0];
+					}
+					LookupIndex += 2;
+				}
+				break; }
+
+			// We are dealing with a filename.
+			default:
+				Filename = Key;
+				break;
+
+		}
+		switch(Flag) {
+			// Print a help message.
+			case 'h':
+				printf(
+					"MM's and Triclops200's Z-machine Interpreter.\n"
+					"Version %i.%i\n"
+					"Compliant with standard %i.%i\n"
+					"Arguments take form as:  -<flag>=<value>\n"
+					"                         --<key>=<value>\n"
+					"Options:\n"
+					"-i,--string-indirection  Show pointer indirection in Z-Strings by\n"
+					"                         surrounding them like <this>.\n"
+					"\n"
+					"-h,--help                Display this message.\n"
+					"\n"
+					"-d,--debug=#             Set the verboseness.\n",
+					d_VersionMajor,
+					d_VersionMinor,
+					d_StandardMajor,
+					d_StandardMinor
+				);
+				break;
+
+			// Turn on debug messages.
+			case 'd':
+				g_VerboseDebug = atoi(Value);
+				if(!g_VerboseDebug) {
+					fputs("--debug expects a non-zero integer value.\n", stderr);
 					exit(1);
 				}
-				i++;
-				VerboseDebug = argv[i][0]-'0';
-				if(VerboseDebug > 8 || strlen(argv[i]) > 1){
-					printf("%s expects a value 0-8\n",cmd);
-					exit(1);
-				}
-			}else if(!strcmp(cmd,"-s") || !strcmp(cmd,"--show-string-indirection"))
-			{
-				StrIndirection=1;
-			}else if(!strcmp(cmd,"-f") || !strcmp(cmd,"--file"))
-			{
-				if(i==argc-1)
-				{
-					printf("%s expects a value.\n",cmd);
-					exit(1);
-				}
-				i++;
-				filename = argv[i];
-				filefound = 1;
-				if(argv[i][0]=='-')
-				{
-					printf("%s expects a file name following.\n",cmd);
-					exit(1);
-				}
-			}else
-			{
-				printf("%s is not a valid switch.\n",cmd);
-				exit(0);
-			}
-		}else
-		{
-			if(i != 0 && !filefound)
-			{
-				filename = argv[i];
-				filefound = 1;
-			}
+				break;
+
+			// Turn on string indirection printing.
+			case 'i':
+				g_StrIndirection = 1;
+				break;
+
+			// A bad flg has been passed.
+			default:
+				if(!ArgType)
+					break;
+				fputs("Unrecognized option: ",stderr);
+				fputs(Key,stderr);
+				fputs("\n",stderr);
+				break;
 		}
 	}
-	if (!filefound)
-	{
-		printf("Usage: %s <filename> [OPTS]\n",argv[0]);
+
+	// Check if a filename was passed.
+	if (!Filename) {
+		printf("Usage: %s <filename> [OPTS]\n",Arguments[0]);
 		exit(1);
 	}
-	printf("Using file %s.\n",filename);
-
-	printf("MM's and Tri's minimalistic Z-Machine interpreter.\n");
-	printf("Revision 3 for platform PC and standard 1.0\n");
-	// Load file into RAM (TODO: detect blorb (Special Z-Code file format for easy resource usage)
-	// files and load them correctly.)
-	loadRAM(filename);
+	loadRAM(Filename);
 	// Initialize the machine.
 	initZM();
 	fflush(stdout);
+	// Execute each command. I intend to make execNextInstruction
+	// recursive and make this loop obsolete.
 	while(1)
-		// TODO: figured out some advanced stack optimization earlier. it will be a bitch to implement, may not
-		// add any speed increase. this while loop will become obsolete upon implementation.
 		execNextInstruction();
 }
 

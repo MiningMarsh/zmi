@@ -15,19 +15,17 @@ AddOption("--small", dest="small", action='store_true', default=False, help="Com
 env = Environment()
 
 #env setup
-env.Append(CCFLAGS='-std=c99')
+env.Append(CCFLAGS='-pipe -fomit-frame-pointer --std=c99')
 env.Append(CPPPATH=incdirs)
+zmi = env.Program('build/zmi', sources)
 
 #option reading
 if(GetOption("debug")):
 	env.Append(CCFLAGS='-ggdb')
-	zmi = env.Program('debug/zmi', sources)
-else:
-	zmi = env.Program('release/zmi', sources)
 if(env.GetOption('clean')):
 	os.system("touch src/* ; touch include/* ; touch SConstruct")
 	os.system("rm src/*.d 2>/dev/null")
-	os.system("rm build/* debug/* 2>/dev/null")
+	os.system("rm build/* 2>/dev/null")
 if(GetOption("small")):
 	env.Append(CCFLAGS='-Os')
 if(GetOption("fast")):

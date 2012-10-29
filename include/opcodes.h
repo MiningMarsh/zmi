@@ -31,6 +31,10 @@ void op_ret();
 void op_call() {
 	pushZFrame();
 	CurrentZFrame->PC = exPadAdr(Operand[0]);
+	if(CurrentZFrame->PC > 0xFFFFFFF) {
+		fputs("Invalid routine address.\n",stderr);
+		exit(1);
+	}
 	uint8_t lclsz = getByte(CurrentZFrame->PC++);
 	CurrentZFrame->locals = calloc(sizeof(uint16_t),lclsz+1);
 	CurrentZFrame->locals[0] = lclsz;
@@ -90,7 +94,7 @@ void op_div() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	if(num2 == 0) {
-		fputs("Divide by zero error.\n", stderr);
+		fputs("\nFATAL: Divide by zero error.\n", stderr);
 		exit(1);
 	}
 	zStore((uint16_t)(num1 / num2)&0xFFFF);
@@ -98,19 +102,36 @@ void op_div() {
 
 // Woops! something shouldn't have happened!
 void op_errnop() {
-	fputs("Error, tried to execute nonexistant opcode.\n",stderr);
+	fputs("\nFATAL: tried to execute nonexistant opcode.\n",stderr);
 	exit(1);
 }
 
 // Get the child of an object.
 void op_get_child() {
-	zStore(getChild(Operand[0]));
-	zBranch(getChild(Operand[0]));
+	uint16_t adr = 0;
+	if(Operand[0])
+		adr = getChild(Operand[0]);
+	printf("Child is: %u\n", adr);
+	uint16_t s = getPropertyTableAdr(adr);
+	s++;
+	char* name = zCharsToZSCII(getZChars(s));
+	zPrint(name);
+	free(name);
+	s = getPropertyTableAdr(Operand[0]);
+	s++;
+	name = zCharsToZSCII(getZChars(s));
+	zPrint(name);
+	free(name);
+	zStore(adr);
+	zBranch(adr);
 }
 
 // Get the parent of an object.
 void op_get_parent() {
-	zStore(getParent(Operand[0]));
+	uint16_t adr = 0;
+	if(Operand[0])
+		adr = getParent(Operand[0]);
+	zStore(adr);
 }
 
 // Get a property of an object.
@@ -127,12 +148,9 @@ void op_get_prop() {
 // Get the property address of a property.
 void op_get_prop_addr() {
 	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
-	if(adr) {
+	if(adr)
 		adr++;
-		zStore(adr);
-	} else {
-		zStore(0);
-	}
+	zStore(adr);
 }
 
 // Get the sibling of an object and store it.

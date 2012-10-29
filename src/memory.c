@@ -2,93 +2,112 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "command.h"
+#include "memory.h"
+#include "log.h"
 
 uint8_t* RAM = NULL; // Holds the file.
-// Globals and locals are pointers so that they can easily be stored on the
-// stack.
-struct stack_frame { // Holds the current routine state.
-	struct stack_frame* old_frame;
-	uint32_t PC;
-	uint16_t* locals;
-	uint16_t* stack;
-	uint8_t retvar;
-	uint8_t nargs;
-};
 
-struct stack_frame* CurrentZFrame;
-int size;
-
-void loadRAM(char* file)
+void loadRAM(char* Filename)
 {
+	const char* LogPrefix = "loadRAM()";
+
+	// Check if the ram is already been initilized. 
 	if(RAM != NULL)
 	{
-		free(RAM);
-		RAM = NULL;
+		LogMessage(MFatal, LogPrefix, "Tried to load file while live.\n");
+		exit(1);
 	}
-	FILE* storyfile;
-	storyfile = fopen(file, "rb");
-	if(storyfile == NULL)
+	// File pointer to the story.
+	FILE* StoryFile;
+	StoryFile = fopen(Filename, "rb");
+	if(StoryFile == NULL)
 	{
-		fputs("Error opening story file.\n",stderr);
+		perror(Filename);
 		exit (1);
 	}
-	fseek(storyfile, 0, SEEK_END);
-	int size = ftell(storyfile);
-	rewind(storyfile);
-	RAM = (int8_t*)malloc(sizeof(int8_t)*size);
+	fseek(StoryFile, 0, SEEK_END);
+	g_StorySize = ftell(StoryFile);
+	rewind(StoryFile);
+	RAM = (int8_t*)malloc(sizeof(int8_t)*g_StorySize);
+	g_RAMSize = g_StorySize
 	if(RAM == NULL)
 	{
-		fputs("Error allocating ram.\n",stderr);
+		LogMessage(MFatal, LogPrefix, "Failed to allocate RAM.");
 		exit (1);
 	}
-	for(int i = 0; i < size; i++)
+ 	for(int i = 0; i < g_StorySize; i++)
 	{
-		char buf[1];
-		if(fread(buf, 1, 1, storyfile)!= 1)
+		char Buffer[1];
+		if(fread(Buffer, 1, 1, StoryFile)!= 1)
 		{
-			fputs("Error reading story file.\n",stderr);
+			LogMessage(MFatal, LogPrefix, "Failed to read file.");
 			exit(1);
 		}
-		RAM[i] = (uint8_t)buf[0];
+		RAM[i] = (uint8_t)Buffer[0];
 	}
-	size /= 1024;
-	int maxsize;
+	g_StorySize /= 1024;
 	switch(RAM[0])
 	{
 		case 1:
 		case 2:
 		case 3:
-			maxsize = 128;
+			g_MaxStorySize = 128;
 			break;
 		case 4:
 		case 5:
-			maxsize = 256;
+			g_MaxStorySize = 256;
 			break;
 		case 7:
-			maxsize = 320;
+			g_MaxStorySize = 320;
 			break;
 		case 6:
 		case 8:
-			maxsize = 512;
+			g_MaxStorySize = 512;
 			break;
 	}
-	if(size > maxsize)
+	if(g_StorySize > g_MaxStorySize)
 	{
-		fputs("Story file too large.\n", stderr);
+		LogMessage(MWarning, LogPrefix, "File larger than allowed by standard.");
 		exit (1);
 	}
-	fclose(storyfile);
+	fclose(StoryFile);
 }
 
 // Get the word beginning at ram address adr.
-uint16_t getWord(int adr)
+uint16_t getWord(unsigned int Address)
 {
+	if(Address+1 > g_RAMSize) {
+		char* ErrMessage;
+		sprintf(
+			ErrMessage,
+			"FATAL: tried to grab word outside of memory: %p\n"
+			"FATAL: RAM is %u bytes.\n",
+			Address,
+			g_RAMSize
+		);
+		fputs(ErrMessage,stderr);
+		free(ErrMessage);
+		exit(1);
+	}
 	return RAM[adr+1]|(RAM[adr]<<8);
 }
 
 // Get the byte beginning at ram address adr.
-uint8_t getByte(int adr)
+uint8_t getByte(unsigned int adr)
 {
+	if(Address > g_RAMSize) {
+		char* ErrMessage;
+		sprintf(
+			ErrMessage,
+			"FATAL: tried to grab byte outside of memory: %p\n"
+			"FATAL: RAM is %u bytes.\n",
+			Address,
+			g_RAMSize
+		);
+		fputs(ErrMessage,stderr);
+		free(ErrMessage);
+		exit(1);
+	}
 	return RAM[adr];
 }
 
@@ -98,15 +117,24 @@ uint8_t getZRev() {
 }
 
 // Set the word beginning at ram address adr to value.
-void setWord(int adr, int16_t value)
+void setWord(unsigned int Address, int Value)
 {
-	if(adr == 0)
-	{
-		fputs("Tried to set getZRev().\n",stderr);
+	if(!Address) {
+		char* ErrMessage;
+		sprintf(
+			ErrMessage,
+			"FATAL: tried to set Z-Revision to %i.\n"
+			Value
+		);
+		fputs(ErrMessage,stderr);
+		free(ErrMessage);
 		exit(1);
 	}
-	RAM[adr+1] = value&0xFF;
-	RAM[adr] = (value>>8)&0xFF;
+	if(Value > 0xFFFF) {
+		fputs("WARNING: Setting a word to a value greater tha
+	}
+	RAM[Address+1] = Value&0xFF;
+	RAM[Address] = (Value>>8)&0xFF;
 }
 
 // Set the byte beginning at ram address adr to value.
@@ -134,36 +162,36 @@ uint32_t exPadAdr(uint16_t padr)
 // Pop from the stack.
 uint16_t popZStack()
 {
-	if(CurrentZFrame->stack == NULL || CurrentZFrame->stack[0] < 1)
+	if(CurrentZFrame->Stack == NULL || CurrentZFrame->sSack[0] < 1)
 	{
 		fputs("Tried POPing empty stack.\n", stderr);
 		exit(1);
 	}
-	CurrentZFrame->stack[0]--;
-	return CurrentZFrame->stack[CurrentZFrame->stack[0] + 1];
+	CurrentZFrame->Stack[0]--;
+	return CurrentZFrame->Stack[CurrentZFrame->Stack[0] + 1];
 }
 // Push to the stack.
 void pushZStack(uint16_t val)
 {
-	if(CurrentZFrame->stack == NULL)
+	if(CurrentZFrame->Stack == NULL)
 	{
-		CurrentZFrame->stack = malloc(sizeof(uint16_t)*1024);
-		CurrentZFrame->stack[0] = 0;
+		CurrentZFrame->Stack = malloc(sizeof(uint16_t)*1024);
+		CurrentZFrame->Stack[0] = 0;
 	}
-	CurrentZFrame->stack[0]++;
-	if(CurrentZFrame->stack == NULL)
+	CurrentZFrame->Stack[0]++;
+	if(CurrentZFrame->Stack == NULL)
 	{
 		fputs("Error PUSHing stack.\n", stderr);
 		exit(1);
 	}
-	CurrentZFrame->stack[CurrentZFrame->stack[0]] = val;
+	CurrentZFrame->Stack[CurrentZFrame->Stack[0]] = val;
 }
 // Get the value of variable reference var.
 uint16_t getZVar(uint8_t var)
 {
 	if(var > 15)
 		return getWord(getWord(0x06*2) + 2*(var - 16));
-	return var > 0 ? CurrentZFrame->locals[var] : popZStack();
+	return var > 0 ? CurrentZFrame->Locals[var] : popZStack();
 }
 void setZVar(uint8_t var, uint16_t val) {
 	if(var > 15)
@@ -171,36 +199,36 @@ void setZVar(uint8_t var, uint16_t val) {
 	else if(var == 0)
 		pushZStack(val);
 	else
-		CurrentZFrame->locals[var] = val;
+		CurrentZFrame->Locals[var] = val;
 }
 
 // Push a copy of the current routine (stack frame).
 void pushZFrame()
 {
-	struct stack_frame* new_frame = malloc(sizeof(struct stack_frame));
+	stackframe_t* new_frame = malloc(sizeof(stackframe_t));
 	if(new_frame == NULL)
 	{
 		fputs("Not enough memory to PUSH a stack frame.\n",stderr);
 		exit(1);
 	}
-	new_frame->old_frame = CurrentZFrame;
+	new_frame->OldFrame = CurrentZFrame;
 	CurrentZFrame = new_frame;
-	CurrentZFrame->locals = NULL;
-	CurrentZFrame->stack = NULL;
-	CurrentZFrame->retvar = 1;
+	CurrentZFrame->Locals = NULL;
+	CurrentZFrame->Stack = NULL;
+	CurrentZFrame->ReturnVar = 1;
 }
 // Pop a stack frame.
 void popZFrame()
 {
-	if(CurrentZFrame->old_frame == NULL)
+	if(CurrentZFrame->OldFrame == NULL)
 	{
 		fputs("Attempted to POP main stack frame.\n", stderr);
 		exit(1);
 	}
 	free(CurrentZFrame->locals);
 	free(CurrentZFrame->stack);
-	struct stack_frame* dead_frame = CurrentZFrame;
-	CurrentZFrame = dead_frame->old_frame;
+	stackframe_t* dead_frame = CurrentZFrame;
+	CurrentZFrame = dead_frame->OldFrame;
 	free(dead_frame); //Summon Cthulhu to take the soul of the dead frame to the place of ultimate evil
 }
 uint16_t zFrameNumber(struct stack_frame* frame)
@@ -209,7 +237,7 @@ uint16_t zFrameNumber(struct stack_frame* frame)
 	while(frame != NULL)
 	{
 		frames++;
-		frame = frame->old_frame;
+		frame = frame->OldFrame;
 	}
 	return frames;
 }
@@ -221,9 +249,9 @@ void traceZStack()
 	{
 		printf("   Frame %u\n",zFrameNumber(frame));
 		printf("      PC: %u\n",frame->PC);
-		printf("      Arguments passed: %u\n",frame->nargs);
-		printf("      Return: %s.\n", frame->retvar ? "Yes" : "No");
-		if(!(frame->stack == NULL || frame->stack[0] < 1))
+		printf("      Arguments passed: %u\n",frame->);
+		printf("      Return: %s.\n", frame->ReturnVar ? "Yes" : "No");
+		if(!(frame->stack == NULL || frame->Stack[0] < 1))
 		{
 			unsigned int count = 1;
 			printf("      Stack:\n");
