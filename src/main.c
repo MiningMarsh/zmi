@@ -16,7 +16,7 @@ int main(int ArgCount, char** Arguments) {
 	char* Filename = NULL;
 	
 	// By default print no debug messages.
-	VerboseDebug = 0;
+	g_VerboseDebug = 0;
 	// Don't print <> around string pointers.
 	StrIndirection = 0;
 
@@ -50,13 +50,12 @@ int main(int ArgCount, char** Arguments) {
 		}
 
 		// A lookup table mapping long options to flags.
-		const char LookupTable[][30] = {
+		const char const LookupTable[][30] = {
 			"help","h",
 			"string-indirection","i",
 			"debug","d",
 			"log-file","l",
-			0
-		};
+			0 };
 
 		switch(ArgType) {
 			// We are dealing with a flag.
@@ -95,15 +94,14 @@ int main(int ArgCount, char** Arguments) {
 					"Options:\n"
 					"-i,--string-indirection  Show pointer indirection in Z-Strings by\n"
 					"                         surrounding them like <this>.\n"
-					"\n"
 					"-h,--help                Display this message.\n"
-					"\n"
 					"-d,--debug=#             Set the verboseness.\n",
 					d_VersionMajor,
 					d_VersionMinor,
 					d_StandardMajor,
 					d_StandardMinor
 				);
+				exit(0);
 				break;
 
 			// Turn on debug messages.

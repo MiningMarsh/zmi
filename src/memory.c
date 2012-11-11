@@ -35,7 +35,7 @@ void loadRAM(char* Filename)
 	fseek(StoryFile, 0, SEEK_END);
 	g_StorySize = ftell(StoryFile);
 	rewind(StoryFile);
-	RAM = (int8_t*)malloc(sizeof(int8_t)*g_StorySize);
+	RAM = (uint8_t*)malloc(sizeof(uint8_t)*g_StorySize);
 	g_RAMSize = g_StorySize;
 	if(!RAM)
 	{
@@ -46,7 +46,6 @@ void loadRAM(char* Filename)
 			sizeof(int8_t)*g_RAMSize
 		);
 		LogMessage(MFatal, LogPrefix, Message);
-		free(Message);
 		exit (1);
 	}
  	for(int i = 0; i < g_StorySize; i++)
@@ -88,25 +87,23 @@ void loadRAM(char* Filename)
 			g_MaxStorySize
 		);
 		LogMessage(MFatal, LogPrefix, Message);
-		free(Message);
 		exit (1);
 	}
 	fclose(StoryFile);
 }
 
 // Get the word beginning at ram address adr.
-uint16_t getWord(unsigned int Address) {
+uint16_t getWord(const unsigned int Address) {
 	if(Address+1 > g_RAMSize) {
-		char* Message;
+		char Message[256];
 		sprintf(
 			Message,
 			"Tried to grab word outside of memory: %p\n"
 			"RAM is %u bytes.\n",
-			Address,
+			(void*)Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"getWord()",Message);
-		free(Message);
 		exit(1);
 	}
 	return RAM[Address+1]|(RAM[Address]<<8);
@@ -116,16 +113,15 @@ uint16_t getWord(unsigned int Address) {
 uint8_t getByte(unsigned int Address)
 {
 	if(Address > g_RAMSize) {
-		char* Message;
+		char Message[256];
 		sprintf(
 			Message,
 			"Tried to grab byte outside of memory: %p\n"
 			"RAM is %u bytes.\n",
-			Address,
+			(void*)Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"getWord()",Message);
-		free(Message);
 		exit(1);
 	}
 	return RAM[Address];
@@ -139,26 +135,24 @@ uint8_t getZRev() {
 // Set the word beginning at ram address adr to value.
 void setWord(unsigned int Address, int Value){
 	if(!Address) {
-		char* Message;
+		char  Message[256];
 		sprintf(
 			Message,
 			"Tried to set byte 0 (Z-Revision) to %i.",
 			Value
 		);
 		LogMessage(MFatal,"setWord()",Message);
-		free(Message);
 		exit(1);
 	} else if(Address+1 > g_RAMSize) {
-		char* Message;
+		char Message[256];
 		sprintf(
 			Message,
 			"Tried to set word outside of memory: %p\n"
 			"RAM is %u bytes.\n",
-			Address,
+			(void*)Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"setWord()",Message);
-		free(Message);
 		exit(1);
 	} else if(Value > 0xFFFF) {
 		LogMessage(MWarning,"setWord()","Truncating large word value.");
@@ -171,26 +165,24 @@ void setWord(unsigned int Address, int Value){
 void setByte(unsigned int Address, int Value)
 {
 	if(!Address) {
-		char* Message;
+		char Message[256];
 		sprintf(
 			Message,
 			"Tried to set byte 0 (Z-Revision) to %i.",
 			Value
 		);
 		LogMessage(MFatal,"setWord()",Message);
-		free(Message);
 		exit(1);
 	} else if(Address > g_RAMSize) {
-		char* Message;
+		char Message[256];
 		sprintf(
 			Message,
 			"Tried to set byte outside of memory: %p\n"
 			"RAM is %u bytes.\n",
-			Address,
+			(void*)Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"setWord()",Message);
-		free(Message);
 		exit(1);
 	} else if(Value > 0xFF) {
 		LogMessage(MWarning,"setByte()","Truncating large byte value.");
@@ -293,34 +285,43 @@ uint16_t zFrameNumber(stackframe_t* frame)
 }
 void traceZStack()
 {
-	printf("--- Stacktrace ---\n");
+	LogMessage(MNull, "traceZStack()", "Begin Stacktrace.");
 	stackframe_t* frame = CurrentZFrame;
 	while(frame != NULL)
 	{
-		printf("   Frame %u\n",zFrameNumber(frame));
-		printf("      PC: %u\n",frame->PC);
-		printf("      Arguments passed: %u\n",frame->PassedArgs);
-		printf("      Return: %s.\n", frame->ReturnVar ? "Yes" : "No");
+		char Message[256];
+		sprintf(Message,"   Frame %u",zFrameNumber(frame));
+		LogMessage(MNull,NULL,Message);
+		sprintf(Message, "      PC: %u",frame->PC);
+		LogMessage(MNull,NULL,Message);
+		sprintf(Message, "      Arguments passed: %u",frame->PassedArgs);
+		LogMessage(MNull,NULL,Message);
+		sprintf(Message, "      Return: %s.", frame->ReturnVar ? "Yes" : "No");
+		LogMessage(MNull,NULL,Message);
 		if(!(frame->Stack == NULL || frame->Stack[0] < 1))
 		{
 			unsigned int count = 1;
-			printf("      Stack:\n");
-			for(uint16_t cell = frame->Stack[0]; cell > 0; cell--)
-				printf("         %04u: %u\n", count++, frame->Stack[cell]);
+			LogMessage(MNull, NULL, "      Stack:");
+			for(uint16_t cell = frame->Stack[0]; cell > 0; cell--) {
+				sprintf(Message, "         %04u: %u", count++, frame->Stack[cell]);
+				LogMessage(MNull, NULL, Message);
+			}
 		} else
 		{
-			printf("      Empty Stack.\n");
+			LogMessage(MNull,NULL,"      Empty Stack.");
 		}
 		if(!(frame->Locals == NULL || frame->Locals[0] < 1))
 		{
-			printf("      Locals:\n");
-			for(uint16_t cell = 1; cell <= frame->Locals[0]; cell++)
-				printf("          %01u: %u\n", cell, frame->Locals[cell]);
+			LogMessage(MNull, NULL, "      Locals:");
+			for(uint16_t cell = 1; cell <= frame->Locals[0]; cell++) {
+				sprintf(Message, "          %01u: %u", cell, frame->Locals[cell]);
+				LogMessage(MNull,NULL,Message);
+			}
 		} else
 		{
-			printf("      No local variables.\n");
+			LogMessage(MNull, NULL, "      No local variables.");
 		}
 		frame = frame->OldFrame;
 	}
-	printf("--- End Stacktrace ---\n");
+	LogMessage(MNull, "traceZStack()", "End Stacktrace.");
 }

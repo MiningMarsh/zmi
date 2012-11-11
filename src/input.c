@@ -57,12 +57,11 @@ void readString()
 	maxsz--;
 	if(getZRev() < 5)
 		maxsz--;
-	if(VerboseDebug >=4)
+	if(g_VerboseDebug >=4)
 		printf("maxsz is %u\n",maxsz);
 	char* line = NULL;
 	line = calloc(sizeof(char), maxsz+ 2);
 	int loop = 1;
-	int pos = 0;
 	int strptr=0;
 	while(loop)
 	{
@@ -70,10 +69,10 @@ void readString()
 		int i = read(STDIN_FILENO,&c,1);
 		if (c==0x1b)
 		{
-			int trash = read(STDIN_FILENO,&c,1);
+			read(STDIN_FILENO,&c,1);
 			if (c=='[')
 			{
-				trash = read(STDIN_FILENO,&c,1);
+				read(STDIN_FILENO,&c,1);
 				switch(c)
 				{
 					case 'A':

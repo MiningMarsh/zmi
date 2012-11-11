@@ -1,12 +1,28 @@
 #ifndef OPCODES_H
 #define OPCODES_H
 #include <time.h>
+#include <stdint.h>
+#include "log.h"
 
 // Signed 16-bit addition.
 void op_add() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
-	zStore((uint16_t)(num1 + num2)&0xFFFF);
+	int32_t num3 = (int32_t)(num1 + num2);
+	if(num3 < -32768 || num3 > 32767) {
+		char Message[256];
+		sprintf(
+			Message,
+			"%s detected. This is undefined behavior.\n"
+			"Operands of %i and %i with result of %i.",
+			num3 > 32767 ? "Overflow" : "Underflow",
+			num1,
+			num2,
+			num3
+		);
+		LogMessage(MWarning, "op_add()", Message);
+	}
+	zStore((uint16_t)(num1 + num2)%10000);
 }
 
 // Bitwise and.
@@ -102,7 +118,7 @@ void op_div() {
 
 // Woops! something shouldn't have happened!
 void op_errnop() {
-	fputs("\nFATAL: tried to execute nonexistant opcode.\n",stderr);
+	LogMessage(MFatal, "op_err()", "Tried to execute nonexistant opcode!");
 	exit(1);
 }
 
@@ -111,17 +127,6 @@ void op_get_child() {
 	uint16_t adr = 0;
 	if(Operand[0])
 		adr = getChild(Operand[0]);
-	printf("Child is: %u\n", adr);
-	uint16_t s = getPropertyTableAdr(adr);
-	s++;
-	char* name = zCharsToZSCII(getZChars(s));
-	zPrint(name);
-	free(name);
-	s = getPropertyTableAdr(Operand[0]);
-	s++;
-	name = zCharsToZSCII(getZChars(s));
-	zPrint(name);
-	free(name);
 	zStore(adr);
 	zBranch(adr);
 }
@@ -214,19 +219,11 @@ void op_jz() {
 
 // Get a byte from memory and store it.
 void op_loadb() {
-	if(Operand[0]+Operand[1] > 0xffff) {
-		printf("Error trying to loadb from high memory.\n",stderr);
-		exit(1);
-	}
 	zStore(getByte(Operand[0]+Operand[1]));
 }
 
 // Get a word from memory and store it.
 void op_loadw() {
-	if(Operand[0]+2*Operand[1] > 0xffff) {
-		printf("Error trying to loadw from high memory.\n",stderr);
-		exit(1);
-	}
 	zStore(getWord(Operand[0]+2*Operand[1]));
 }
 
@@ -334,11 +331,7 @@ void op_random() {
 		next = (state&15)^((state>>2)&13)^((state>>2)&13)^((state>>6)&10);
 		state = ((state<<1)) + (next);
 	}
-	if(VerboseDebug >= 4)
-		printf("Random number is: %u\n", state);
 	if(Operand[0] > 0) {
-		if(VerboseDebug >= 4)
-			printf("Returning: %u\n",state%Operand[0]);
 		zStore(state%Operand[0]);
 	} else if(Operand[0] < 0) {
 		zStore(0);

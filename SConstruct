@@ -15,7 +15,7 @@ AddOption("--small", dest="small", action='store_true', default=False, help="Com
 env = Environment()
 
 #env setup
-env.Append(CCFLAGS='-pipe -fomit-frame-pointer --std=c99')
+env.Append(CCFLAGS='-Wall -pipe -O2 --std=c99')
 env.Append(CPPPATH=incdirs)
 zmi = env.Program('build/zmi', sources)
 

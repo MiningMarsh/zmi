@@ -79,7 +79,6 @@ char* zCharsToZSCII(uint32_t* buffer)
 		buffer[0]--; // decrease the buffer size by one.
 		if(ptr + 5 >= size) {
 			size *= 2;
-			printf("\ntest\n");
 			zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
 			if(zscii == NULL)
 			{ // No memory.
@@ -166,7 +165,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 				break;
 			default: // No special characters, now we do a standard conversion.
 			{
-				char n;
+				char n = 0;
 				uint16_t adr;
 				adr = 0;
 				if(getZRev() >= 5)

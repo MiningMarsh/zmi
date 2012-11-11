@@ -9,30 +9,32 @@ uint8_t* RAM; // Holds the file.
 
 // Clean things instead of letting the OS do it.
 void clean() {
-	LogClose();
-	printf("Exiting...\n");
-	if(VerboseDebug)
-		printf("Reverting IO modes...\n");
+	const char* const Prefix = "clean()";
+	LogMessage(MNull, "", "");
+	LogMessage(MNull, Prefix, "Begin cleanup.");
+	if(g_VerboseDebug)
+		LogMessage(MNull, Prefix, "Reverting IO modes.");
 	// Revert input.
 	cleanInput();
 	// Revert output.
 	cleanOutput();
-	if(VerboseDebug)
-		printf("Cleaning RAM...\n");
+	if(g_VerboseDebug)
+		LogMessage(MNull, Prefix, "Cleaning RAM.");
 	// Free the storyfile from ram.
 	free(RAM);
 	// Print a Stacktrace in debug mode.
-	if(VerboseDebug >= 6)
+	if(VerboseDebug >= 5)
 		traceZStack();
 	while(CurrentZFrame->OldFrame != NULL) {
-		if(VerboseDebug)
-			printf("Cleaning frame...\n");
+		if(g_VerboseDebug)
+			LogMessage(MNull, Prefix, "Cleaning frame.");
 		popZFrame();
 	}
 	// Pop the final frame manually. (popframe() wont let us.)
-	if(VerboseDebug)
-		printf("Cleaning final frame...\n");
+	if(g_VerboseDebug)
+		LogMessage(MNull, Prefix, "Cleaning final frame.");
 	free(CurrentZFrame->Locals);
 	free(CurrentZFrame->Stack);
 	free(CurrentZFrame);
+	LogClose();
 }

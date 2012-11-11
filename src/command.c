@@ -125,22 +125,26 @@ void initZM() {
 }
 
 void execNextInstruction() {
+	if( g_VerboseDebug >= 5)
+	LogMessage(MNull, "Main loop", "Operation started.");
 	// Clean the operands.
-	uint8_t OperandType[8] = {Omitted,
-						Omitted,
-						Omitted,
-						Omitted,
-						Omitted,
-						Omitted,
-						Omitted,
-						Omitted};
+	uint8_t OperandType[8] = {
+		Omitted, 
+		Omitted,
+		Omitted,
+		Omitted,
+		Omitted,
+		Omitted,
+		Omitted,
+		Omitted
+	};
 	// Get the next operation and advance the PC.
 	uint8_t op = getByte(CurrentZFrame->PC++);
 	// Print the operand in debug mode.
-		char* Message = NULL;
 	if(g_VerboseDebug >= 10) {
-		sprintf(Message,"\nPC: %5u OP: %3u\n", CurrentZFrame->PC - 1, op);
-		LogMessage(MFatal,"Main loop:", Message);
+		char Message[256];
+		sprintf(Message,"PC: %5u OP: %3u", CurrentZFrame->PC - 1, op);
+		LogMessage(MNull,"", Message);
 	}
    	// Extract argument types based on the opcode.
 	if(op < 128) {
@@ -180,23 +184,32 @@ void execNextInstruction() {
 				Operand[i] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
 				if(g_VerboseDebug >= 10) {
-					sprintf(Message,"Large: %u\n", Operand[i]);
-					LogMessage(MFatal,"Main loop:", Message);
+					char Message[256];
+					sprintf(Message,"Large: %u", Operand[i]);
+					LogMessage(MNull,"Operand", Message);
 				}
 				break;
 			case SmallConstant:
 				Operand[i] = getByte(CurrentZFrame->PC++);
-				if(VerboseDebug >= 4)
-					printf("Small: %u\n", Operand[i]);
+				if(g_VerboseDebug >= 10) {
+					char Message[256];
+					sprintf(Message,"Small: %u", Operand[i]);
+					LogMessage(MNull,"Operand", Message);
+				}
 				break;
 			case Variable: {
 				uint8_t var = getByte(CurrentZFrame->PC++);
 				Operand[i] = getZVar(var);
-				if(VerboseDebug >= 4)
-					printf("Var %u: %u\n", var, Operand[i]);
+				if(VerboseDebug >= 10) {
+					char Message[256];
+					sprintf(Message, "Var %u: %u", var, Operand[i]);
+					LogMessage(MNull,"Operand", Message);
+				}
 				break; }
 		}
 	}
 	// Execute the operation.
 	CallOpCode[op]();
+	if( g_VerboseDebug >= 5)
+		LogMessage(MNull, "Main loop", "Operation finished.\n");
 }
