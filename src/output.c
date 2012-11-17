@@ -77,7 +77,9 @@ void zPrint(char* str, ...) {
 					putchar('\n');
 				}
 				word[wordsz] = 0;
-				printf("%s ",word);
+				printf("%s",word);
+				if(wordsz + pos != w)
+					putchar(' ');
 				pos += wordsz + 1;
 				wordsz = 0;
 				break;
@@ -95,8 +97,8 @@ void zPrint(char* str, ...) {
 		putchar('\n');
 	}
 	word[wordsz]=0;
+	printf("%s",word);
 	wordsz--;
-	printf("%s", word);
 	pos += wordsz;
 	}
 	va_end(args);

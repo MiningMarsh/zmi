@@ -285,19 +285,20 @@ uint16_t zFrameNumber(stackframe_t* frame)
 }
 void traceZStack()
 {
-	LogMessage(MNull, "traceZStack()", "Begin Stacktrace.");
+	char* prefix = "tZS()";
+	LogMessage(MNull, prefix, "Begin Stacktrace.");
 	stackframe_t* frame = CurrentZFrame;
 	while(frame != NULL)
 	{
 		char Message[256];
 		sprintf(Message,"   Frame %u",zFrameNumber(frame));
-		LogMessage(MNull,NULL,Message);
+		LogMessage(MNull, NULL,Message);
 		sprintf(Message, "      PC: %u",frame->PC);
 		LogMessage(MNull,NULL,Message);
 		sprintf(Message, "      Arguments passed: %u",frame->PassedArgs);
 		LogMessage(MNull,NULL,Message);
 		sprintf(Message, "      Return: %s.", frame->ReturnVar ? "Yes" : "No");
-		LogMessage(MNull,NULL,Message);
+		LogMessage(MNull, NULL, Message);
 		if(!(frame->Stack == NULL || frame->Stack[0] < 1))
 		{
 			unsigned int count = 1;
@@ -308,14 +309,14 @@ void traceZStack()
 			}
 		} else
 		{
-			LogMessage(MNull,NULL,"      Empty Stack.");
+			LogMessage(MNull, NULL,"      Empty Stack.");
 		}
 		if(!(frame->Locals == NULL || frame->Locals[0] < 1))
 		{
 			LogMessage(MNull, NULL, "      Locals:");
 			for(uint16_t cell = 1; cell <= frame->Locals[0]; cell++) {
 				sprintf(Message, "          %01u: %u", cell, frame->Locals[cell]);
-				LogMessage(MNull,NULL,Message);
+				LogMessage(MNull, NULL, Message);
 			}
 		} else
 		{
@@ -323,5 +324,5 @@ void traceZStack()
 		}
 		frame = frame->OldFrame;
 	}
-	LogMessage(MNull, "traceZStack()", "End Stacktrace.");
+	LogMessage(MNull, prefix, "End Stacktrace.");
 }

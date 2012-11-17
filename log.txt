@@ -1,0 +1,21 @@
+LogOpen(): Log opened.
+Main loop: Operation started.
+PC: 22133 OP: 226
+Operand: Var 187: 11068
+Operand: Small: 0
+Operand: Small: 59
+FATAL: op_err(): Tried to execute nonexistant opcode!
+
+clean(): Begin cleanup.
+clean(): Reverting IO modes.
+clean(): Cleaning RAM.
+tZS(): Begin Stacktrace.
+   Frame 1
+      PC: 22138
+      Arguments passed: 3
+      Return: Yes.
+      Empty Stack.
+      No local variables.
+tZS(): End Stacktrace.
+clean(): Cleaning final frame.
+LogClose(): Log closed.

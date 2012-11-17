@@ -20,7 +20,6 @@ uint16_t Operand[8];
 
 // Better than a switch. Each cell contains a pointer to a function to execute its opcode.
 // callop[20]() executes operation 20.
-void (*CallOpCode[256])(void) = {NULL};
 
 // Used for easy identification of operand types.
 enum operand_type {
@@ -54,72 +53,10 @@ void initZM() {
 	CurrentZFrame->ReturnVar=1;
 
 	// Populate the operation index.
+	initOpCodes();
 	for(int I = 0; I < 256; I++)
-		CallOpCode[I] = &op_errnop;
-	for(int I = 0; I < 7; I++) {
-		CallOpCode[1+32*I] = &op_je;
-		CallOpCode[2+32*I] = &op_jl;
-		CallOpCode[3+32*I] = &op_jg;
-		CallOpCode[4+32*I] = &op_dec_chk;
-		CallOpCode[5+32*I] = &op_inc_chk;
-		CallOpCode[6+32*I] = &op_jin;
-		CallOpCode[7+32*I] = &op_test;
-		CallOpCode[8+32*I] = &op_or;
-		CallOpCode[9+32*I] = &op_and;
-		CallOpCode[10+32*I] = &op_test_attr;
-		CallOpCode[11+32*I] = &op_set_attr;
-		CallOpCode[12+32*I] = &op_clear_attr;
-		CallOpCode[13+32*I] = &op_store;
-		CallOpCode[14+32*I] = &op_insert_obj;
-		CallOpCode[15+32*I] = &op_loadw;
-		CallOpCode[16+32*I] = &op_loadb;
-		CallOpCode[17+32*I] = &op_get_prop;
-		CallOpCode[18+32*I] = &op_get_prop_addr;
-		CallOpCode[20+32*I] = &op_add;
-		CallOpCode[21+32*I] = &op_sub;
-		CallOpCode[22+32*I] = &op_mul;
-		CallOpCode[23+32*I] = &op_div;
-		CallOpCode[24+32*I] = &op_mod;
-		if(getZRev() >= 4)
-			CallOpCode[25+32*I] = &op_call;
-		if(getZRev() >= 5)
-			CallOpCode[26+32*I] = &op_call_throw;
-		if(getZRev() == 5 || getZRev() == 6)
-			CallOpCode[28+32*I] = &op_throw;
-	}
-	for(int I = 0; I  < 32; I++) {
-		CallOpCode[I+32*4] = &op_errnop;
-		CallOpCode[I+32*5] = &op_errnop;
-	}
-	for(int I = 0; I < 3; I++) {
-		CallOpCode[128+16*I] = &op_jz;
-		CallOpCode[129+16*I] = &op_get_sibling;
-		CallOpCode[130+16*I] = &op_get_child;
-		CallOpCode[131+16*I] = &op_get_parent;
-		CallOpCode[133+16*I] = &op_inc;
-		CallOpCode[134+16*I] = &op_dec;
-		if(getZRev() >= 4)
-			CallOpCode[136+16*I] = &op_call;
-		CallOpCode[138+16*I] = &op_print_obj;
-		CallOpCode[139+16*I] = &op_ret;
-		CallOpCode[140+16*I] = &op_jump;
-		CallOpCode[141+16*I] = &op_print_paddr;
-		CallOpCode[176+16*I] = &op_rtrue;
-		CallOpCode[177+16*I] = &op_rfalse;
-		CallOpCode[178+16*I] = &op_print;
-		CallOpCode[184+16*I] = &op_ret_popped;
-		CallOpCode[187+16*I] = &op_new_line;
-	}
-	CallOpCode[224] = &op_call;
-	CallOpCode[225] = &op_storew;
-	CallOpCode[226] = &op_storeb;
-	CallOpCode[227] = &op_put_prop;
-	CallOpCode[228] = &op_read;
-	CallOpCode[229] = &op_print_char;
-	CallOpCode[230] = &op_print_num;
-	CallOpCode[231] = &op_random;
-	CallOpCode[232] = &op_push;
-	CallOpCode[233] = &op_pull;
+		if(!CallOpCode[I])
+			CallOpCode[I] = &op_errnop;
 	// By this time, should be okay to clear the screen.
 	printf("%c[2J,%c[0;0H",27,27);
 }

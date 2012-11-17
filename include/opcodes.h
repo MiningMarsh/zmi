@@ -4,83 +4,180 @@
 #include <stdint.h>
 #include "log.h"
 
-// Signed 16-bit addition.
-void op_add() {
-	int16_t num1 = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	int32_t num3 = (int32_t)(num1 + num2);
-	if(num3 < -32768 || num3 > 32767) {
+// Table of opcodes.
+void (*CallOpCode[256])(void) = {NULL};
+
+/*********************************
+ * 2OP:20 14 add a b -> (result) *
+ *************************************************************************
+ * Signed 16-bit addition.                                               *
+ *************************************************************************/
+
+void opAdd() {
+	// The first number. to add, casted from its unsigned form in memory.
+	int16_t Number1 = (int16_t)Operand[0];
+	// The second number. to add, casted from its unsigned form in memory.
+	int16_t Number2 = (int16_t)Operand[1];
+	// Result, 23bit to check for over/undrflows which are undefined 
+	// behavior that is commonly defined as modulo 10000.
+	int32_t Result = (int32_t)(Number1 + Number2);
+	// Did we oer/underflow?
+	if(Result < -32768 || Result > 32767) {
+		// Log the warning message.
 		char Message[256];
 		sprintf(
 			Message,
 			"%s detected. This is undefined behavior.\n"
 			"Operands of %i and %i with result of %i.",
-			num3 > 32767 ? "Overflow" : "Underflow",
-			num1,
-			num2,
-			num3
+			Number1 > 32767 ? "Overflow" : "Underflow",
+			Number1,
+			Number2,
+			Result
 		);
-		LogMessage(MWarning, "op_add()", Message);
+		LogMessage(MWarning, "add", Message);
 	}
-	zStore((uint16_t)(num1 + num2)%10000);
+	// Store the result.
+	zStore((uint16_t)(Number1 + Number2)%10000);
 }
 
-// Bitwise and.
-void op_and() {
+/*******************************
+ * 2OP:9 9 and a b -> (result) *
+ *************************************************************************
+ * Bitwise AND.                                                          *
+ *************************************************************************/
+
+void opAnd() {
+	// Store operand 1 AND operand 2.
 	zStore(Operand[0]&Operand[1]);
 }
 
-// Arithmetic shift
-void op_art_shift() {
-	int16_t num = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	if(num2 >= 0)
-		num = num<<num2;
-	else
-		num = num>>(num2*(0-1));
-	zStore(num);
+/***********************************************
+ * 2OP:9 9 art_shift number places -> (result) *
+ *************************************************************************
+ * Does an arithmetic shift of _number_ by the given number of _places_, *
+ * shiftin left (i.e. increasing) , right if negative. In a right shift, *
+ * the sign bit is preserved as well as being shifted on down. (The      *
+ * alternative behavior is 'log_shift'.)                                 *
+ *************************************************************************/
+
+void opArtShift() {
+	// Number to shift.
+	int16_t Number = (int16_t)Operand[0];
+	// Number of places to shift by.
+	int16_t Places = (int16_t)Operand[1];
+
+	// Shift positive or negative?
+	if(Places > 0) {
+		// Shift left.
+		Number = Number<<Places;
+	} else if(Places <) {
+		// Shift right.
+		for( Places; Places > 0; Places--) {
+			// Get the sign bit.
+			int Sign = (Number>>16)&0x1;
+			Number = Number>>1;
+			// Restore the sign bit as well as shifting it down.
+			Number = Number|(Sign<<15)|(sign<<16);
+		}
+	} else {
+		// Print a little warning if they shift by zero, as this
+		// does nothing more than wasting cpu cycles.
+		LogMessage(MWarning, "art_shift", "Shifting %i by 0. This is innefficient.\n");
+	}
+	// Store the result.
+	zStore(Number);
 }
 
+/***********************************************************
+ * VAR:224 0 1 call routine ...up to 3 args... -> (result) *
+ *************************************************************************
+ * The only call instruction in Version 3, Inform reads this as 'call_vs'*
+ * in higher versions: it calls the _routine_ with 0, 1, 2, or 4         *
+ * _arguments_ as supplied and stores the resulting return value. (When  *
+ * address 0 is called as a routine, nothing happens and the return      *
+ * value is false.)                                                      *
+ *************************************************************************/
 
-// Call a routine and store the result.
-void op_ret();
-void op_call() {
+void opCall() {
+	// If address 0 is called, we instantly return 0 and nothing happens.
+	if(!Operand[0]) {
+		if(CurrentZFrame->ReturnVar == 1)
+			setZVar(getByte(CurrentZFrame->PC++), 0);
+		CurrentZFrame->ReturnVar = 1;
+		return;
+	}
+	// Create a new blank stack frame.
 	pushZFrame();
+	// Expand the padded address to get the routine location.
 	CurrentZFrame->PC = exPadAdr(Operand[0]);
-	if(CurrentZFrame->PC > 0xFFFFFFF) {
-		fputs("Invalid routine address.\n",stderr);
+	// Check if it is out of memory range.
+	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > g_RAMSize ) {
+		// Log an error message if it is.
+		char Message[1024];
+		sprintf(
+			Message,
+			"Address %u expands to %u, which is out of memory range.\n"
+			"Memory size is: %u",
+			Operand[0],
+			CurrentZFrame->PC,
+			g_RAMSize
+		);
+		LogMessage(MFatal, "call", Message);
 		exit(1);
 	}
-	uint8_t lclsz = getByte(CurrentZFrame->PC++);
-	CurrentZFrame->Locals = calloc(sizeof(uint16_t),lclsz+1);
-	CurrentZFrame->Locals[0] = lclsz;
+	// Get the number of local variables the routine has.
+	uint8_t NumberLocals = getByte(CurrentZFrame->PC++);
+	// Allocate room for the locals.
+	CurrentZFrame->Locals = calloc(sizeof(uint16_t), NumberLocals+1);
+	CurrentZFrame->Locals[0] = NumberLocals;
+	// Special handling for revision 3 and lower.
 	if(getZRev() < 4)
-		for(int i = 1; i < CurrentZFrame->Locals[0] + 1; i++){
-			CurrentZFrame->Locals[i] = getWord(CurrentZFrame->PC);
+		// Revision 3 andlower define default values for all routine
+		// arguments. Get them and assign them here. revisions 4 and up 
+		// use 0 for all default values.
+		for(int I = 1; I < CurrentZFrame->Locals[0] + 1; I++) {
+			CurrentZFrame->Locals[I] = getWord(CurrentZFrame->PC);
 			CurrentZFrame->PC += 2;
 		}
-	for(int i = 1; i < CurrentZFrame->OldFrame->PassedArgs;i++) {
-		if(lclsz <= i)
-			CurrentZFrame->Locals[i] = Operand[i];
-	}
-	if(Operand[0] == 0) {
-		op_ret();
-	}
+	// Pass the supplied arguments to the rutine being called
+	// by putting them on the stack frame.
+	for(int I = 1; I < CurrentZFrame->OldFrame->PassedArgs;I++)
+		if(NumberLocals <= I)
+			CurrentZFrame->Locals[I] = Operand[I];
 }
 
-// Same as op_call, but throws away the result.
-void op_call_throw() {
+/***************************************************
+ * VAR:249 19 5 call_vn routine ...up to 3 args... *
+ *************************************************************************
+ * Like 'call', but throws away the result.                              *
+ *************************************************************************/
+
+void opCallVN () {
+	// Set up metadata saying this stackframe doesn't return anything.
 	CurrentZFrame->ReturnVar = 0;
-	op_call();
+	// Transfer to a standard routine call.
+	opCall();
 }
 
-// Return the current number of Stack frames.
-void op_catch() {
+/***********************************
+ * 0OP:185 0 5/6 catch -> (result) *
+ *************************************************************************
+ * Opposite to 'throw' (and occupying the same opcode that 'pop' used in *
+ * Version 3 and 4. 'catch' returns the current stackframe.              *
+ *************************************************************************/
+
+void opCatch() {
 	zStore(zFrameNumber(CurrentZFrame));
 }
 
-// Branch if a given number of arguments have been provided.
-void op_check_arg_count() {
+/************************************************
+ * VAR:255 1F 5 check_arg_count argument-number *
+ *************************************************************************
+ * Opposite to 'throw' (and occupying the same opcode that 'pop' used in *
+ * Version 3 and 4. 'catch' returns the current stackframe.              *
+ *************************************************************************/
+
+void opCheckArgCount() {
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
@@ -278,6 +375,13 @@ void op_print() {
 	free(str);
 }
 
+// Print a string stored after the operation.
+void op_print_ret() {
+	op_print();
+	op_new_line();
+	op_ret();
+}
+
 // Print a z-character.
 void op_print_char() {
 	printf("%c",Operand[0]);
@@ -436,6 +540,13 @@ void op_throw() {
 	while(Operand[1] < zFrameNumber(CurrentZFrame))
 		popZFrame();
 	op_ret();
+}
+
+void initOpCodes() {
+	CallOpCode[9] = 
+	CallOpCode[41] =
+	CallOpCode[73] = 
+	CallOpCode[105] = &opAdd;
 }
 
 #endif /* OPCODES_H */

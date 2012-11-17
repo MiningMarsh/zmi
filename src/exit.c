@@ -9,6 +9,7 @@ uint8_t* RAM; // Holds the file.
 
 // Clean things instead of letting the OS do it.
 void clean() {
+	putchar('\n');
 	const char* const Prefix = "clean()";
 	LogMessage(MNull, "", "");
 	LogMessage(MNull, Prefix, "Begin cleanup.");
