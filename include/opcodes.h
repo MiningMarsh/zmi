@@ -2,6 +2,7 @@
 #define OPCODES_H
 #include <time.h>
 #include <stdint.h>
+#include <bool.h>
 #include "log.h"
 
 // Table of opcodes.
@@ -21,21 +22,25 @@ void opAdd() {
 	// Result, 23bit to check for over/undrflows which are undefined 
 	// behavior that is commonly defined as modulo 10000.
 	int32_t Result = (int32_t)(Number1 + Number2);
-	// Did we oer/underflow?
-	if(Result < -32768 || Result > 32767) {
-		// Log the warning message.
-		char Message[256];
-		sprintf(
-			Message,
-			"%s detected. This is undefined behavior.\n"
-			"Operands of %i and %i with result of %i.",
-			Number1 > 32767 ? "Overflow" : "Underflow",
-			Number1,
-			Number2,
-			Result
-		);
-		LogMessage(MWarning, "add", Message);
-	}
+	// Did we over/underflow?
+	static bool AlreadyWarned = false;
+	if(!AlreadyWarned)
+		if(Result < -32768 || Result > 32767) {
+			// Log the warning message.
+			char Message[256];
+			sprintf(
+				Message,
+				"%s detected. This is undefined behavior.\n"
+				"Operands of %i and %i with result of %i.\n",
+				"This is only reported once."
+				Number1 > 32767 ? "Overflow" : "Underflow",
+				Number1,
+				Number2,
+				Result
+			);
+			LogMessage(MWarning, "add", Message);
+			AlreadyWarned = true;
+		}
 	// Store the result.
 	zStore((uint16_t)(Number1 + Number2)%10000);
 }
@@ -70,7 +75,7 @@ void opArtShift() {
 	if(Places > 0) {
 		// Shift left.
 		Number = Number<<Places;
-	} else if(Places <) {
+	} else if(Places < 0) {
 		// Shift right.
 		for( Places; Places > 0; Places--) {
 			// Get the sign bit.
@@ -81,8 +86,17 @@ void opArtShift() {
 		}
 	} else {
 		// Print a little warning if they shift by zero, as this
-		// does nothing more than wasting cpu cycles.
-		LogMessage(MWarning, "art_shift", "Shifting %i by 0. This is innefficient.\n");
+		// does nothing more than waste cpu cycles.
+		static bool AlreadyReported = false;
+		if(!AlreadyReported) {
+			AlreadyReported = true;
+			LogMessage(
+				MWarning, 
+				"art_shift",
+				"Shifting %i by 0. This is innefficient.\n"
+				"This is only reported once."
+			);
+		}
 	}
 	// Store the result.
 	zStore(Number);
@@ -163,7 +177,7 @@ void opCallVN () {
  * 0OP:185 0 5/6 catch -> (result) *
  *************************************************************************
  * Opposite to 'throw' (and occupying the same opcode that 'pop' used in *
- * Version 3 and 4. 'catch' returns the current stackframe.              *
+ * Version 3 and 4.) 'catch' returns the current stackframe.             *
  *************************************************************************/
 
 void opCatch() {
@@ -173,15 +187,26 @@ void opCatch() {
 /************************************************
  * VAR:255 1F 5 check_arg_count argument-number *
  *************************************************************************
- * Opposite to 'throw' (and occupying the same opcode that 'pop' used in *
- * Version 3 and 4. 'catch' returns the current stackframe.              *
+ * Branch if a given argument number (couting by 1) has been provided by *
+ * the routine call to the current routine. (This allows routines in     *
+ * 5 and later to distingiush between calls routine(1) and routine(1,0)  *
+ * which would otherwise be impossible to tell apart.)                   *
  *************************************************************************/
 
 void opCheckArgCount() {
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
-// Tell the program we can't do unicode.
+/*****************************************************\
+ * EXT:12 C 5/* check_unicode char-number -> (result) *
+ **************************************************************************\
+ * Determines whether or not the interprter can print, or recieve from     *
+ * the keyboard, the given Unicode character. Bit 0 should be set if and   *
+ * only if the interpreter can print the character, bit 1 if and only if   *
+ * the interpreter can receive it from the keyboard. Bits 2 to 15 are      *
+ * undefined.                                                              *
+ \*************************************************************************/
+
 void op_check_unicode() {
 	zStore(0);
 }
