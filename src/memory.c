@@ -43,7 +43,7 @@ void loadRAM(char* Filename)
 			Message, 
 			"Failed to allocate enough RAM to hold the story file.\n"
 			"%u bytes are needed.",
-			sizeof(int8_t)*g_RAMSize
+			(unsigned int)sizeof(int8_t)*g_RAMSize
 		);
 		LogMessage(MFatal, LogPrefix, Message);
 		exit (1);
@@ -98,9 +98,9 @@ uint16_t getWord(const unsigned int Address) {
 		char Message[256];
 		sprintf(
 			Message,
-			"Tried to grab word outside of memory: %p\n"
+			"Tried to grab word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
-			(void*)Address,
+			Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"getWord()",Message);
@@ -116,9 +116,9 @@ uint8_t getByte(unsigned int Address)
 		char Message[256];
 		sprintf(
 			Message,
-			"Tried to grab byte outside of memory: %p\n"
+			"Tried to grab byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
-			(void*)Address,
+			Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"getWord()",Message);
@@ -147,9 +147,9 @@ void setWord(unsigned int Address, int Value){
 		char Message[256];
 		sprintf(
 			Message,
-			"Tried to set word outside of memory: %p\n"
+			"Tried to set word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
-			(void*)Address,
+			Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"setWord()",Message);
@@ -177,9 +177,9 @@ void setByte(unsigned int Address, int Value)
 		char Message[256];
 		sprintf(
 			Message,
-			"Tried to set byte outside of memory: %p\n"
+			"Tried to set byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
-			(void*)Address,
+			Address,
 			g_RAMSize
 		);
 		LogMessage(MFatal,"setWord()",Message);

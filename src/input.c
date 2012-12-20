@@ -66,13 +66,15 @@ void readString()
 	while(loop)
 	{
 		char c = 0;
-		int i = read(STDIN_FILENO,&c,1);
+		int i =read(STDIN_FILENO,&c,1);
 		if (c==0x1b)
 		{
-			read(STDIN_FILENO,&c,1);
+			int i =read(STDIN_FILENO,&c,1);
+			if(i) {};
 			if (c=='[')
 			{
-				read(STDIN_FILENO,&c,1);
+				int i = read(STDIN_FILENO,&c,1);
+				if(i) {};
 				switch(c)
 				{
 					case 'A':
