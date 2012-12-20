@@ -54,9 +54,7 @@ void initZM() {
 
 	// Populate the operation index.
 	initOpCodes();
-	for(int I = 0; I < 256; I++)
-		if(!CallOpCode[I])
-			CallOpCode[I] = &op_errnop;
+
 	// By this time, should be okay to clear the screen.
 	printf("%c[2J,%c[0;0H",27,27);
 }

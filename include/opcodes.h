@@ -2,11 +2,13 @@
 #define OPCODES_H
 #include <time.h>
 #include <stdint.h>
-#include <bool.h>
+#include <stdbool.h>
 #include "log.h"
 
 // Table of opcodes.
 void (*CallOpCode[256])(void) = {NULL};
+
+void opRet();
 
 /*********************************
  * 2OP:20 14 add a b -> (result) *
@@ -31,9 +33,9 @@ void opAdd() {
 			sprintf(
 				Message,
 				"%s detected. This is undefined behavior.\n"
-				"Operands of %i and %i with result of %i.\n",
-				"This is only reported once."
-				Number1 > 32767 ? "Overflow" : "Underflow",
+				"Operands of %i and %i with result of %i.\n"
+				"This is only reported once.",
+				(char*)(Number1 > 32767 ? "Overflow" : "Underflow"),
 				Number1,
 				Number2,
 				Result
@@ -77,12 +79,12 @@ void opArtShift() {
 		Number = Number<<Places;
 	} else if(Places < 0) {
 		// Shift right.
-		for( Places; Places > 0; Places--) {
+		for(; Places > 0; Places--) {
 			// Get the sign bit.
 			int Sign = (Number>>16)&0x1;
 			Number = Number>>1;
 			// Restore the sign bit as well as shifting it down.
-			Number = Number|(Sign<<15)|(sign<<16);
+			Number = Number|(Sign<<15)|(Sign<<16);
 		}
 	} else {
 		// Print a little warning if they shift by zero, as this
@@ -197,102 +199,186 @@ void opCheckArgCount() {
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
-/*****************************************************\
+/******************************************************
  * EXT:12 C 5/* check_unicode char-number -> (result) *
- **************************************************************************\
- * Determines whether or not the interprter can print, or recieve from     *
- * the keyboard, the given Unicode character. Bit 0 should be set if and   *
- * only if the interpreter can print the character, bit 1 if and only if   *
- * the interpreter can receive it from the keyboard. Bits 2 to 15 are      *
- * undefined.                                                              *
- \*************************************************************************/
+ *************************************************************************
+ * Determines whether or not the interperter can print, or recieve from  *
+ * the keyboard, the given Unicode character. Bit 0 should be set if and *
+ * only if the interpreter can print the character, bit 1 if and only if *
+ * the interpreter can receive it from the keyboard. Bits 2 to 15 are    *
+ * undefined.                                                            *
+ *************************************************************************/
 
-void op_check_unicode() {
+void opCheckUnicode() {
+	// No unicode support yet.
 	zStore(0);
 }
 
-// Make object not have an attribute
-void op_clear_attr() {
+/****************************************
+ * 2OP:12 C clear_attr object attribute *
+ *************************************************************************
+ * Make object not have the attribute numbered attribute.                *
+ *************************************************************************/
+
+void opClearAttr() {
+	// Set the specified flg to 0.
 	setObjectFlagValue(Operand[0], Operand[1], 0);
 }
 
-// Decrement a variable.
-void op_dec() {
-	setZVar(Operand[0],getZVar(Operand[0]) - 1);
+/****************************
+ * 1OP:134 6 dec (variable) *
+ *************************************************************************
+ * Decrement variable by 1. This is signed, so 0 decrements to -1.       *
+ *************************************************************************/
+
+void opDec() {
+	int16_t Value = getZVar(Operand[0]);
+	Value--;
+	setZVar(Operand[0], (uint16_t)Value);
 }
 
-// Decrement a variable and branch if its greater than a value.
-void op_dec_chk() {
-	setZVar(Operand[0],getZVar(Operand[0]) - 1);
-	zBranch(getZVar(Operand[0]) < Operand[1]);
+/***********************************************
+ * 2OP:4 4 dec_check (variable) value ?(label) *
+ *************************************************************************
+ * Decrement variable, and branch if it is now less than the given       *
+ * value.                                                                *
+ *************************************************************************/
+
+void opDecChk() {
+	// Perform the decrement.
+	opDec();
+
+	// Check the new value;
+	int16_t Variable = getZVar(Operand[0]);
+	int16_t Value = Operand[1];
+	zBranch(Variable < Value);
 }
 
-// Signed division.
-void op_div() {
-	int16_t num1 = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	if(num2 == 0) {
-		fputs("\nFATAL: Divide by zero error.\n", stderr);
+/*********************************
+ * 2OP:23 17 div a b -> (result) *
+ *************************************************************************
+ * Signed 16-bit division. Division by zero should halt the interpreter  *
+ * with a suitable error message.                                        *
+ *************************************************************************/
+void opDiv() {
+	int16_t Operator = (int16_t)Operand[0];
+	int16_t Dividend = (int16_t)Operand[1];
+	if(Dividend == 0) {
+		LogMessage(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
-	zStore((uint16_t)(num1 / num2)&0xFFFF);
+	zStore((uint16_t)(Operator / Dividend)&0xFFFF);
 }
 
-// Woops! something shouldn't have happened!
-void op_errnop() {
-	LogMessage(MFatal, "op_err()", "Tried to execute nonexistant opcode!");
+/*********
+ * DUMMY *
+ *************************************************************************
+ * A dummy opcode that should crash the interpreter. This gets executed  *
+ * when a bad opcode is detected.                                        *
+ *************************************************************************/
+
+void opNonexistant() {
+	LogMessage(MFatal, "opNonexistant()", "Tried to execute nonexistant opcode!");
 	exit(1);
 }
 
-// Get the child of an object.
-void op_get_child() {
-	uint16_t adr = 0;
-	if(Operand[0])
-		adr = getChild(Operand[0]);
-	zStore(adr);
-	zBranch(adr);
+/***************************************************
+ * 1OP:130 2 get_child object -> (result) ?(label) *
+ *************************************************************************
+ * Get object contained in given object, branching if this exists, i.e.  *
+ * is not nothing (i.e., is not 0).                                      *
+ *************************************************************************/
+
+void opGetChild() {
+	if(!Operand[0]) {
+		LogMessage(MFatal, "get_child", "Tried to get object in object 0.");
+		exit(1);
+	}
+	// Get the address of the child.
+	uint16_t Address = getChild(Operand[0]);
+	zStore(Address);
+	zBranch(Address);
 }
 
-// Get the parent of an object.
-void op_get_parent() {
-	uint16_t adr = 0;
-	if(Operand[0])
-		adr = getParent(Operand[0]);
-	zStore(adr);
+/*******************************************
+ * 1OP:131 3 get_parent object -> (result) *
+ *************************************************************************
+ * Get parent object (note this has no "banch if exists" clause).        *
+ *************************************************************************/
+
+void opGetParent() {
+	if(!Operand[0]) {
+		LogMessage(MFatal, "get_parent", "Tried to get object in object 0.");
+		exit(1);
+	}
+	uint16_t Address = getParent(Operand[0]);
+	zStore(Address);
 }
+
+/**************************************************
+ * 2OP:17 11 get_prop object property -> (result) *
+ *************************************************************************
+ * Read property from object (resulting in the default value if it had   *
+ * no such declared property). If the property has length 1, the value   *
+ * only that byte. If it has length of 2, the first two bytes of that    *
+ * property is taken as a word value. It is illegal for the opcode to be *
+ * if the property has length greater then 2, and the result is          *
+ * unspecified.                                                          *
+ *************************************************************************/
 
 // Get a property of an object.
-void op_get_prop() {
-	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
-	if(adr != 0) {
-		unsigned int mode = getByte(adr++);
-		zStore(mode == 1 ? getByte(adr) : getWord(adr));
+void opGetProp() {
+	// Get the property address.
+	uint16_t Address = getPropertyAdr(Operand[0],Operand[1]);
+	if(Address != 0) {
+		// If it existed, find its size.
+		unsigned int Size = getByte(Address++);
+		if(Size == 1) {
+			zStore(getByte(Address));
+		} else if(Size == 2 {
+			zStore(getWord(Address));
+		} else {
+			LogMessage(MFatal, "get_prop", "Property size is greater then 2.");
+			exit(1);
+		}
 	} else {
 		zStore(getWord(getWord(0x0a) + (2*Operand[1])));
 	}
 }
 
-// Get the property address of a property.
-void op_get_prop_addr() {
-	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
-	if(adr)
-		adr++;
-	zStore(adr);
+/*******************************************************
+ * 2OP:18 12 get_prop_addr object property -> (result) *
+ *************************************************************************
+ * Get the byte address (in dynamic memory) of the property data for the *
+ * given object's property. This must return 0 if the property doesn't   *
+ * exist.                                                                *
+ *************************************************************************/
+
+void opGetPropAddr() {
+	uint16_t Address = getPropertyAdr(Operand[0], Operand[1]);
+	if(Address)
+		Address++;
+	zStore(Address);
 }
 
-// Get the sibling of an object and store it.
-void op_get_sibling() {
+/*****************************************************
+ * 1OP:129 1 get_sibling object -> (result) ?(label) *
+ *************************************************************************
+ * Get next object in tree, branching if this exists, i.e. is not 0.     *
+ *************************************************************************/
+
+ void opGetSibling() {
 	zStore(getSibling(Operand[0]));
 	zBranch(getSibling(Operand[0]));
 }
 
 // Increment a variable.
-void op_inc() {
+void opInc() {
 	setZVar(Operand[0],getZVar(Operand[0]) + 1);
 }
 
 // Increment a variable and branch if it is greater than a value.
-void op_inc_chk() {
+void opIncChk() {
 	int16_t val;
 	val = getZVar(Operand[0]);
 	setZVar(Operand[0],++val);
@@ -300,9 +386,9 @@ void op_inc_chk() {
 }
 
 // Insert an object somewhere in the object tree.
-void op_remove_obj();
-void op_insert_obj() {
-	op_remove_obj();
+void opRemoveObj();
+void opInsertObj() {
+	opRemoveObj();
 	uint16_t child = getChild(Operand[1]);
 	setSibling(Operand[0], child);
 	setParent(Operand[0], Operand[1]);
@@ -310,47 +396,47 @@ void op_insert_obj() {
 }
 
 // Branch if equal.
-void op_je() {
+void opJe() {
 	zBranch(Operand[0] == Operand[1]);
 }
 
 // Branch if greater than.
-void op_jg() {
+void opJg() {
 	zBranch(Operand[0] > Operand[1]);
 }
 
 // Branch if an object is inside another.
-void op_jin() {
+void opJin() {
 	zBranch(getParent(Operand[0]) == Operand[1]);
 }
 
 // Jump unconditionally.
-void op_jump() {
+void opJump() {
 	CurrentZFrame->PC += (int16_t)Operand[0] - 2;
 }
 
 // Branch if less than.
-void op_jl() {
+void opJl() {
 	zBranch(Operand[0] < Operand[1]);
 }
 
 // Branch if zero.
-void op_jz() {
+void opJz() {
 	zBranch((int16_t)Operand[0] == 0);
 }
 
 // Get a byte from memory and store it.
-void op_loadb() {
+void opLoadb() {
 	zStore(getByte(Operand[0]+Operand[1]));
 }
 
 // Get a word from memory and store it.
-void op_loadw() {
+void opLoadw() {
 	zStore(getWord(Operand[0]+2*Operand[1]));
 }
 
 // Log shift
-void op_log_shift() {
+void opLogShift() {
 	uint16_t num = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	if(num2 >= 0)
@@ -361,7 +447,7 @@ void op_log_shift() {
 }
 
 // Modulus.
-void op_mod() {
+void opMod() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	if(num2 == 0) {
@@ -372,53 +458,53 @@ void op_mod() {
 }
 
 // Multiply.
-void op_mul() {
+void opMul() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	zStore((uint16_t)(num1 * num2)&0xFFFF);
 }
 
 // No operation.
-void op_nop() {
+void opNop() {
 }
 
 
 // Print a newline.
-void op_new_line() {
+void opNewLine() {
 	zPrint("\n");
 }
 
 // Logical or.
-void op_or() {
+void opOr() {
 	zStore(Operand[0] | Operand[1]);
 }
 
 // Print a string stored after the operation.
-void op_print() {
+void opPrint() {
 	char* str = zGetStringFromPC();
 	zPrint(str);
 	free(str);
 }
 
 // Print a string stored after the operation.
-void op_print_ret() {
-	op_print();
-	op_new_line();
-	op_ret();
+void opPrintRet() {
+	opPrint();
+	opNewLine();
+	opRet();
 }
 
 // Print a z-character.
-void op_print_char() {
+void opPrintChar() {
 	printf("%c",Operand[0]);
 }
 
 // Print a number
-void op_print_num() {
+void opPrintNum() {
 	printf("%i",Operand[0]);
 }
 
 // Print an objects name.
-void op_print_obj() {
+void opPrintObj() {
 	uint16_t adr = getPropertyTableAdr(Operand[0]);
 	adr++;
 	char* name = zCharsToZSCII(getZChars(adr));
@@ -427,31 +513,31 @@ void op_print_obj() {
 }
 
 // Print a string stored at a padded address.
-void op_print_paddr() {
+void opPrintPaddr() {
 	char* str = zCharsToZSCII(getZChars(exPadAdr(Operand[0])));
 	zPrint(str);
 	free(str);
 }
 
 // Pop from the current local Stack.
-void op_pull() {
+void opPull() {
 	setZVar(Operand[0],popZStack());
 }
 
 // Push to the current local Stack.
-void op_push() {
+void opPush() {
 	pushZStack(Operand[0]);
 }
 
 // Set the value of a property.
-void op_put_prop() {
+void opPutProp() {
 	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
 	unsigned int mode = getByte(adr++);
 	mode == 1 ? setByte(adr,Operand[2]) : setWord(adr, Operand[2]);
 }
 
 // Get a random number.
-void op_random() {
+void opRandom() {
 	static uint16_t state = 0;
 	if(!state)
 		state = time(NULL)%0xFFFF;
@@ -472,12 +558,12 @@ void op_random() {
 }
 
 // Read a string from the user.
-void op_read() {
+void opRead() {
 	readString(0);
 }
 
 // Remove an object from the object tree.
-void op_remove_obj() {
+void opRemoveObj() {
 	uint16_t parent = getParent(Operand[0]);
 	if(parent != 0) {
 		if(getChild(parent) == Operand[0]) {
@@ -493,8 +579,8 @@ void op_remove_obj() {
 	setSibling(Operand[0], 0);
 }
 
-// REturn from a routine, returning a value if needed.
-void op_ret() {
+// Return from a routine, returning a value if needed.
+void opRet() {
 	popZFrame();
 	if(CurrentZFrame->ReturnVar == 1)
 		setZVar(getByte(CurrentZFrame->PC++), Operand[0]);
@@ -502,76 +588,106 @@ void op_ret() {
 }
 
 // Pop from the Stack and return that value.
-void op_ret_popped() {
+void opRetPopped() {
 	Operand[0] = popZStack();
-	op_ret();
+	opRet();
 }
 
 // Return false.
-void op_rfalse() {
+void opRfalse() {
 	Operand[0] = 0;
-	op_ret();
+	opRet();
 }
 
 // Return true.
-void op_rtrue() {
+void opRtrue() {
 	Operand[0] = 1;
-	op_ret();
+	opRet();
 }
 
 // Set the flag of an object to on.
-void op_set_attr() {
+void opSetAttr() {
 	setObjectFlagValue(Operand[0], Operand[1], 1);
 }
 
 // Store a value in a variable.
-void op_store() {
+void opStore() {
 	setZVar(Operand[0],Operand[1]);
 }
 
 // Set a byte in memory.
-void op_storeb() {
+void opStoreb() {
 	setByte(Operand[0]+Operand[1], Operand[2]);
 }
 
 // Set a word in memory.
-void op_storew() {
+void opStorew() {
 	setWord(Operand[0]+2*Operand[1], Operand[2]);
 }
 
-//  Subtract.
-void op_sub() {
+// Subtract.
+void opSub() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	zStore((uint16_t)(num1 - num2)&0xFFFF);
 }
 
 // Test to see if a bitmask is set.
-void op_test() {
+void opTest() {
 	zBranch((Operand[0] & Operand[1]) == Operand[1]);
 }
 
 // Find is a flag of an object is set to on.
-void op_test_attr() {
+void opTestAttr() {
 	zBranch(getObjectFlag(Operand[0], Operand[1]));
 }
 
 // Throw away some Stack frames, until the desired number is reached.
-void op_throw() {
+void opThrow() {
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);
 		exit(1);
 	}
 	while(Operand[1] < zFrameNumber(CurrentZFrame))
 		popZFrame();
-	op_ret();
+	opRet();
 }
 
 void initOpCodes() {
-	CallOpCode[9] = 
-	CallOpCode[41] =
-	CallOpCode[73] = 
-	CallOpCode[105] = &opAdd;
+	for(int I = 0; I < 256; I++) {
+		CallOpCode[I] = &opNonexistant;
+	}
+	for(int I = 0; I <= 32; I++) {
+		CallOpCode[1+I] = opJe;
+		CallOpCode[2+I] = opJl;
+		CallOpCode[3+I] = opJg;
+		CallOpCode[4+I] = opDecChk;
+		CallOpCode[5+I] = opIncChk;
+		CallOpCode[6+I] = opJin;
+		CallOpCode[7+I] = opTest;
+		CallOpCode[8+I] = opOr;
+		CallOpCode[9+I] = opAnd;
+		CallOpCode[10+I] = opTestAttr;
+		CallOpCode[11+I] = opSetAttr;
+		CallOpCode[12+I] = opClearAttr;
+		CallOpCode[13+I] = opStore;
+		CallOpCode[14+I] = opInsertObj;
+		CallOpCode[15+I] = opLoadw;
+		CallOpCode[16+I] = opLoadb;
+		CallOpCode[17+I] = opGetProp;
+		CallOpCode[18+I] = opGetPropAddr;
+		CallOpCode[19+I] = opGetNextProp;
+		CallOpCode[20+I] = opAdd;
+		CallOpCode[21+I] = opSub;
+		CallOpCode[22+I] = opMul;
+		CallOpCode[23+I] = opDiv;
+		CallOpCode[24+I] = opMod;
+		CallOpCode[25+I] = opCall;
+		CallOpCode[26+I] = opCall;
+		CallOpCode[28+I] = opThrow;
+
+	}
+	CallOpCode[224] = &opCall;
 }
 
 #endif /* OPCODES_H */
