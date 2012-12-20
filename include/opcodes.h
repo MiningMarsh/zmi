@@ -368,102 +368,212 @@ void opGetPropAddr() {
  *************************************************************************/
 
  void opGetSibling() {
+	 if(!Operand[0]) {
+		LogMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
+		exit(1);
+	}
 	zStore(getSibling(Operand[0]));
 	zBranch(getSibling(Operand[0]));
 }
 
-// Increment a variable.
+/****************************
+ * 1OP:133 5 inc (variable) *
+ *************************************************************************
+ * Increment variable by 1. (This is signed, so -1 increments to 0.)     *
+ *************************************************************************/
+
 void opInc() {
-	setZVar(Operand[0],getZVar(Operand[0]) + 1);
+	int16_t Value = getZVar(Operand[0]);
+	Value++;
+	setZVar(Operand[0], (uint16_t)Value);
 }
 
-// Increment a variable and branch if it is greater than a value.
+/*********************************************
+ * 2OP:5 5 inc_chk (variable) value ?(label) *
+ *************************************************************************
+ * Increment variable, and branch if now greater than value.             *
+ *************************************************************************/
+ 
 void opIncChk() {
-	int16_t val;
-	val = getZVar(Operand[0]);
-	setZVar(Operand[0],++val);
-	zBranch(val > Operand[1]);
+	// Perform the increment.
+	opInc();
+
+	// Check the new value;
+	int16_t Variable = getZVar(Operand[0]);
+	int16_t Value = Operand[1];
+	zBranch(Variable > Value);
 }
 
-// Insert an object somewhere in the object tree.
+/******************************************
+ * 2OP:14 E insert_obj object destination *
+ *************************************************************************
+ * Moves object O to become the first child of the destination object D. *
+ * (Thus, after the operation the child of D is O, and the sibling of O  *
+ * is whatever was previously the child of D.) All children of O move    *
+ * with it. (Initially O can be at any point in the object tree; it may  *
+ * legally have parent zero.)                                            *
+ *************************************************************************/
+ 
 void opRemoveObj();
 void opInsertObj() {
 	opRemoveObj();
-	uint16_t child = getChild(Operand[1]);
-	setSibling(Operand[0], child);
+	uint16_t Child = getChild(Operand[1]);
+	setSibling(Operand[0], Child);
 	setParent(Operand[0], Operand[1]);
 	setChild(Operand[1],Operand[0]);
 }
 
-// Branch if equal.
+/***************************
+ * 2OP:1 1 je a b ?(label) *
+ *************************************************************************
+ * Jump if a is equal to any of the subsequent operands. (Thus @je a     *
+ * never jumps and @je a b jumps if a = b.)                              *
+ *************************************************************************/
+
 void opJe() {
-	zBranch(Operand[0] == Operand[1]);
+	bool DoJump = false;
+	for(int I = 1; I < 8; I++) {
+		if((OperandType[I] != Omitted) && (Operand[0] == Operand[I]))
+			DoJump = true;
+	}
+	zBranch(DoJump);
 }
 
-// Branch if greater than.
+/***************************
+ * 2OP:3 3 jg a b ?(label) *
+ *************************************************************************
+ * Jump if a > b (using a signed 16-bit comparison).                     *
+ *************************************************************************/
+
 void opJg() {
-	zBranch(Operand[0] > Operand[1]);
+	int16_t A = Operand[0];
+	int16_t B = Operand[1];
+	zBranch(A > B);
 }
 
-// Branch if an object is inside another.
+/**********************************
+ * 2OP:6 6 jin obj1 obj2 ?(label) *
+ *************************************************************************
+ * Jump if object a is a direct child of b, i.e., if parent of a is b.   *
+ *************************************************************************/
+
 void opJin() {
 	zBranch(getParent(Operand[0]) == Operand[1]);
 }
 
-// Jump unconditionally.
-void opJump() {
-	CurrentZFrame->PC += (int16_t)Operand[0] - 2;
-}
+/***************************
+ * 2OP:2 2 jl a b ?(label) *
+ *************************************************************************
+ * Jump if a < b (using a signed 16-bit comparison).                     *
+ * ***********************************************************************/
 
-// Branch if less than.
 void opJl() {
 	zBranch(Operand[0] < Operand[1]);
 }
 
-// Branch if zero.
-void opJz() {
-	zBranch((int16_t)Operand[0] == 0);
+/***************************
+ * 1OP:140 C jump ?(label) *
+ *************************************************************************
+ * Jump (unconditionally) to the given label. (This is not a branch      *
+ * instruction and the operand is a 2-byte signed offset to apply to the *
+ * program counter.) It is legal for this to jump into a different       *
+ * routine (which should not change the routine call state), although it *
+ * is considered bad practice to do so and the Txd disassembler is       *
+ * confused by it.                                                       *
+ *************************************************************************/
+
+void opJump() {
+	CurrentZFrame->PC += (int16_t)Operand[0] - 2;
 }
 
-// Get a byte from memory and store it.
+/***************************
+ * 1OP:128 0 jz a ?(label) *
+ *************************************************************************
+ * Jump if a = 0.                                                        *
+ *************************************************************************/
+
+void opJz() {
+	zBranch(!Operand[0]);
+}
+
+/************************************************
+ * 2OP:16 10 loadb array byte-index -> (result) *
+ *************************************************************************
+ * Stores array->byte-index (i.e., the byte at address array+byte-index, *
+ *  which must lie in static or dynamic memory).                         *
+ *************************************************************************/
+
 void opLoadb() {
 	zStore(getByte(Operand[0]+Operand[1]));
 }
 
-// Get a word from memory and store it.
+/***********************************************
+ * 2OP:15 F loadw array word-index -> (result) *
+ *************************************************************************
+ * Stores array-->word-index (i.e., the word at address                  *
+ * array+2*word-index, which must lie in static or dynamic memory).      *
+ *************************************************************************/
+
 void opLoadw() {
 	zStore(getWord(Operand[0]+2*Operand[1]));
 }
 
-// Log shift
+/*************************************************
+ * EXT:2 2 5 log_shift number places -> (result) *
+ *************************************************************************
+ * Does a logical shift of number by the given number of places,         *
+ * shifting left (i.e. increasing) if places is positive, right if       *
+ * negative. In a right shift, the sign is zeroed instead of being       *
+ * shifted on. (See also art_shift.)                                     *
+ *************************************************************************/
+
 void opLogShift() {
-	uint16_t num = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	if(num2 >= 0)
-		num = num<<num2;
+	uint16_t Number = (int16_t)Operand[0];
+	int16_t Places = (int16_t)Operand[1];
+	if(Places >= 0)
+		Number = Number << Places;
 	else
-		num = num>>(num2*(-1));
-	zStore(num);
+		Number = Number >> (Places*(-1));
+	zStore(Number);
 }
 
-// Modulus.
+/*********************************
+ * 2OP:24 18 mod a b -> (result) *
+ *************************************************************************
+ * Remainder after signed 16-bit division. Division by zero should halt  *
+ * the interpreter with a suit-able error message.                       *
+ *************************************************************************/
+
 void opMod() {
-	int16_t num1 = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	if(num2 == 0) {
-		fputs("Divide by zero error.\n", stderr);
+	int16_t Base = (int16_t)Operand[0];
+	int16_t Dividend = (int16_t)Operand[1];
+	if(Dividend == 0) {
+		LogMessage(MFatal, "mod", "Modulus by zero.");
 		exit(1);
 	}
-	zStore((uint16_t)(num1 % num2)&0xFFFF);
+	zStore((uint16_t)(Base % Dividend)&0xFFFF);
 }
 
-// Multiply.
+/*********************************
+ * 2OP:22 16 mul a b -> (result) *
+ *************************************************************************
+ * Signed 16-bit multiplication.                                         *
+ *************************************************************************/
+ 
 void opMul() {
 	int16_t num1 = (int16_t)Operand[0];
 	int16_t num2 = (int16_t)Operand[1];
 	zStore((uint16_t)(num1 * num2)&0xFFFF);
 }
 
+/*********************
+ * 0OP:180 4 1/- nop *
+ *************************************************************************
+ * Probably the official "no operation" instruction, which,              *
+ * appropriately, was never operated (in any of the Infocom datafiles):  *
+ * it may once have been a breakpoint.                                   *
+ *************************************************************************/
+ 
 // No operation.
 void opNop() {
 }
