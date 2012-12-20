@@ -8,6 +8,8 @@
 // Table of opcodes.
 void (*CallOpCode[256])(void) = {NULL};
 
+/* --------------------------------------------------------------------- */
+
 void opRet();
 
 /*********************************
@@ -199,8 +201,8 @@ void opCheckArgCount() {
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
-/******************************************************
- * EXT:12 C 5/* check_unicode char-number -> (result) *
+/********************************************************
+ * EXT:12 C 5 / * check_unicode char-number -> (result) *
  *************************************************************************
  * Determines whether or not the interperter can print, or recieve from  *
  * the keyboard, the given Unicode character. Bit 0 should be set if and *
@@ -335,7 +337,7 @@ void opGetProp() {
 		unsigned int Size = getByte(Address++);
 		if(Size == 1) {
 			zStore(getByte(Address));
-		} else if(Size == 2 {
+		} else if(Size == 2) {
 			zStore(getWord(Address));
 		} else {
 			LogMessage(MFatal, "get_prop", "Property size is greater then 2.");
@@ -431,12 +433,7 @@ void opInsertObj() {
  *************************************************************************/
 
 void opJe() {
-	bool DoJump = false;
-	for(int I = 1; I < 8; I++) {
-		if((OperandType[I] != Omitted) && (Operand[0] == Operand[I]))
-			DoJump = true;
-	}
-	zBranch(DoJump);
+	zBranch(Operand[0] == Operand[1]);
 }
 
 /***************************
@@ -587,14 +584,12 @@ void opNewLine() {
  
 void opNop() {
 	// This is "probably" standard compliant.
-	if(Dividend == 0) {
-		LogMessage(MWarning, "nop", 
-			"Nop wastes both cpu cycles, and is\n"
-			"not fully defined in the standard, and is therefore undefined"
-			"behavior. Don't use it."
+	LogMessage(MWarning, "nop", 
+		"Nop wastes both cpu cycles, and is\n"
+		"not fully defined in the standard, and is therefore undefined"
+		"behavior. Don't use it."
 		);
-		exit(1);
-	}
+	exit(1);
 }
 
 /******************************
@@ -700,12 +695,12 @@ void opPrintPaddr() {
 
 void opPrint();
 void opNewLine();
-void opRTrue();
+void opRtrue();
 
 void opPrintRet() {
 	opPrint();
 	opNewLine();
-	opRTrue();
+	opRtrue();
 }
 
 /*******************************
@@ -722,19 +717,56 @@ void opPull() {
 	setZVar(Operand[0],popZStack());
 }
 
-// Push to the current local Stack.
+/************************
+ * VAR:232 8 push value *
+ *************************************************************************
+ * Pushes value onto the game stack.                                     *
+ *************************************************************************/
+
 void opPush() {
 	pushZStack(Operand[0]);
 }
 
-// Set the value of a property.
+/********************************************
+ * VAR:227 3 put_prop object property value *
+ *************************************************************************
+ * Writes the given value to the given property of the given object. If  *
+ * the property does not exist for that object, the interpreter should   *
+ * halt with a suitable error message. If the property length is 1, then *
+ * the interpreter should store only the least significant byte of the   *
+ * value. (For instance, storing -1 into a 1-byte property results in    *
+ * the property value 255.) As with get_prop the property length must    *
+ * not be more than 2: if it is, the behaviour of the opcode is          *
+ * undefined.                                                            *
+ *************************************************************************/
+
 void opPutProp() {
-	uint16_t adr = getPropertyAdr(Operand[0],Operand[1]);
-	unsigned int mode = getByte(adr++);
-	mode == 1 ? setByte(adr,Operand[2]) : setWord(adr, Operand[2]);
+	uint16_t Address = getPropertyAdr(Operand[0],Operand[1]);
+	unsigned int Size = getByte(Address++);
+	if(Size == 1) {
+		setByte(Address,Operand[2]);
+	} else if(Size == 2) {
+		setWord(Address, Operand[2]);
+	} else {
+		LogMessage(MFatal, "put_prop", "Property size is greater then 2.");
+		exit(1);
+	}
 }
 
-// Get a random number.
+/**************************************
+ * VAR:231 7 random range -> (result) *
+ *************************************************************************
+ * If range is positive, returns a uniformly random number between 1 and *
+ * range. If range is negative, the random number generator is seeded to *
+ * that value and the return value is 0. Most interpreters consider      *
+ * giving 0 as range illegal (because they attempt a division with       *
+ * remainder by the range), but correct behaviour is to reseed the       *
+ * generator in as random a way as the interpreter can(e.g. by using the *
+ * time in milliseconds). (Some version 3 games, such as 'Enchanter'     *
+ * release 29, had a debugging verb #random such that typing, say,       *
+ * #random 14 caused a call of random with -14.)                         *
+ *************************************************************************/
+
 void opRandom() {
 	// This state varibale represents the current value of the LFSR. 
 	// Since in normal operation, a LFSR will never reach state 0, we
@@ -759,29 +791,122 @@ void opRandom() {
 	}
 }
 
-// Read a string from the user.
+/*********************************************************
+ * VAR:228 4 1 sread text parse                          *
+ *           4 sread text parse time routine             *
+ *           5 aread text parse time routine -> (result) *
+ *************************************************************************
+ * (Note that Inform internally names the read opcode as aread in        *
+ * Versions 5 and later and sread in Versions 3 and 4.)                  *
+ * This opcode reads a whole command from the keyboard (no prompt is     *
+ * automatically displayed). It is legal for this to be called with the  *
+ * cursor at any position on any window. In Versions 1 to 3, the status  *
+ * line is automatically redisplayed first. A sequence of characters is  *
+ * read in from the current input stream until a carriage return (or, in *
+ * Versions 5 and later, any terminating character) is found. In         *
+ * Versions 1 to 4, byte 0 of the text-buffer should initially contain   *
+ * the maximum number of letters which can be typed, minus 1             *
+ * (the interpreter should not accept more than this). The text typed is *
+ * reduced to lower case (so that it can tidily be printed back by the   *
+ * program if need be) and stored in bytes 1 onward, with a zero         *
+ * terminator (but without any other terminator, such as a carriage      *
+ * return code). (This means that if byte 0 contains n then the buffer   *
+ * must contain n+1 bytes, which makes it a string array of length n in  *
+ * Inform terminology.) In Versions 5 and later, byte 0 of the           *
+ * text-buffer should initially contain the maximum number of letters    *
+ * which can be typed (the interpreter should not accept more than       *
+ * this). The interpreter stores the number of characters actually typed *
+ * in byte 1 (not counting the terminating character), and the           *
+ * characters themselves in bytes 2 onward (not storing the terminating  *
+ * character). (Some interpreters wrongly add a zero byte after the text *
+ * anyway, so it is wise for the buffer to contain at least n+3 bytes.)  *
+ *                                                                       *
+ * Moreover, if byte 1 contains a positive value at the start of the     *
+ * input, then read assumes that number of characters are left over from *
+ * an interrupted previous input, and writes the new characters after    *
+ * those already there. Note that the interpreter does not redisplay the *
+ * characters left over: the game does this, if it wants to. This is     *
+ * unfortunate for any interpreter wanting to give input text a          *
+ * distinctive appearance on-screen, but 'Beyond Zork', 'Zork Zero' and  *
+ * 'Shogun' clearly require it. ("Just a tremendous pain in my butt" --  *
+ * Andrew Plotkin; "the most unfortunate feature of the Z-machine        *
+ * design" -- Stefan Jokisch.) In Version 4 and later, if the operands   *
+ * time and routine are supplied (and non-zero) then the routine call    *
+ * routine() is made every time/10 seconds during the keyboard-reading   *
+ * process. If this routine returns true, all input is erased (to zero)  *
+ * and the reading process is terminated at once. (The terminating       *
+ * character code is 0.) The routine is permitted to print to the screen *
+ * even if it returns false to signal "carry on": the interpreter should *
+ * notice and redraw the input line so far, before input continues.      *
+ * (Frotz notices by looking to see if the cursor position is at the     *
+ * left-hand margin after the interrupt routine has returned.) If input  *
+ * was terminated in the usual way, by the player typing a carriage      *
+ * return, then a carriage return is printed (so the cursor moves to the *
+ * next line). If it was interrupted, the cursor is left at the          *
+ * rightmost end of the text typed in so far. Next, lexical analysis is  *
+ * performed on the text (except that in Versions 5 and later, if        *
+ * parse-buffer is zero then this is omitted). Initially, byte 0 of the  *
+ * parse-buffer should hold the maximum number of textual words which    *
+ * can be parsed. (If this is n, the buffer must be at least 2 + 4*n     *
+ * bytes long to hold the results of the analysis.) The interpreter      *
+ * divides the text into words and looks them up in the dictionary, as   *
+ * described in S 13. The number of words is written in byte 1 and one   *
+ * 4-byte block is written for each word, from byte 2 onwards (except    *
+ * that it should stop before going beyond the maximum number of words   *
+ * specified). Each block consists of the byte address of the word in    *
+ * the dictionary, if it is in the dictionary, or 0 if it isn't;         *
+ * followed by a byte giving the number of letters in the word; and      *
+ * finally a byte giving the position in the text-buffer of the first    *
+ * letter of the word. In Version 5 and later, this is a store           *
+ * instruction: the return value is the terminating character (note that *
+ * the user pressing his "enter" key may cause either 10 or 13 to be     *
+ * returned; the author recommends that interpreters return 10). A       *
+ * timed-out input returns 0. (Versions 1 and 2 and early Version 3      *
+ * games mistakenly write the parse buffer length 240 into byte 0 of the *
+ * parse buffer: later games fix this bug and write 59, because          *
+ * 2+4*59 = 238 so that 59 is the maximum number of textual words which  *
+ * can be parsed into a buffer of length 240 bytes. Old versions of the  *
+ * Inform 5 library commit the same error. Neither mistake has very      *
+ * serious consequences.) (Interpreters are asked to halt with a         *
+ * suitable error message if the text or parse buffers have length of    *
+ * less than 3 or 6 bytes, respectively: this sometimes occurs due to a  *
+ * previous array being overrun, causing bugs which are very difficult   *
+ * to find.)                                                             *
+ *************************************************************************/
+ 
 void opRead() {
 	readString(0);
 }
 
-// Remove an object from the object tree.
+/*******************************
+ * 1OP:137 9 remove_obj object *
+ *************************************************************************
+ * Detach the object from its parent, so that it no longer has any       *
+ * parent. (Its children remain in its possession.)                      *
+ *************************************************************************/
+ 
 void opRemoveObj() {
-	uint16_t parent = getParent(Operand[0]);
-	if(parent != 0) {
-		if(getChild(parent) == Operand[0]) {
-			setChild(parent, getSibling(Operand[0]));
+	uint16_t Parent = getParent(Operand[0]);
+	if(Parent != 0) {
+		if(getChild(Parent) == Operand[0]) {
+			setChild(Parent, getSibling(Operand[0]));
 		} else {
-			uint16_t last = getChild(parent);
-			while(getSibling(last) != Operand[0])
-				last = getSibling(last);
-			setSibling(last, getSibling(Operand[0]));
+			uint16_t LastChild = getChild(Parent);
+			while(getSibling(LastChild) != Operand[0])
+				LastChild = getSibling(LastChild);
+			setSibling(LastChild, getSibling(Operand[0]));
 		}
 	}
 	setParent(Operand[0], 0);
 	setSibling(Operand[0], 0);
 }
 
-// Return from a routine, returning a value if needed.
+/***********************
+ * 1OP:139 B ret value *
+ *************************************************************************
+ * Returns from the current routine with the value given.                *
+ *************************************************************************/
+
 void opRet() {
 	popZFrame();
 	if(CurrentZFrame->ReturnVar == 1)
@@ -789,62 +914,126 @@ void opRet() {
 	CurrentZFrame->ReturnVar = 1;
 }
 
-// Pop from the Stack and return that value.
+/************************
+ * 0OP:184 8 ret_popped *
+ *************************************************************************
+ * Pops top of stack and returns that. (This is equivalent to ret sp,    *
+ * but is one byte cheaper.)                                             *
+ *************************************************************************/
+
 void opRetPopped() {
 	Operand[0] = popZStack();
 	opRet();
 }
 
-// Return false.
+/********************
+ * 0OP:177 1 rfalse *
+ *************************************************************************
+ * Return false (i.e., 0) from the current routine.                      *
+ *************************************************************************/
+ 
 void opRfalse() {
 	Operand[0] = 0;
 	opRet();
 }
 
-// Return true.
+/*******************
+ * 0OP:176 0 rtrue *
+ *************************************************************************
+ * Return true (i.e., 1) from the current routine.                       *
+ *************************************************************************/
+
 void opRtrue() {
 	Operand[0] = 1;
 	opRet();
 }
 
-// Set the flag of an object to on.
+/**************************************
+ * 2OP:11 B set_attr object attribute *
+ *************************************************************************
+ * Make object have the attribute numbered attribute.                    *
+ *************************************************************************/
+ 
 void opSetAttr() {
 	setObjectFlagValue(Operand[0], Operand[1], 1);
 }
 
-// Store a value in a variable.
+/***********************************
+ * 2OP:13 D store (variable) value *
+ *************************************************************************
+ * Set the VARiable referenced by the operand to value.                  *
+ *************************************************************************/
+ 
 void opStore() {
 	setZVar(Operand[0],Operand[1]);
 }
 
-// Set a byte in memory.
+/*******************************************
+ * VAR:226 2 storeb array byte-index value *
+ *************************************************************************
+ * array->byte-index = value, i.e. stores the given value in the byte at *
+ * address array+byte-index (which must lie in dynamic memory).          *
+ * (See loadb.)                                                          *
+ *************************************************************************/
+
 void opStoreb() {
 	setByte(Operand[0]+Operand[1], Operand[2]);
 }
 
-// Set a word in memory.
+/*******************************************
+ * VAR:225 1 storew array word-index value *
+ *************************************************************************
+ * array-->word-index = value, i.e. stores the given value in the word   *
+ * at address array+2*word- index (which must lie in dynamic memory).    *
+ *  (See loadw.)                                                         *
+ *************************************************************************/
+
 void opStorew() {
 	setWord(Operand[0]+2*Operand[1], Operand[2]);
 }
 
-// Subtract.
+/*********************************
+ * 2OP:21 15 sub a b -> (result) *
+ *************************************************************************
+ * Signed 16-bit subtraction.                                            *
+ *************************************************************************/
+
 void opSub() {
-	int16_t num1 = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	zStore((uint16_t)(num1 - num2)&0xFFFF);
+	int16_t Value = (int16_t)Operand[0];
+	int16_t Smaller = (int16_t)Operand[1];
+	zStore((uint16_t)(Value - Smaller)&0xFFFF);
 }
 
-// Test to see if a bitmask is set.
+/**************************************
+ * 2OP:7 7 test bitmap flags ?(label) *
+ *************************************************************************
+ * Jump if all of the flags in bitmap are set (i.e. if bitmap & flags == *
+ * flags).                                                               *
+ *************************************************************************/
+
 void opTest() {
 	zBranch((Operand[0] & Operand[1]) == Operand[1]);
 }
 
-// Find is a flag of an object is set to on.
+/************************************************
+ * 2OP:10 A test_attr object attribute ?(label) *
+ *************************************************************************
+ * Jump if object has attribute.                                         *
+ *************************************************************************/ 
+
 void opTestAttr() {
 	zBranch(getObjectFlag(Operand[0], Operand[1]));
 }
 
-// Throw away some Stack frames, until the desired number is reached.
+/*****************************************
+ * 2OP:28 1C 5/6 throw value stack-frame *
+ *************************************************************************
+ * Opposite of catch: resets the routine call state to the state it had  *
+ *  when the given stack frame value was 'caught', and then returns. In  *
+ * other words, it returns as if from the routine which executed the     *
+ * catch which found this stack frame value.                             *
+ *************************************************************************/
+
 void opThrow() {
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);
@@ -854,6 +1043,8 @@ void opThrow() {
 		popZFrame();
 	opRet();
 }
+
+/* --------------------------------------------------------------------- */
 
 void initOpCodes() {
 	for(int I = 0; I < 256; I++) {
@@ -878,7 +1069,6 @@ void initOpCodes() {
 		CallOpCode[16+I] = opLoadb;
 		CallOpCode[17+I] = opGetProp;
 		CallOpCode[18+I] = opGetPropAddr;
-		CallOpCode[19+I] = opGetNextProp;
 		CallOpCode[20+I] = opAdd;
 		CallOpCode[21+I] = opSub;
 		CallOpCode[22+I] = opMul;
