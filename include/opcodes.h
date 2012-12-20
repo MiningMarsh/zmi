@@ -566,6 +566,17 @@ void opMul() {
 	zStore((uint16_t)(num1 * num2)&0xFFFF);
 }
 
+/**********************
+ * 0OP:187 B new_line *
+ *************************************************************************
+ * Print carriage return.                                                *
+ *************************************************************************/
+
+// Print a newline.
+void opNewLine() {
+	zPrint("\n");
+}
+
 /*********************
  * 0OP:180 4 1/- nop *
  *************************************************************************
@@ -574,62 +585,139 @@ void opMul() {
  * it may once have been a breakpoint.                                   *
  *************************************************************************/
  
-// No operation.
 void opNop() {
+	// This is "probably" standard compliant.
+	if(Dividend == 0) {
+		LogMessage(MWarning, "nop", 
+			"Nop wastes both cpu cycles, and is\n"
+			"not fully defined in the standard, and is therefore undefined"
+			"behavior. Don't use it."
+		);
+		exit(1);
+	}
 }
 
+/******************************
+ * 2OP:8 8 or a b -> (result) *
+ *************************************************************************
+ * Bitwise OR.                                                           *
+ *************************************************************************/
 
-// Print a newline.
-void opNewLine() {
-	zPrint("\n");
-}
-
-// Logical or.
 void opOr() {
 	zStore(Operand[0] | Operand[1]);
 }
 
-// Print a string stored after the operation.
+/*********************************
+ * 0OP:191 F 5/- piracy ?(label) *
+ *************************************************************************
+ * Branches if the game disc is believed to be genuine by the            *
+ * interpreter (which is assumed to have some arcane way of finding      *
+ * out). Interpreters are asked to be gullible and to unconditionally    *
+ * branch.                                                               *
+ *************************************************************************/
+
+void opPiracy() {
+	zBranch(true);
+}
+
+/*******************
+ * 0OP:178 2 print *
+ *************************************************************************
+ * Print the quoted (literal) Z-encoded string.                          *
+ *************************************************************************/
+
 void opPrint() {
-	char* str = zGetStringFromPC();
-	zPrint(str);
-	free(str);
+	// The string on this operation is stored on teh byte now pointed to
+	// by the program counter.
+	char* String = zGetStringFromPC();
+	zPrint(String);
+	
+	// zPrint does not autofree.
+	free(String);
 }
 
-// Print a string stored after the operation.
-void opPrintRet() {
-	opPrint();
-	opNewLine();
-	opRet();
-}
+/**********************************************
+ * VAR:229 5 print_char output-character-code *
+ *************************************************************************
+ * Print a ZSCII character. The operand must be a character code defined *
+ * in ZSCII for output (see S 3). In particular, it must certainly not   *
+ * be negative or larger than 1023.                                      *
+ *************************************************************************/ 
 
-// Print a z-character.
 void opPrintChar() {
+	// TODO: Make this operation standard compliant.
 	printf("%c",Operand[0]);
 }
 
-// Print a number
+/*****************************
+ * VAR:230 6 print_num value *
+ *************************************************************************
+ * Print (signed) number in decimal.                                     *
+ *************************************************************************/
+
 void opPrintNum() {
+	// TODO: Fix zPrint so that this can use that instead of printf.
 	printf("%i",Operand[0]);
 }
 
-// Print an objects name.
+/******************************
+ * 1OP:138 A print_obj object *
+ *************************************************************************
+ * Print short name of object (the Z-encoded string in the object        * 
+ * header, not a property). If the object number is invalid, the         *
+ * interpreter should halt with a suitable error message.                *
+ *************************************************************************/
+
 void opPrintObj() {
-	uint16_t adr = getPropertyTableAdr(Operand[0]);
-	adr++;
-	char* name = zCharsToZSCII(getZChars(adr));
-	zPrint(name);
-	free(name);
+	// TODO: Implement %s in zprint to fix this potential code injecction
+	// exploit.
+	uint16_t PropertyTableAddress = getPropertyTableAdr(Operand[0]);
+	 PropertyTableAddress++;
+	char* ObjectName = zCharsToZSCII(getZChars( PropertyTableAddress));
+	zPrint(ObjectName);
+	free(ObjectName);
 }
 
-// Print a string stored at a padded address.
+/**************************************************
+ * 1OP:141 D print_paddr packed-address-of-string *
+ *************************************************************************
+ * Print the (Z-encoded) string at the given packed address in high      *
+ * memory.                                                               *
+ *************************************************************************/
+
 void opPrintPaddr() {
-	char* str = zCharsToZSCII(getZChars(exPadAdr(Operand[0])));
-	zPrint(str);
-	free(str);
+	char* String = zCharsToZSCII(getZChars(exPadAdr(Operand[0])));
+	zPrint(String);
+	free(String);
 }
 
-// Pop from the current local Stack.
+/***********************
+ * 0OP:179 3 print_ret *
+ *************************************************************************
+ * Print the quoted (literal) Z-encoded string, then print a new-line    *
+ * and then return true (i.e., 1).                                       *
+ *************************************************************************/
+
+void opPrint();
+void opNewLine();
+void opRTrue();
+
+void opPrintRet() {
+	opPrint();
+	opNewLine();
+	opRTrue();
+}
+
+/*******************************
+ * VAR:233 9 1 pull (variable) *
+ * 6 pull stack -> (result)    *
+ *************************************************************************
+ * Pulls value off a stack. (If the stack underflows, the interpreter    *
+ * should halt with a suitable error message.) In Version 6, the stack   *
+ * in question may be specified as a user one: otherwise it is the game  *
+ * stack.                                                                *
+ *************************************************************************/
+ 
 void opPull() {
 	setZVar(Operand[0],popZStack());
 }
@@ -648,22 +736,26 @@ void opPutProp() {
 
 // Get a random number.
 void opRandom() {
-	static uint16_t state = 0;
-	if(!state)
-		state = time(NULL)%0xFFFF;
-	uint8_t next;
-	for(int i = 0; i != 16; i++) {
-		next = (state&15)^((state>>2)&13)^((state>>2)&13)^((state>>6)&10);
-		state = ((state<<1)) + (next);
+	// This state varibale represents the current value of the LFSR. 
+	// Since in normal operation, a LFSR will never reach state 0, we
+	// can assume a value of 0 means we have not yet initilized the LFSR.
+	static uint16_t State = 0;
+	// Set the inital random value to the current clock.
+	if(!State)
+		State = time(NULL)%0xFFFF;
+	uint8_t Next; // Holds the next value of the LFSR.
+	for(int I = 0; I != 16; I++) {
+		Next = (State&15)^((State>>2)&13)^((State>>2)&13)^((State>>6)&10);
+		State = ((State<<1)) + (Next);
 	}
 	if(Operand[0] > 0) {
-		zStore(state%Operand[0]);
+		zStore(State%Operand[0]);
 	} else if(Operand[0] < 0) {
 		zStore(0);
-		state = Operand[0];
+		State = Operand[0];
 	} else {
 		zStore(0);
-		state = time(NULL)%0xFFFF;
+		State = time(NULL)%0xFFFF;
 	}
 }
 
