@@ -206,7 +206,7 @@ uint16_t popZStack()
 {
 	if(CurrentZFrame->Stack == NULL || CurrentZFrame->Stack[0] < 1)
 	{
-		fputs("Tried POPing empty Stack.\n", stderr);
+		LogMessage(MFatal, "popZStack()", "Tried to POP an empty stack.");
 		exit(1);
 	}
 	CurrentZFrame->Stack[0]--;
@@ -223,7 +223,7 @@ void pushZStack(uint16_t val)
 	CurrentZFrame->Stack[0]++;
 	if(CurrentZFrame->Stack == NULL)
 	{
-		fputs("Error PUSHing Stack.\n", stderr);
+		LogMessage(MFatal, "pushZStack()", "Ran out of memory while PUSHing to the stack");
 		exit(1);
 	}
 	CurrentZFrame->Stack[CurrentZFrame->Stack[0]] = val;
@@ -250,7 +250,7 @@ void pushZFrame()
 	stackframe_t* new_frame = malloc(sizeof(stackframe_t));
 	if(new_frame == NULL)
 	{
-		fputs("Not enough memory to PUSH a Stack frame.\n",stderr);
+		LogMessage(MFatal, "pushZFrame()", "Ran out of memory while PUSHing a new stack frame.");
 		exit(1);
 	}
 	new_frame->OldFrame = CurrentZFrame;
@@ -264,7 +264,7 @@ void popZFrame()
 {
 	if(CurrentZFrame->OldFrame == NULL)
 	{
-		fputs("Attempted to POP main Stack frame.\n", stderr);
+		LogMessage(MFatal, "popZFrame()", "Tried to POP the main stack frame.");
 		exit(1);
 	}
 	free(CurrentZFrame->Locals);
