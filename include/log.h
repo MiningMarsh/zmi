@@ -14,7 +14,7 @@ enum log_message_type {
 	MOk = 4
 };
 
-int LogMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
+int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
 
 int LogOpen(const char* const FileName);
 

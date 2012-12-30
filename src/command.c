@@ -43,7 +43,7 @@ void initZM() {
 	// Create the initial Stack frame.
 	CurrentZFrame = malloc(sizeof(stackframe_t));
 	if(CurrentZFrame == NULL) {
-		LogMessage(MFatal,"Initlization", "Not enough memory to create stack frame.");
+		logMessage(MFatal,"Initlization", "Not enough memory to create stack frame.");
 		exit(1);
 	}
 	CurrentZFrame->OldFrame = NULL;
@@ -61,7 +61,7 @@ void initZM() {
 
 void execNextInstruction() {
 	if( g_VerboseDebug >= 5)
-	LogMessage(MNull, "Main loop", "Operation started.");
+	logMessage(MNull, "Main loop", "Operation started.");
 	// Clean the operands.
 	uint8_t OperandType[8] = {
 		Omitted, 
@@ -79,7 +79,7 @@ void execNextInstruction() {
 	if(g_VerboseDebug >= 10) {
 		char Message[256];
 		sprintf(Message,"PC: %5u OP: %3u", CurrentZFrame->PC - 1, op);
-		LogMessage(MNull,"", Message);
+		logMessage(MNull,"", Message);
 	}
    	// Extract argument types based on the opcode.
 	if(op < 128) {
@@ -121,7 +121,7 @@ void execNextInstruction() {
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
 					sprintf(Message,"Large: %u", Operand[i]);
-					LogMessage(MNull,"Operand", Message);
+					logMessage(MNull,"Operand", Message);
 				}
 				break;
 			case SmallConstant:
@@ -129,7 +129,7 @@ void execNextInstruction() {
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
 					sprintf(Message,"Small: %u", Operand[i]);
-					LogMessage(MNull,"Operand", Message);
+					logMessage(MNull,"Operand", Message);
 				}
 				break;
 			case Variable: {
@@ -138,7 +138,7 @@ void execNextInstruction() {
 				if(VerboseDebug >= 10) {
 					char Message[256];
 					sprintf(Message, "Var %u: %u", var, Operand[i]);
-					LogMessage(MNull,"Operand", Message);
+					logMessage(MNull,"Operand", Message);
 				}
 				break; }
 		}
@@ -146,5 +146,5 @@ void execNextInstruction() {
 	// Execute the operation.
 	CallOpCode[op]();
 	if( g_VerboseDebug >= 5)
-		LogMessage(MNull, "Main loop", "Operation finished.\n");
+		logMessage(MNull, "Main loop", "Operation finished.\n");
 }

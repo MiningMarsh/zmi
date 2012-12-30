@@ -4,7 +4,7 @@
 #include "log.h"
 FILE* Log = NULL;
 
-char LogMessages[][30] = {
+char logMessages[][30] = {
 	"",
 	"WARNING",
 	"ERROR",
@@ -14,12 +14,12 @@ char LogMessages[][30] = {
 
 unsigned long MessageNumber = 0;
 
-int LogMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
+int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
 	if(!Log)
 		return 0;
 	int PrefixLength = 0;
-	if(strlen(LogMessages[(const unsigned int)Type])) {
-		fputs(LogMessages[(const unsigned int)Type], Log);
+	if(strlen(logMessages[(const unsigned int)Type])) {
+		fputs(logMessages[(const unsigned int)Type], Log);
 		fputs(": ", Log);
 	}
 	if(Prefix != NULL)
@@ -31,8 +31,8 @@ int LogMessage(const unsigned char Type, const char* const Prefix, const char* c
 	for(int I = 0; I < strlen(Message); I++) {
 		if(Message[I] == '\n') {
 			fputc('\n', Log);
-			if(strlen(LogMessages[(const unsigned int)Type])) {
-				fputs(LogMessages[(const unsigned int)Type], Log);
+			if(strlen(logMessages[(const unsigned int)Type])) {
+				fputs(logMessages[(const unsigned int)Type], Log);
 				fputs(": ", Log);
 			}
 			for(int I = 0; I != PrefixLength; I++)
@@ -48,24 +48,24 @@ int LogMessage(const unsigned char Type, const char* const Prefix, const char* c
 
 int LogOpen(const char* const FileName) {
 	if(Log) {
-		fputs(LogMessages[MWarning],stderr);
+		fputs(logMessages[MWarning],stderr);
 		fputs("Log already open.\n",stderr);
-		LogMessage(MWarning,"LogOpen()", "Message log already open.");
+		logMessage(MWarning,"LogOpen()", "Message log already open.");
 		return 0;
 	}
 	Log = fopen(FileName, "wba");
 	if(!Log) {
-		fputs(LogMessages[MWarning],stderr);
+		fputs(logMessages[MWarning],stderr);
 		fputs("Failed to open log file.\n",stderr);
 		return 0;
 	}
-	LogMessage(MNull, "LogOpen()", "Log opened.");
+	logMessage(MNull, "LogOpen()", "Log opened.");
 	return 1;
 }
 
 void LogClose() {
 	if(Log) {
-		LogMessage(MNull, "LogClose()", "Log closed.");
+		logMessage(MNull, "LogClose()", "Log closed.");
 		fclose(Log);
 	}
 }

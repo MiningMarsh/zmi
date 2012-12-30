@@ -42,7 +42,7 @@ void opAdd() {
 				Number2,
 				Result
 			);
-			LogMessage(MWarning, "add", Message);
+			logMessage(MWarning, "add", Message);
 			AlreadyWarned = true;
 		}
 	// Store the result.
@@ -94,7 +94,7 @@ void opArtShift() {
 		static bool AlreadyReported = false;
 		if(!AlreadyReported) {
 			AlreadyReported = true;
-			LogMessage(
+			logMessage(
 				MWarning, 
 				"art_shift",
 				"Shifting %i by 0. This is innefficient.\n"
@@ -140,7 +140,7 @@ void opCall() {
 			CurrentZFrame->PC,
 			g_RAMSize
 		);
-		LogMessage(MFatal, "call", Message);
+		logMessage(MFatal, "call", Message);
 		exit(1);
 	}
 	// Get the number of local variables the routine has.
@@ -266,7 +266,7 @@ void opDiv() {
 	int16_t Operator = (int16_t)Operand[0];
 	int16_t Dividend = (int16_t)Operand[1];
 	if(Dividend == 0) {
-		LogMessage(MFatal, "div", "Divide by zero.");
+		logMessage(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
 	zStore((uint16_t)(Operator / Dividend)&0xFFFF);
@@ -280,7 +280,7 @@ void opDiv() {
  *************************************************************************/
 
 void opNonexistant() {
-	LogMessage(MFatal, "opNonexistant()", "Tried to execute nonexistant opcode!");
+	logMessage(MFatal, "opNonexistant()", "Tried to execute nonexistant opcode!");
 	exit(1);
 }
 
@@ -293,7 +293,7 @@ void opNonexistant() {
 
 void opGetChild() {
 	if(!Operand[0]) {
-		LogMessage(MFatal, "get_child", "Tried to get object in object 0.");
+		logMessage(MFatal, "get_child", "Tried to get object in object 0.");
 		exit(1);
 	}
 	// Get the address of the child.
@@ -310,7 +310,7 @@ void opGetChild() {
 
 void opGetParent() {
 	if(!Operand[0]) {
-		LogMessage(MFatal, "get_parent", "Tried to get object in object 0.");
+		logMessage(MFatal, "get_parent", "Tried to get object in object 0.");
 		exit(1);
 	}
 	uint16_t Address = getParent(Operand[0]);
@@ -340,7 +340,7 @@ void opGetProp() {
 		} else if(Size == 2) {
 			zStore(getWord(Address));
 		} else {
-			LogMessage(MFatal, "get_prop", "Property size is greater then 2.");
+			logMessage(MFatal, "get_prop", "Property size is greater then 2.");
 			//fexit(1);
 		}
 	} else {
@@ -371,7 +371,7 @@ void opGetPropAddr() {
 
  void opGetSibling() {
 	 if(!Operand[0]) {
-		LogMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
+		logMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
 		exit(1);
 	}
 	zStore(getSibling(Operand[0]));
@@ -545,7 +545,7 @@ void opMod() {
 	int16_t Base = (int16_t)Operand[0];
 	int16_t Dividend = (int16_t)Operand[1];
 	if(Dividend == 0) {
-		LogMessage(MFatal, "mod", "Modulus by zero.");
+		logMessage(MFatal, "mod", "Modulus by zero.");
 		exit(1);
 	}
 	zStore((uint16_t)(Base % Dividend)&0xFFFF);
@@ -584,7 +584,7 @@ void opNewLine() {
  
 void opNop() {
 	// This is "probably" standard compliant.
-	LogMessage(MWarning, "nop", 
+	logMessage(MWarning, "nop", 
 		"Nop wastes both cpu cycles, and is\n"
 		"not fully defined in the standard, and is therefore undefined\n"
 		"behavior. Don't use it."
@@ -747,7 +747,7 @@ void opPutProp() {
 	} else if(Size == 2) {
 		setWord(Address, Operand[2]);
 	} else {
-		LogMessage(MFatal, "put_prop", "Property size is greater then 2.");
+		logMessage(MFatal, "put_prop", "Property size is greater then 2.");
 		//exit(1);
 	}
 }
