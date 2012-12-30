@@ -341,7 +341,7 @@ void opGetProp() {
 			zStore(getWord(Address));
 		} else {
 			LogMessage(MFatal, "get_prop", "Property size is greater then 2.");
-			exit(1);
+			//fexit(1);
 		}
 	} else {
 		zStore(getWord(getWord(0x0a) + (2*Operand[1])));
@@ -586,10 +586,9 @@ void opNop() {
 	// This is "probably" standard compliant.
 	LogMessage(MWarning, "nop", 
 		"Nop wastes both cpu cycles, and is\n"
-		"not fully defined in the standard, and is therefore undefined"
+		"not fully defined in the standard, and is therefore undefined\n"
 		"behavior. Don't use it."
 		);
-	exit(1);
 }
 
 /******************************
@@ -749,7 +748,7 @@ void opPutProp() {
 		setWord(Address, Operand[2]);
 	} else {
 		LogMessage(MFatal, "put_prop", "Property size is greater then 2.");
-		exit(1);
+		//exit(1);
 	}
 }
 
@@ -1047,39 +1046,73 @@ void opThrow() {
 /* --------------------------------------------------------------------- */
 
 void initOpCodes() {
-	for(int I = 0; I < 256; I++) {
+	for(int I = 0; I < 256; I++)
 		CallOpCode[I] = &opNonexistant;
+	for(int I = 0; I < 7; I++) {
+		CallOpCode[0+32*I] = &opNop;
+		CallOpCode[1+32*I] = &opJe;
+		CallOpCode[2+32*I] = &opJl;
+		CallOpCode[3+32*I] = &opJg;
+		CallOpCode[4+32*I] = &opDecChk;
+		CallOpCode[5+32*I] = &opIncChk;
+		CallOpCode[6+32*I] = &opJin;
+		CallOpCode[7+32*I] = &opTest;
+		CallOpCode[8+32*I] = &opOr;
+		CallOpCode[9+32*I] = &opAnd;
+		CallOpCode[10+32*I] = &opTestAttr;
+		CallOpCode[11+32*I] = &opSetAttr;
+		CallOpCode[12+32*I] = &opClearAttr;
+		CallOpCode[13+32*I] = &opStore;
+		CallOpCode[14+32*I] = &opInsertObj;
+		CallOpCode[15+32*I] = &opLoadw;
+		CallOpCode[16+32*I] = &opLoadb;
+		CallOpCode[17+32*I] = &opGetProp;
+		CallOpCode[18+32*I] = &opGetPropAddr;
+		CallOpCode[20+32*I] = &opAdd;
+		CallOpCode[21+32*I] = &opSub;
+		CallOpCode[22+32*I] = &opMul;
+		CallOpCode[23+32*I] = &opDiv;
+		CallOpCode[24+32*I] = &opMod;
+		if(getZRev() >= 4)
+			CallOpCode[25+32*I] = &opCall;
+		if(getZRev() >= 5)
+			CallOpCode[26+32*I] = &opCallVN;
+		if(getZRev() == 5 || getZRev() == 6)
+			CallOpCode[28+32*I] = &opThrow;
 	}
-	for(int I = 0; I <= 32; I++) {
-		CallOpCode[1+I] = opJe;
-		CallOpCode[2+I] = opJl;
-		CallOpCode[3+I] = opJg;
-		CallOpCode[4+I] = opDecChk;
-		CallOpCode[5+I] = opIncChk;
-		CallOpCode[6+I] = opJin;
-		CallOpCode[7+I] = opTest;
-		CallOpCode[8+I] = opOr;
-		CallOpCode[9+I] = opAnd;
-		CallOpCode[10+I] = opTestAttr;
-		CallOpCode[11+I] = opSetAttr;
-		CallOpCode[12+I] = opClearAttr;
-		CallOpCode[13+I] = opStore;
-		CallOpCode[14+I] = opInsertObj;
-		CallOpCode[15+I] = opLoadw;
-		CallOpCode[16+I] = opLoadb;
-		CallOpCode[17+I] = opGetProp;
-		CallOpCode[18+I] = opGetPropAddr;
-		CallOpCode[20+I] = opAdd;
-		CallOpCode[21+I] = opSub;
-		CallOpCode[22+I] = opMul;
-		CallOpCode[23+I] = opDiv;
-		CallOpCode[24+I] = opMod;
-		CallOpCode[25+I] = opCall;
-		CallOpCode[26+I] = opCall;
-		CallOpCode[28+I] = opThrow;
-
+	for(int I = 0; I  < 32; I++) {
+		CallOpCode[I+32*4] = &opNonexistant;
+		CallOpCode[I+32*5] = &opNonexistant;
+	}
+	for(int I = 0; I < 3; I++) {
+		CallOpCode[128+16*I] = &opJz;
+		CallOpCode[129+16*I] = &opGetSibling;
+		CallOpCode[130+16*I] = &opGetChild;
+		CallOpCode[131+16*I] = &opGetParent;
+		CallOpCode[133+16*I] = &opInc;
+		CallOpCode[134+16*I] = &opDec;
+		if(getZRev() >= 4)
+			CallOpCode[136+16*I] = &opCall;
+		CallOpCode[138+16*I] = &opPrintObj;
+		CallOpCode[139+16*I] = &opRet;
+		CallOpCode[140+16*I] = &opJump;
+		CallOpCode[141+16*I] = &opPrintPaddr;
+		CallOpCode[176+16*I] = &opRtrue;
+		CallOpCode[177+16*I] = &opRfalse;
+		CallOpCode[178+16*I] = &opPrint;
+		CallOpCode[184+16*I] = &opRetPopped;
+		CallOpCode[187+16*I] = &opNewLine;
 	}
 	CallOpCode[224] = &opCall;
+	CallOpCode[225] = &opStorew;
+	CallOpCode[226] = &opStoreb;
+	CallOpCode[227] = &opPutProp;
+	CallOpCode[228] = &opRead;
+	CallOpCode[229] = &opPrintChar;
+	CallOpCode[230] = &opPrintNum;
+	CallOpCode[231] = &opRandom;
+	CallOpCode[232] = &opPush;
+	CallOpCode[233] = &opPull;
 }
 
 #endif /* OPCODES_H */
