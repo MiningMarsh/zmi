@@ -5,8 +5,9 @@
 #include "memory.h"
 #include "globalvars.h"
 #include "log.h"
+#include "zint.h"
 
-uint8_t* RAM = NULL; // Holds the file.
+uzbyte* RAM = NULL; // Holds the file.
 
 void loadRAM(char* Filename)
 {
@@ -35,7 +36,7 @@ void loadRAM(char* Filename)
 	fseek(StoryFile, 0, SEEK_END);
 	g_StorySize = ftell(StoryFile);
 	rewind(StoryFile);
-	RAM = (uint8_t*)malloc(sizeof(uint8_t)*g_StorySize);
+	RAM = (uzbyte*)malloc(sizeof(uzbyte)*g_StorySize);
 	g_RAMSize = g_StorySize;
 	if(!RAM)
 	{
@@ -43,7 +44,7 @@ void loadRAM(char* Filename)
 			Message, 
 			"Failed to allocate enough RAM to hold the story file.\n"
 			"%u bytes are needed.",
-			(unsigned int)sizeof(int8_t)*g_RAMSize
+			(unsigned int)sizeof(uzbyte)*g_RAMSize
 		);
 		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
@@ -56,7 +57,7 @@ void loadRAM(char* Filename)
 			logMessage(MFatal, LogPrefix, "Failed to read file.");
 			exit(1);
 		}
-		RAM[i] = (uint8_t)Buffer[0];
+		RAM[i] = (uzbyte)Buffer[0];
 	}
 	g_StorySize /= 1024;
 	switch(RAM[0])
@@ -93,7 +94,7 @@ void loadRAM(char* Filename)
 }
 
 // Get the word beginning at ram address adr.
-uint16_t getWord(const unsigned int Address) {
+uzword getWord(const unsigned int Address) {
 	if(Address+1 > g_RAMSize) {
 		char Message[256];
 		sprintf(
@@ -110,7 +111,7 @@ uint16_t getWord(const unsigned int Address) {
 }
 
 // Get the byte beginning at ram address adr.
-uint8_t getByte(unsigned int Address)
+uzbyte getByte(unsigned int Address)
 {
 	if(Address > g_RAMSize) {
 		char Message[256];
@@ -128,12 +129,12 @@ uint8_t getByte(unsigned int Address)
 }
 
 // Get the current story file revision.
-uint8_t getZRev() {
+uzbyte getZRev() {
 	return RAM[0];
 }
 
 // Set the word beginning at ram address adr to value.
-void setWord(unsigned int Address, int Value){
+void setWord(unsigned int Address, uzword Value){
 	if(!Address) {
 		char  Message[256];
 		sprintf(
@@ -162,7 +163,7 @@ void setWord(unsigned int Address, int Value){
 }
 
 // Set the byte beginning at ram address adr to value.
-void setByte(unsigned int Address, int Value)
+void setByte(unsigned int Address, uzbyte Value)
 {
 	if(!Address) {
 		char Message[256];
@@ -191,18 +192,17 @@ void setByte(unsigned int Address, int Value)
 }
 
 // Return the expanded packed address depending on the machine.
-uint32_t exPadAdr(uint16_t padr)
+uint32_t expandPaddedAddress(uzword PaddedAddress)
 {
-	unsigned int machine = getByte(0);
-	if(machine <= 3)
-		return 2*padr;
-	if(machine <=7)
-		return 4*padr;
-	return 8*padr;
+	if(getZRev() <= 3)
+		return 2*PaddedAddress;
+	if(getZRev() <=7)
+		return 4*PaddedAddress;
+	return 8*PaddedAddress;
 }
 
 // Pop from the Stack.
-uint16_t popZStack()
+uzword popZStack()
 {
 	if(CurrentZFrame->Stack == NULL || CurrentZFrame->Stack[0] < 1)
 	{
@@ -213,11 +213,11 @@ uint16_t popZStack()
 	return CurrentZFrame->Stack[CurrentZFrame->Stack[0] + 1];
 }
 // Push to the Stack.
-void pushZStack(uint16_t val)
+void pushZStack(uzword val)
 {
 	if(CurrentZFrame->Stack == NULL)
 	{
-		CurrentZFrame->Stack = malloc(sizeof(uint16_t)*1024);
+		CurrentZFrame->Stack = malloc(sizeof(uzword)*1024);
 		CurrentZFrame->Stack[0] = 0;
 	}
 	CurrentZFrame->Stack[0]++;
@@ -228,20 +228,22 @@ void pushZStack(uint16_t val)
 	}
 	CurrentZFrame->Stack[CurrentZFrame->Stack[0]] = val;
 }
-// Get the value of variable reference var.
-uint16_t getZVar(uint8_t var)
+// Get the value of variable reference Variable.
+uzword getZVar(uzbyte Variable)
 {
-	if(var > 15)
-		return getWord(getWord(0x06*2) + 2*(var - 16));
-	return var > 0 ? CurrentZFrame->Locals[var] : popZStack();
+	if(Variable > 15)
+		return getWord(getWord(0x06*2) + 2*(Variable - 16));
+	return Variable > 0 ? CurrentZFrame->Locals[Variable] : popZStack();
 }
-void setZVar(uint8_t var, uint16_t val) {
-	if(var > 15)
-		setWord(getWord(0x06*2) + 2*(var - 16), val);
-	else if(var == 0)
-		pushZStack(val);
+
+// Set the value of a variable reference Variable.
+void setZVar(uzbyte Variable, uzword Value) {
+	if(Variable > 15)
+		setWord(getWord(0x06*2) + 2*(Variable - 16), Value);
+	else if(Variable == 0)
+		pushZStack(Value);
 	else
-		CurrentZFrame->Locals[var] = val;
+		CurrentZFrame->Locals[Variable] =Value;
 }
 
 // Push a copy of the current routine (Stack frame).
@@ -273,9 +275,9 @@ void popZFrame()
 	CurrentZFrame = dead_frame->OldFrame;
 	free(dead_frame); //Summon Cthulhu to take the soul of the dead frame to the place of ultimate evil
 }
-uint16_t zFrameNumber(stackframe_t* frame)
+uzword zFrameNumber(stackframe_t* frame)
 {
-	uint16_t frames = 0;
+	uzword frames = 0;
 	while(frame != NULL)
 	{
 		frames++;
@@ -303,7 +305,7 @@ void traceZStack()
 		{
 			unsigned int count = 1;
 			logMessage(MNull, NULL, "      Stack:");
-			for(uint16_t cell = frame->Stack[0]; cell > 0; cell--) {
+			for(uzword cell = frame->Stack[0]; cell > 0; cell--) {
 				sprintf(Message, "         %04u: %u", count++, frame->Stack[cell]);
 				logMessage(MNull, NULL, Message);
 			}
@@ -314,7 +316,7 @@ void traceZStack()
 		if(!(frame->Locals == NULL || frame->Locals[0] < 1))
 		{
 			logMessage(MNull, NULL, "      Locals:");
-			for(uint16_t cell = 1; cell <= frame->Locals[0]; cell++) {
+			for(uzword cell = 1; cell <= frame->Locals[0]; cell++) {
 				sprintf(Message, "          %01u: %u", cell, frame->Locals[cell]);
 				logMessage(MNull, NULL, Message);
 			}

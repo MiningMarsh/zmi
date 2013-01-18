@@ -21,13 +21,15 @@ int main(int ArgCount, char** Arguments) {
 	StrIndirection = 0;
 
 	// Loop through all the arguments.
+	int CurArg = 0;
 	while(--ArgCount) {
+		CurArg++;
 		// The switch to set.
 		char Flag = 0;
 		// Holds everything after the '=' of the argument.
-		char* Value = Arguments[ArgCount];
+		char* Value = Arguments[CurArg];
 		// Holds everything befor the '=' of the argument.
-		char* Key = Arguments[ArgCount];
+		char* Key = Arguments[CurArg];
 		// The type of argument being passed (name, switch, or full).
 		int ArgType = 0;
 
@@ -66,6 +68,10 @@ int main(int ArgCount, char** Arguments) {
 			// We are dealing with a long option, an need to convert it
 			// to a flag with the lookup table.
 			case 2: {
+				if(Key == Value) {
+					ArgCount = 1;
+					continue;
+				}
 				int LookupIndex = 0;
 				// The table is null terminated.
 				while(LookupTable[LookupIndex][0] != 0) {
@@ -120,10 +126,10 @@ int main(int ArgCount, char** Arguments) {
 
 			// Open the log file
 			case 'l':
-				LogOpen(Value);
+				logOpen(Value);
 				break;
 
-			// A bad flg has been passed.
+			// A bad flag has been passed.
 			default:
 				if(!ArgType)
 					break;
@@ -136,7 +142,11 @@ int main(int ArgCount, char** Arguments) {
 
 	// Check if a filename was passed.
 	if (!Filename) {
-		printf("Usage: %s <filename> [OPTS]\n",Arguments[0]);
+		printf(
+			"MM's and Triclops200's Z-machine Interpreter.\n"
+			"Usage: %s <filename> [OPTS]\n",
+			Arguments[0]
+		);
 		exit(1);
 	}
 	loadRAM(Filename);

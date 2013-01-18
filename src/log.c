@@ -15,22 +15,31 @@ char logMessages[][30] = {
 unsigned long MessageNumber = 0;
 
 int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
+	// Return if no log is open.
 	if(!Log)
 		return 0;
+
+	// Holds the lngth of the mssage pefix.
 	int PrefixLength = 0;
+
+	// Prints the Message type, if it exists.
 	if(strlen(logMessages[(const unsigned int)Type])) {
 		fputs(logMessages[(const unsigned int)Type], Log);
 		fputs(": ", Log);
 	}
+
+	// If a prefix was passed, print it and add its length to the pefix length.
 	if(Prefix != NULL)
 	if(strlen(Prefix)) {
 		PrefixLength += strlen(Prefix) + 2;
 		fputs(Prefix, Log);
 		fputs(": ", Log);
 	}
+
 	for(int I = 0; I < strlen(Message); I++) {
 		if(Message[I] == '\n') {
 			fputc('\n', Log);
+			// Prints the Message type, if it exists.
 			if(strlen(logMessages[(const unsigned int)Type])) {
 				fputs(logMessages[(const unsigned int)Type], Log);
 				fputs(": ", Log);
@@ -46,13 +55,15 @@ int logMessage(const unsigned char Type, const char* const Prefix, const char* c
 	return 1;
 }
 
-int LogOpen(const char* const FileName) {
+int logOpen(const char* const FileName) {
+	// Print a warning if a log has already been opened.
 	if(Log) {
 		fputs(logMessages[MWarning],stderr);
 		fputs("Log already open.\n",stderr);
 		logMessage(MWarning,"LogOpen()", "Message log already open.");
 		return 0;
 	}
+	// Open the log.
 	Log = fopen(FileName, "wba");
 	if(!Log) {
 		fputs(logMessages[MWarning],stderr);
@@ -63,7 +74,8 @@ int LogOpen(const char* const FileName) {
 	return 1;
 }
 
-void LogClose() {
+void logClose() {
+	// Close a log if one is open.
 	if(Log) {
 		logMessage(MNull, "LogClose()", "Log closed.");
 		fclose(Log);

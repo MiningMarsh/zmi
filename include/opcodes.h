@@ -1,12 +1,12 @@
 #ifndef OPCODES_H
-#define OPCODES_H
+#define OPCODES_H 1
 #include <time.h>
-#include <stdint.h>
+#include "zint.h"
 #include <stdbool.h>
 #include "log.h"
 
 // Table of opcodes.
-void (*CallOpCode[256])(void) = {NULL};
+void (*CallOpCode[256+30])(void) = {NULL};
 
 /* --------------------------------------------------------------------- */
 
@@ -19,13 +19,13 @@ void opRet();
  *************************************************************************/
 
 void opAdd() {
-	// The first number. to add, casted from its unsigned form in memory.
-	int16_t Number1 = (int16_t)Operand[0];
-	// The second number. to add, casted from its unsigned form in memory.
-	int16_t Number2 = (int16_t)Operand[1];
-	// Result, 23bit to check for over/undrflows which are undefined 
+	// The first number to add, casted from its unsigned form in memory.
+	zword Number1 = zSign(Operand[0]);
+	// The second number to add, casted from its unsigned form in memory.
+	zword Number2 = zSign(Operand[1]);
+	// Result, 32bit to check for over/underflows which are undefined 
 	// behavior that is commonly defined as modulo 10000.
-	int32_t Result = (int32_t)(Number1 + Number2);
+	zlong Result = (zlong)(Number1 + Number2);
 	// Did we over/underflow?
 	static bool AlreadyWarned = false;
 	if(!AlreadyWarned)
@@ -45,8 +45,20 @@ void opAdd() {
 			logMessage(MWarning, "add", Message);
 			AlreadyWarned = true;
 		}
+	// Log the warning message.
+	if(g_VerboseDebug >= 25) {
+		char Message[256];
+		sprintf(
+			Message,
+			"%i + %i -> %i",
+			Number1,
+			Number2,
+			Result
+		);
+		logMessage(MNull, "add", Message);
+	}
 	// Store the result.
-	zStore((uint16_t)(Number1 + Number2)%10000);
+	zStore(zUnsign((Number1 + Number2)%10000));
 }
 
 /*******************************
@@ -56,6 +68,17 @@ void opAdd() {
  *************************************************************************/
 
 void opAnd() {
+	if(g_VerboseDebug >= 25) {
+		char Message[256];
+		sprintf(
+			Message,
+			"%i & %i -> %i",
+			Operand[0],
+			Operand[1],
+			Operand[0]&Operand[1]
+		);
+		logMessage(MNull, "and", Message);
+	}
 	// Store operand 1 AND operand 2.
 	zStore(Operand[0]&Operand[1]);
 }
@@ -71,9 +94,9 @@ void opAnd() {
 
 void opArtShift() {
 	// Number to shift.
-	int16_t Number = (int16_t)Operand[0];
+	zword Number = zSign(Operand[0]);
 	// Number of places to shift by.
-	int16_t Places = (int16_t)Operand[1];
+	zword Places = zSign(Operand[1]);
 
 	// Shift positive or negative?
 	if(Places > 0) {
@@ -102,8 +125,20 @@ void opArtShift() {
 			);
 		}
 	}
+	if(g_VerboseDebug >= 25) {
+		char Message[256];
+		sprintf(
+			Message,
+			"%i %s %i -> %i",
+			zSign(Operand[0]),
+			Places > 0 ? "<<" : ">>",
+			Number
+			
+		);
+		logMessage(MNull, "art_shift", Message);
+	}
 	// Store the result.
-	zStore(Number);
+	zStore(zUnsign(Number));
 }
 
 /***********************************************************
@@ -127,7 +162,7 @@ void opCall() {
 	// Create a new blank stack frame.
 	pushZFrame();
 	// Expand the padded address to get the routine location.
-	CurrentZFrame->PC = exPadAdr(Operand[0]);
+	CurrentZFrame->PC = expandPaddedAddress(Operand[0]);
 	// Check if it is out of memory range.
 	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > g_RAMSize ) {
 		// Log an error message if it is.
@@ -144,9 +179,9 @@ void opCall() {
 		exit(1);
 	}
 	// Get the number of local variables the routine has.
-	uint8_t NumberLocals = getByte(CurrentZFrame->PC++);
+	uzbyte NumberLocals = getByte(CurrentZFrame->PC++);
 	// Allocate room for the locals.
-	CurrentZFrame->Locals = calloc(sizeof(uint16_t), NumberLocals+1);
+	CurrentZFrame->Locals = calloc(sizeof(uzword), NumberLocals+1);
 	CurrentZFrame->Locals[0] = NumberLocals;
 	// Special handling for revision 3 and lower.
 	if(getZRev() < 4)
@@ -185,6 +220,15 @@ void opCallVN () {
  *************************************************************************/
 
 void opCatch() {
+	if(g_VerboseDebug >= 25) {
+		char Message[256];
+		sprintf(
+			Message,
+			"Frame number: %u",
+			zFrameNumber(CurrentZFrame)
+		);
+		logMessage(MNull, "catch", Message);
+	}
 	zStore(zFrameNumber(CurrentZFrame));
 }
 
@@ -198,6 +242,17 @@ void opCatch() {
  *************************************************************************/
 
 void opCheckArgCount() {
+	if(g_VerboseDebug >= 25) {
+		char Message[256];
+		sprintf(
+			Message,
+			"%u <= %u -> %u",
+			Operand[0] - 1,
+			CurrentZFrame->OldFrame->PassedArgs,
+			Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs
+		);
+		logMessage(MNull, "check_arg_count", Message);
+	}
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }
 
@@ -212,6 +267,9 @@ void opCheckArgCount() {
  *************************************************************************/
 
 void opCheckUnicode() {
+	if(g_VerboseDebug >= 25) {
+		logMessage(MNull, "check_unicode", "Unicode not supported.");
+	}
 	// No unicode support yet.
 	zStore(0);
 }
@@ -234,9 +292,8 @@ void opClearAttr() {
  *************************************************************************/
 
 void opDec() {
-	int16_t Value = getZVar(Operand[0]);
-	Value--;
-	setZVar(Operand[0], (uint16_t)Value);
+	zword Value = zSign(getZVar(Operand[0]));
+	setZVar(Operand[0], zUnsign(--Value));
 }
 
 /***********************************************
@@ -247,12 +304,10 @@ void opDec() {
  *************************************************************************/
 
 void opDecChk() {
-	// Perform the decrement.
-	opDec();
-
 	// Check the new value;
-	int16_t Variable = getZVar(Operand[0]);
-	int16_t Value = Operand[1];
+	zword Variable = zSign(getZVar(Operand[0]));
+	setZVar(Operand[0], zUnsign(--Variable));
+	zword Value = zSign(Operand[1]);
 	zBranch(Variable < Value);
 }
 
@@ -263,13 +318,13 @@ void opDecChk() {
  * with a suitable error message.                                        *
  *************************************************************************/
 void opDiv() {
-	int16_t Operator = (int16_t)Operand[0];
-	int16_t Dividend = (int16_t)Operand[1];
+	zword Operator = zSign(Operand[0]);
+	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
 		logMessage(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
-	zStore((uint16_t)(Operator / Dividend)&0xFFFF);
+	zStore(zSign((Operator / Dividend)&0xFFFF));
 }
 
 /*********
@@ -297,7 +352,7 @@ void opGetChild() {
 		exit(1);
 	}
 	// Get the address of the child.
-	uint16_t Address = getChild(Operand[0]);
+	uzword Address = getChild(Operand[0]);
 	zStore(Address);
 	zBranch(Address);
 }
@@ -313,7 +368,7 @@ void opGetParent() {
 		logMessage(MFatal, "get_parent", "Tried to get object in object 0.");
 		exit(1);
 	}
-	uint16_t Address = getParent(Operand[0]);
+	uzword Address = getParent(Operand[0]);
 	zStore(Address);
 }
 
@@ -331,7 +386,7 @@ void opGetParent() {
 // Get a property of an object.
 void opGetProp() {
 	// Get the property address.
-	uint16_t Address = getPropertyAdr(Operand[0],Operand[1]);
+	uzword Address = getPropertyAdr(Operand[0],Operand[1]);
 	if(Address != 0) {
 		// If it existed, find its size.
 		unsigned int Size = getByte(Address++);
@@ -341,7 +396,7 @@ void opGetProp() {
 			zStore(getWord(Address));
 		} else {
 			logMessage(MFatal, "get_prop", "Property size is greater then 2.");
-			//fexit(1);
+			exit(1);
 		}
 	} else {
 		zStore(getWord(getWord(0x0a) + (2*Operand[1])));
@@ -357,7 +412,7 @@ void opGetProp() {
  *************************************************************************/
 
 void opGetPropAddr() {
-	uint16_t Address = getPropertyAdr(Operand[0], Operand[1]);
+	uzword Address = getPropertyAdr(Operand[0], Operand[1]);
 	if(Address)
 		Address++;
 	zStore(Address);
@@ -385,9 +440,8 @@ void opGetPropAddr() {
  *************************************************************************/
 
 void opInc() {
-	int16_t Value = getZVar(Operand[0]);
-	Value++;
-	setZVar(Operand[0], (uint16_t)Value);
+	zword Value = zSign(getZVar(Operand[0]));
+	setZVar(Operand[0], zUnsign(++Value));
 }
 
 /*********************************************
@@ -397,12 +451,10 @@ void opInc() {
  *************************************************************************/
  
 void opIncChk() {
-	// Perform the increment.
-	opInc();
-
 	// Check the new value;
-	int16_t Variable = getZVar(Operand[0]);
-	int16_t Value = Operand[1];
+	zword Variable = zSign(getZVar(Operand[0]));
+	setZVar(Operand[0], zUnsign(++Variable));
+	zword Value = zSign(Operand[1]);
 	zBranch(Variable > Value);
 }
 
@@ -419,7 +471,7 @@ void opIncChk() {
 void opRemoveObj();
 void opInsertObj() {
 	opRemoveObj();
-	uint16_t Child = getChild(Operand[1]);
+	uzword Child = getChild(Operand[1]);
 	setSibling(Operand[0], Child);
 	setParent(Operand[0], Operand[1]);
 	setChild(Operand[1],Operand[0]);
@@ -443,8 +495,8 @@ void opJe() {
  *************************************************************************/
 
 void opJg() {
-	int16_t A = Operand[0];
-	int16_t B = Operand[1];
+	zword A = Operand[0];
+	zword B = Operand[1];
 	zBranch(A > B);
 }
 
@@ -480,7 +532,7 @@ void opJl() {
  *************************************************************************/
 
 void opJump() {
-	CurrentZFrame->PC += (int16_t)Operand[0] - 2;
+	CurrentZFrame->PC += zSign(Operand[0]) - 2;
 }
 
 /***************************
@@ -525,13 +577,13 @@ void opLoadw() {
  *************************************************************************/
 
 void opLogShift() {
-	uint16_t Number = (int16_t)Operand[0];
-	int16_t Places = (int16_t)Operand[1];
+	uzword Number = zSign(Operand[0]);
+	zword Places = zSign(Operand[1]);
 	if(Places >= 0)
 		Number = Number << Places;
 	else
 		Number = Number >> (Places*(-1));
-	zStore(Number);
+	zStore(zUnsign(Number));
 }
 
 /*********************************
@@ -542,13 +594,13 @@ void opLogShift() {
  *************************************************************************/
 
 void opMod() {
-	int16_t Base = (int16_t)Operand[0];
-	int16_t Dividend = (int16_t)Operand[1];
+	zword Base = zSign(Operand[0]);
+	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
 		logMessage(MFatal, "mod", "Modulus by zero.");
 		exit(1);
 	}
-	zStore((uint16_t)(Base % Dividend)&0xFFFF);
+	zStore(zUnsign((Base % Dividend)&0xFFFF));
 }
 
 /*********************************
@@ -558,9 +610,9 @@ void opMod() {
  *************************************************************************/
  
 void opMul() {
-	int16_t num1 = (int16_t)Operand[0];
-	int16_t num2 = (int16_t)Operand[1];
-	zStore((uint16_t)(num1 * num2)&0xFFFF);
+	zword Multiple = zSign(Operand[0]);
+	zword Multiplied = zSign(Operand[1]);
+	zStore(zUnsign((Multiple * Multiplied)&0xFFFF));
 }
 
 /**********************
@@ -665,7 +717,7 @@ void opPrintNum() {
 void opPrintObj() {
 	// TODO: Implement %s in zprint to fix this potential code injecction
 	// exploit.
-	uint16_t PropertyTableAddress = getPropertyTableAdr(Operand[0]);
+	uzword PropertyTableAddress = getPropertyTableAdr(Operand[0]);
 	 PropertyTableAddress++;
 	char* ObjectName = zCharsToZSCII(getZChars( PropertyTableAddress));
 	zPrint(ObjectName);
@@ -680,7 +732,7 @@ void opPrintObj() {
  *************************************************************************/
 
 void opPrintPaddr() {
-	char* String = zCharsToZSCII(getZChars(exPadAdr(Operand[0])));
+	char* String = zCharsToZSCII(getZChars(expandPaddedAddress(Operand[0])));
 	zPrint(String);
 	free(String);
 }
@@ -740,7 +792,7 @@ void opPush() {
  *************************************************************************/
 
 void opPutProp() {
-	uint16_t Address = getPropertyAdr(Operand[0],Operand[1]);
+	uzword Address = getPropertyAdr(Operand[0],Operand[1]);
 	unsigned int Size = getByte(Address++);
 	if(Size == 1) {
 		setByte(Address,Operand[2]);
@@ -748,7 +800,7 @@ void opPutProp() {
 		setWord(Address, Operand[2]);
 	} else {
 		logMessage(MFatal, "put_prop", "Property size is greater then 2.");
-		//exit(1);
+		exit(1);
 	}
 }
 
@@ -770,11 +822,11 @@ void opRandom() {
 	// This state varibale represents the current value of the LFSR. 
 	// Since in normal operation, a LFSR will never reach state 0, we
 	// can assume a value of 0 means we have not yet initilized the LFSR.
-	static uint16_t State = 0;
+	static uzword State = 0;
 	// Set the inital random value to the current clock.
 	if(!State)
 		State = time(NULL)%0xFFFF;
-	uint8_t Next; // Holds the next value of the LFSR.
+	uzbyte Next; // Holds the next value of the LFSR.
 	for(int I = 0; I != 16; I++) {
 		Next = (State&15)^((State>>2)&13)^((State>>2)&13)^((State>>6)&10);
 		State = ((State<<1)) + (Next);
@@ -885,12 +937,12 @@ void opRead() {
  *************************************************************************/
  
 void opRemoveObj() {
-	uint16_t Parent = getParent(Operand[0]);
+	uzword Parent = getParent(Operand[0]);
 	if(Parent != 0) {
 		if(getChild(Parent) == Operand[0]) {
 			setChild(Parent, getSibling(Operand[0]));
 		} else {
-			uint16_t LastChild = getChild(Parent);
+			uzword LastChild = getChild(Parent);
 			while(getSibling(LastChild) != Operand[0])
 				LastChild = getSibling(LastChild);
 			setSibling(LastChild, getSibling(Operand[0]));
@@ -998,9 +1050,9 @@ void opStorew() {
  *************************************************************************/
 
 void opSub() {
-	int16_t Value = (int16_t)Operand[0];
-	int16_t Smaller = (int16_t)Operand[1];
-	zStore((uint16_t)(Value - Smaller)&0xFFFF);
+	zword Value = zSign(Operand[0]);
+	zword Smaller = zSign(Operand[1]);
+	zStore(zUnsign((Value - Smaller)&0xFFFF));
 }
 
 /**************************************
@@ -1046,7 +1098,7 @@ void opThrow() {
 /* --------------------------------------------------------------------- */
 
 void initOpCodes() {
-	for(int I = 0; I < 256; I++)
+	for(int I = 0; I < 256+30; I++)
 		CallOpCode[I] = &opNonexistant;
 	for(int I = 0; I < 7; I++) {
 		CallOpCode[0+32*I] = &opNop;

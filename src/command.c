@@ -12,17 +12,11 @@
 #include "globalvars.h"
 #include "log.h"
 
-// Is this an extended operation code?
-uint8_t IsExtOpCode = 0;
-
-// Holds the operands to the operation being executed.
+// Holds arguments to opcodes.
 uint16_t Operand[8];
 
-// Better than a switch. Each cell contains a pointer to a function to execute its opcode.
-// callop[20]() executes operation 20.
-
 // Used for easy identification of operand types.
-enum operand_type {
+enum operandType {
 	LargeConstant = 0,
 	SmallConstant = 1,
 	Variable = 2,
@@ -38,18 +32,26 @@ void initZM() {
 	initInput();
 	// Initiate output.
 	initOutput();
+
 	// Clean if an error occurs, don't leave it to the OS. This may also display a Stacktrace and other debug things.
 	atexit(clean);
+
 	// Create the initial Stack frame.
 	CurrentZFrame = malloc(sizeof(stackframe_t));
 	if(CurrentZFrame == NULL) {
 		logMessage(MFatal,"Initlization", "Not enough memory to create stack frame.");
 		exit(1);
 	}
+
+	// Set up the values in the inital stack frame.
 	CurrentZFrame->OldFrame = NULL;
+	// The initial PC is at 0x06
 	CurrentZFrame->PC = getWord(0x06);
+	// First stack frame is not a routine, so no locals.
 	CurrentZFrame->Locals = NULL;
+	// Stack always starts out empty.
 	CurrentZFrame->Stack = NULL;
+	// Don't change this, it breaks all return values.
 	CurrentZFrame->ReturnVar=1;
 
 	// Populate the operation index.
@@ -60,9 +62,11 @@ void initZM() {
 }
 
 void execNextInstruction() {
-	if( g_VerboseDebug >= 5)
-	logMessage(MNull, "Main loop", "Operation started.");
-	// Clean the operands.
+	// Display a debug message.
+	if(g_VerboseDebug >= 5)
+		logMessage(MNull, "Main loop", "Operation started.");
+	
+	// Clean the operands by setting them all to omitted.
 	uint8_t OperandType[8] = {
 		Omitted, 
 		Omitted,
@@ -73,78 +77,109 @@ void execNextInstruction() {
 		Omitted,
 		Omitted
 	};
+
 	// Get the next operation and advance the PC.
-	uint8_t op = getByte(CurrentZFrame->PC++);
-	// Print the operand in debug mode.
+	uint8_t Operation = getByte(CurrentZFrame->PC++);
+
+	// Print the operation in debug mode.
 	if(g_VerboseDebug >= 10) {
 		char Message[256];
-		sprintf(Message,"PC: %5u OP: %3u", CurrentZFrame->PC - 1, op);
+		sprintf(Message,"PC: %5u OP: %3u", CurrentZFrame->PC - 1, Operation);
 		logMessage(MNull,"", Message);
 	}
-   	// Extract argument types based on the opcode.
-	if(op < 128) {
-		OperandType[0] = ((op >> 6 & 1)+1);
-		OperandType[1] = ((op >> 5 & 1)+1);
-	} else if(op < 192 && (op != 190)) {
-		OperandType[0] = (op >> 4 & 3);
-	} else {
-		if(op == 190)
-			IsExtOpCode = getByte(CurrentZFrame->PC++);
-		int8_t args[2] = {0, 255};
-		args[0] = getByte(CurrentZFrame->PC++);
-		if(op == 236 || op == 260) {
-			args[1] = getByte(CurrentZFrame->PC++);
+
+   	// Extract argument types based on the opcodeco
+	if((Operation>>6) == 2) {
+		// We are in short form. Bits 4 and 5 give the type.
+		OperandType[0] = ((Operation >> 4) & 3);
+
+	} else if(Operation>>6 == 3) {
+		// Else we are either in extended form or variable form.
+		
+		// Holds the operation if we are in extended mode.
+		uint8_t ExtendedOperation = 0;
+
+		// If opcode is 190, and we are in revision 5 or greater, this is
+		// an extended operation.
+		if((Operation == 190) && (getZRev() > 4))
+			// The next byte holds the extended operation.
+			ExtendedOperation = (256 - 190) + getByte(CurrentZFrame->PC++);
+
+		// Holds the operand types before they get extracted from the next 1-2 bytes.
+		// the first value is set to any value, as it will always be replaced 
+		// by the next byte. The second cell is set to 255 so that if only
+		// 1 byte is provided, all its operand types resolve to omitted.
+		int8_t Args[2] = {0, 255};
+
+		// Get the first packet of operands.
+		Args[0] = getByte(CurrentZFrame->PC++);
+
+		// For those to operands, grab a second packet of operands.
+		if(Operation == 236 || Operation == 260) {
+			Args[1] = getByte(CurrentZFrame->PC++);
 		}
-		OperandType[0] = args[0] >> 6 & 3;
-		OperandType[1] = args[0] >> 4 & 3;
-		OperandType[2] = args[0] >> 2 & 3;
-		OperandType[3] = args[0] & 3;
-		OperandType[4] = args[1] >> 6 & 3;
-		OperandType[5] = args[1] >> 4 & 3;
-		OperandType[6] = args[1] >> 2 & 3;
-		OperandType[7] = args[1] & 3;
+
+		OperandType[0] = Args[0] >> 6 & 3;
+		OperandType[1] = Args[0] >> 4 & 3;
+		OperandType[2] = Args[0] >> 2 & 3;
+		OperandType[3] = Args[0] & 3;
+		OperandType[4] = Args[1] >> 6 & 3;
+		OperandType[5] = Args[1] >> 4 & 3;
+		OperandType[6] = Args[1] >> 2 & 3;
+		OperandType[7] = Args[1] & 3;
+
+		// Add the extended operation offset if there is one.
+		Operation += ExtendedOperation;
+	} else {
+		// We are in long form. Bits 6 and 5 hold the operand types. 
+		OperandType[0] = ((Operation >> 6 & 1)+1);
+		OperandType[1] = ((Operation >> 5 & 1)+1);
 	}
 
 	// Find the number of operands that have been extracted, then
 	// populate them depending on their type. Print them if in debug mode.
 	CurrentZFrame->PassedArgs = 8;
-	for(int i = 0; i < 8; i++) {
-		switch(OperandType[i]) {
+	for(int I = 0; I < 8; I++) {
+		switch(OperandType[I]) {
 			case Omitted:
-				if(CurrentZFrame->PassedArgs > i)
-					CurrentZFrame->PassedArgs = i;
-				Operand[i] = 0;
+				// If one operand is ommitted, so is all its followers.
+				if(CurrentZFrame->PassedArgs > I)
+					CurrentZFrame->PassedArgs = I;
+				Operand[I] = 0;
 				break;
 			case LargeConstant:
-				Operand[i] = getWord(CurrentZFrame->PC);
+				// Large constants are words.
+				Operand[I] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message,"Large: %u", Operand[i]);
+					sprintf(Message,"Large: %u", Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break;
 			case SmallConstant:
-				Operand[i] = getByte(CurrentZFrame->PC++);
+				// Small constants are bytes.
+				Operand[I] = getByte(CurrentZFrame->PC++);
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message,"Small: %u", Operand[i]);
+					sprintf(Message,"Small: %u", Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break;
 			case Variable: {
+				// Variable values are grabbed from memory.
 				uint8_t var = getByte(CurrentZFrame->PC++);
-				Operand[i] = getZVar(var);
+				Operand[I] = getZVar(var);
 				if(VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message, "Var %u: %u", var, Operand[i]);
+					sprintf(Message, "Var %u: %u", var, Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break; }
 		}
 	}
 	// Execute the operation.
-	CallOpCode[op]();
+	CallOpCode[Operation]();
 	if( g_VerboseDebug >= 5)
 		logMessage(MNull, "Main loop", "Operation finished.\n");
 }

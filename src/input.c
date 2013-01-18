@@ -8,51 +8,58 @@
 #include "memory.h"
 #include "command.h"
 #include "input.h"
-#define getZRev() getByte(0)
-static struct termios term_settings;
-int w,h;
+// Used to hold what the terminal settings were before this program started.
+static struct termios TerminalSettings;
+// Holds the terminals width and height.
+int TerminalWidth, TerminalHeight;
 void initInput()
 {
-	w = 80;
-	h = 24;
+	// Default terminal size, if it can't be extracted.
+	TerminalWidth = 80;
+	TerminalHeight = 24;
 
+	// OS specific terminal size extraction.
 #ifdef TIOCGSIZE
-	struct ttysize ts;
-	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-	w = ts.ts_cols;
-	h = ts.ts_lines;
+	struct ttysize TerminalSize;
+	ioctl(STDIN_FILENO, TIOCGSIZE, &TerminalSize);
+	TerminalWidth = TerminalSize.ts_cols;
+	TerminalHeight = TerminalSize.ts_lines;
 #elif defined(TIOCGWINSZ)
-	struct winsize ts;
-	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-	w = ts.ws_col;
-	h = ts.ws_row;
+	struct winsize TerminalSize;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
+	TerminalWidth = TerminalSize.ws_col;
+	TerminalHeight = TerminalSize.ws_row;
 #endif /* TIOCGSIZE */
 
-	tcgetattr(STDIN_FILENO,&term_settings);
-	struct termios term = term_settings;
-	term.c_lflag &= ~(ICANON|ECHO);
-	term.c_cc[VTIME] = 1;
-	term.c_cc[VMIN] = 0;
-	tcsetattr(STDIN_FILENO,TCSAFLUSH,&term);
+	// Save current terminal state in TerminalSettings.
+	tcgetattr(STDIN_FILENO,&TerminalSettings);
+
+	// Turn the terminal into non-canonical mode.
+	struct termios NewTerminalSettings = TerminalSettings;
+	NewTerminalSettings.c_lflag &= ~(ICANON|ECHO);
+	NewTerminalSettings.c_cc[VTIME] = 1;
+	NewTerminalSettings.c_cc[VMIN] = 0;
+	tcsetattr(STDIN_FILENO,TCSAFLUSH,&NewTerminalSettings);
 }
 void cleanInput()
 {
-	tcsetattr(STDIN_FILENO,TCSANOW,&term_settings);
+	// Restore the terminal state.
+	tcsetattr(STDIN_FILENO,TCSANOW,&TerminalSettings);
 }
-void printstat()
-{
-}
+
+// Read a character in from the terminal.
 char readChar()
 {
 	return 0;
 }
 
+// The Z-Machine prompt reading.
 void readString()
 {
 	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
-	exit(1);
-	unsigned int maxsz = getByte(Operand[0]);
-	maxsz = maxsz>w? w:maxsz;
+	exit(0);
+	/* unsigned int maxsz = getByte(Operand[0]);
+	maxsz = maxsz>TerminalWidth? TerminalWidth:maxsz;
 	maxsz = maxsz<20? 20:maxsz;
 	maxsz--;
 	if(getZRev() < 5)
@@ -181,4 +188,5 @@ void readString()
 	printf("\n");
 	//THE FOLLOWING FREE IS TEMPORARY
 	free(line);
+	*/
 }

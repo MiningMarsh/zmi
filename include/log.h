@@ -16,8 +16,8 @@ enum log_message_type {
 
 int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
 
-int LogOpen(const char* const FileName);
+int logOpen(const char* const FileName);
 
-void LogClose();
+void logClose();
 
 #endif

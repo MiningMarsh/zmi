@@ -10,47 +10,62 @@
 #include "memory.h"
 #include "command.h"
 
-int w,h;
-void initOutput() {
-	w = 80;
-	h = 24;
+// Holds the terminals width and height.
+int TerminalWidth, TerminalHeight;
 
+void initOutput() {
+	// Default terminal size, if it can't be extracted.
+	TerminalWidth = 80;
+	TerminalHeight = 24;
+
+	// OS specific terminal size extraction.
 #ifdef TIOCGSIZE
-	struct ttysize ts;
-	ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
-	w = ts.ts_cols;
-	h = ts.ts_lines;
+	struct ttysize TerminalSize;
+	ioctl(STDIN_FILENO, TIOCGSIZE, &TerminalSize);
+	TerminalWidth = TerminalSize.ts_cols;
+	TerminalHeight = TerminalSize.ts_lines;
 #elif defined(TIOCGWINSZ)
-	struct winsize ts;
-	ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
-	w = ts.ws_col;
-	h = ts.ws_row;
+	struct winsize TerminalSize;
+	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
+	TerminalWidth = TerminalSize.ws_col;
+	TerminalHeight = TerminalSize.ws_row;
 #endif /* TIOCGSIZE */
 }
+
 void cleanOutput() {
 }
-void zPrint(char* str, ...) {
-	va_list args;
-	va_start(args,str);
-	if(!w)
-		w=20;
-	static int pos = 0;
-	int strsz = 0;
-	char word[1024];
-	int wordsz = 0;
-	while(str[strsz]) {
-		switch(str[strsz]) {
+
+void zPrint(char* String, ...) {
+	// Used to access the variable arguments.
+	va_list Arguments;
+	va_start(Arguments, String);
+	if(!TerminalWidth)
+		TerminalWidth=20;
+	// Holds the cursor position, used for word wrapping.
+	int Position = 0;
+	// ditto.
+	int StringSize = 0;
+	// Holds the next word to be printed.
+	char Word[1024];
+	// Holds the size of the last word printed.
+	int WordSize = 0;
+
+	// Parse special characters.
+	while(String[StringSize]) {
+		switch(String[StringSize]) {
+
+			// Used im the same style as printf.
 			case '%': {
-				strsz++;
-				switch(str[strsz]) {
+				StringSize++;
+				switch(String[StringSize]) {
 					case 's': {
-						char *exstr;
-						exstr = va_arg(args,char*);
-						int p = 0;
-						while(exstr[p]) {
-							word[wordsz] = exstr[p];
-							p++;
-							wordsz++;
+						char *ArgString;
+						ArgString = va_arg(Arguments,char*);
+						int Position = 0;
+						while(ArgString[Position]) {
+							Word[WordSize] = ArgString[Position];
+							Position++;
+							WordSize++;
 						}
 						break; }
 					case 'i': {
@@ -62,44 +77,43 @@ void zPrint(char* str, ...) {
 			break; }
 			case '\n':
 			case '\r':
-				word[wordsz] = 0;
-				printf("%s\n",word);
-				wordsz = 0;
-				pos = 0;
+				Word[WordSize] = 0;
+				printf("%s\n",Word);
+				WordSize = 0;
+				Position = 0;
 				break;
 			case '\b':
-				pos--;
+				Position--;
 				putchar('\b');
 				break;
 			case ' ':
-				if(pos + wordsz > w) {
-					pos = 0;
+				if(Position + WordSize > TerminalWidth) {
+					Position = 0;
 					putchar('\n');
 				}
-				word[wordsz] = 0;
-				printf("%s",word);
-				if(wordsz + pos != w)
+				Word[WordSize] = 0;
+				printf("%s",Word);
+				if(WordSize + Position != TerminalWidth)
 					putchar(' ');
-				pos += wordsz + 1;
-				wordsz = 0;
+				Position += WordSize + 1;
+				WordSize = 0;
 				break;
 			default:
-				word[wordsz] = str[strsz];
-				wordsz++;
+				Word[WordSize] = String[StringSize];
+				WordSize++;
 				break;
 		}
-		strsz++;
+		StringSize++;
 	}
-	if(wordsz) {
-	if(pos + wordsz > w)
-	{
-		pos = 0;
+	if(WordSize) {
+	if(Position + WordSize > TerminalWidth) {
+		Position = 0;
 		putchar('\n');
 	}
-	word[wordsz]=0;
-	printf("%s",word);
-	wordsz--;
-	pos += wordsz;
+	Word[WordSize]=0;
+	printf("%s",Word);
+	WordSize--;
+	Position += WordSize;
 	}
-	va_end(args);
+	va_end(Arguments);
 }

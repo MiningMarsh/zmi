@@ -5,7 +5,7 @@
 #include "memory.h"
 #include "globalvars.h"
 #include "log.h"
-uint8_t* RAM; // Holds the file.
+uint8_t* RAM;
 
 // Clean things instead of letting the OS do it.
 void clean() {
@@ -37,5 +37,5 @@ void clean() {
 	free(CurrentZFrame->Locals);
 	free(CurrentZFrame->Stack);
 	free(CurrentZFrame);
-	LogClose();
+	logClose();
 }
