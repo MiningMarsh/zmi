@@ -61,6 +61,7 @@ void initZM() {
 	printf("%c[2J,%c[0;0H",27,27);
 }
 
+// Execute an instruction begininng where the PC is currentl pointing.
 void execNextInstruction() {
 	// Display a debug message.
 	if(g_VerboseDebug >= 5)
