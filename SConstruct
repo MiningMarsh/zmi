@@ -17,17 +17,17 @@ AddOption('--mingw32', dest='mingw32', action='store_true', default=False, help=
 if(GetOption('mingw32')):
 	env.Append(CCFLAGS='-mwindows')
 	lib=['mingw32']
-	builddir='windows'
+	variant='windows'
 	exe='out.exe'
 else:
 	lib=[]
 	exe= 'out'
-	builddir= 'linux'
+	variant= 'linux'
 
 #source directories
-env.VariantDir('build/'+builddir,'src', duplicate=0)
-sources = Glob("build/" + builddir + "/*.c")
-exe="build/" + builddir + "/" + exe
+env.VariantDir('build/objects/'+variant,'src', duplicate=0)
+sources = Glob("build/objects/" + variant + "/*.c")
+exe="build/" + variant + "/" + exe
 
 # Include directories
 incdirs=["./include"]
