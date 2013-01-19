@@ -28,7 +28,7 @@ void zStore(uzword Value) {
 // Grab a string from the PC stream.
 char* zGetStringFromPC() {
 	// Grab thr raw zcharacters.
-	uzword* Buffer = getZChars(CurrentZFrame->PC);
+	uint32_t* Buffer = getZChars(CurrentZFrame->PC);
 	// Increase the pc by the buffersize.
 	CurrentZFrame->PC += (Buffer[0]/3)*2;
 	// Convert the buffer into ascii.

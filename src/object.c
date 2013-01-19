@@ -50,7 +50,7 @@ uint16_t getObjectFlag(uint16_t Object, uint16_t Flag) {
 		char Message[256];
 		sprintf(
 			Message,
-			"An invalid flag number of %u was read.\n",
+			"An invalid flag number of %u was read.\n"
 			"There are %u flags.",
 			Flag,
 			getZRev() >= 4 ? 48:32
@@ -73,7 +73,7 @@ void setObjectFlagValue(uint16_t Object, uint16_t Flag, uint16_t Value) {
 		char Message[256];
 		sprintf(
 			Message,
-			"An invalid flag number of %u was set.\n",
+			"An invalid flag number of %u was set.\n"
 			"There are %u flags.",
 			Flag,
 			getZRev() >= 4 ? 48:32

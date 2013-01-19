@@ -9,11 +9,7 @@ zword zSign(uzword Input) {
 	if(Input <= 32767) {
 		return Input;
 	}
-	zword Return = -1;
-	while((0xFFFF+ Return + 1) != Input) {
-		Return--;
-	}
-	return Return;
+	return -(0xFFFF - Input + 1);
 }
 
 uzword zUnsign(zword Input) {

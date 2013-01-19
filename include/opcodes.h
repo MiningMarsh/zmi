@@ -132,8 +132,8 @@ void opArtShift() {
 			"%i %s %i -> %i",
 			zSign(Operand[0]),
 			Places > 0 ? "<<" : ">>",
-			Number
-			
+			Places,
+			Number	
 		);
 		logMessage(MNull, "art_shift", Message);
 	}

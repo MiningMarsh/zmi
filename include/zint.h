@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 typedef int16_t zword;
-typedef char zbyte;
+typedef int8_t zbyte;
 
 typedef uint16_t uzword;
-typedef unsigned char uzbyte;
+typedef uint8_t uzbyte;
 
 typedef int32_t zlong;
 typedef uint32_t uzlong;
