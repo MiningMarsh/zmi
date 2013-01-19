@@ -19,6 +19,8 @@ void opRet();
  *************************************************************************/
 
 void opAdd() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "add");
 	// The first number to add, casted from its unsigned form in memory.
 	zword Number1 = zSign(Operand[0]);
 	// The second number to add, casted from its unsigned form in memory.
@@ -45,20 +47,8 @@ void opAdd() {
 			logMessage(MWarning, "add", Message);
 			AlreadyWarned = true;
 		}
-	// Log the warning message.
-	if(g_VerboseDebug >= 25) {
-		char Message[256];
-		sprintf(
-			Message,
-			"%i + %i -> %i",
-			Number1,
-			Number2,
-			Result
-		);
-		logMessage(MNull, "add", Message);
-	}
 	// Store the result.
-	zStore(zUnsign((Number1 + Number2)%10000));
+	zStore(zUnsign((Number1 + Number2)));
 }
 
 /*******************************
@@ -68,17 +58,8 @@ void opAdd() {
  *************************************************************************/
 
 void opAnd() {
-	if(g_VerboseDebug >= 25) {
-		char Message[256];
-		sprintf(
-			Message,
-			"%i & %i -> %i",
-			Operand[0],
-			Operand[1],
-			Operand[0]&Operand[1]
-		);
-		logMessage(MNull, "and", Message);
-	}
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "and");
 	// Store operand 1 AND operand 2.
 	zStore(Operand[0]&Operand[1]);
 }
@@ -93,6 +74,8 @@ void opAnd() {
  *************************************************************************/
 
 void opArtShift() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "art_shift");
 	// Number to shift.
 	zword Number = zSign(Operand[0]);
 	// Number of places to shift by.
@@ -152,6 +135,8 @@ void opArtShift() {
  *************************************************************************/
 
 void opCall() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "call");
 	// If address 0 is called, we instantly return 0 and nothing happens.
 	if(!Operand[0]) {
 		if(CurrentZFrame->ReturnVar == 1)
@@ -206,6 +191,8 @@ void opCall() {
  *************************************************************************/
 
 void opCallVN () {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "CallVN");
 	// Set up metadata saying this stackframe doesn't return anything.
 	CurrentZFrame->ReturnVar = 0;
 	// Transfer to a standard routine call.
@@ -220,6 +207,8 @@ void opCallVN () {
  *************************************************************************/
 
 void opCatch() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "catch");
 	if(g_VerboseDebug >= 25) {
 		char Message[256];
 		sprintf(
@@ -242,6 +231,8 @@ void opCatch() {
  *************************************************************************/
 
 void opCheckArgCount() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "check_arg_count");
 	if(g_VerboseDebug >= 25) {
 		char Message[256];
 		sprintf(
@@ -267,6 +258,8 @@ void opCheckArgCount() {
  *************************************************************************/
 
 void opCheckUnicode() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "check_unicode");
 	if(g_VerboseDebug >= 25) {
 		logMessage(MNull, "check_unicode", "Unicode not supported.");
 	}
@@ -281,6 +274,8 @@ void opCheckUnicode() {
  *************************************************************************/
 
 void opClearAttr() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "clear_attr");
 	// Set the specified flg to 0.
 	setObjectFlagValue(Operand[0], Operand[1], 0);
 }
@@ -292,6 +287,8 @@ void opClearAttr() {
  *************************************************************************/
 
 void opDec() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "dec");
 	zword Value = zSign(getZVar(Operand[0]));
 	setZVar(Operand[0], zUnsign(--Value));
 }
@@ -304,6 +301,8 @@ void opDec() {
  *************************************************************************/
 
 void opDecChk() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "dec_chk");
 	// Check the new value;
 	zword Variable = zSign(getZVar(Operand[0]));
 	setZVar(Operand[0], zUnsign(--Variable));
@@ -317,14 +316,17 @@ void opDecChk() {
  * Signed 16-bit division. Division by zero should halt the interpreter  *
  * with a suitable error message.                                        *
  *************************************************************************/
+
 void opDiv() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "div");
 	zword Operator = zSign(Operand[0]);
 	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
 		logMessage(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
-	zStore(zSign((Operator / Dividend)&0xFFFF));
+	zStore(zUnsign((Operator / Dividend)));
 }
 
 /*********
@@ -347,12 +349,15 @@ void opNonexistant() {
  *************************************************************************/
 
 void opGetChild() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "get_child");
+	uzword Address = getChild(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_child", "Tried to get object in object 0.");
-		exit(1);
+		//exit(1);
+		Address = 0;
 	}
 	// Get the address of the child.
-	uzword Address = getChild(Operand[0]);
 	zStore(Address);
 	zBranch(Address);
 }
@@ -364,11 +369,14 @@ void opGetChild() {
  *************************************************************************/
 
 void opGetParent() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "get_parent");
+	uzword Address = getParent(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_parent", "Tried to get object in object 0.");
-		exit(1);
+		//exit(1);
+		Address = 0;
 	}
-	uzword Address = getParent(Operand[0]);
 	zStore(Address);
 }
 
@@ -385,11 +393,13 @@ void opGetParent() {
 
 // Get a property of an object.
 void opGetProp() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "get_prop");
 	// Get the property address.
-	uzword Address = getPropertyAdr(Operand[0],Operand[1]);
+	uzword Address = getPropertyAddress(Operand[0],Operand[1]);
 	if(Address != 0) {
 		// If it existed, find its size.
-		unsigned int Size = getByte(Address++);
+		uzbyte Size = ((getByte(Address++) - Operand[1])/32) + 1;
 		if(Size == 1) {
 			zStore(getByte(Address));
 		} else if(Size == 2) {
@@ -412,7 +422,9 @@ void opGetProp() {
  *************************************************************************/
 
 void opGetPropAddr() {
-	uzword Address = getPropertyAdr(Operand[0], Operand[1]);
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "get_prop_addr");
+	uzword Address = getPropertyAddress(Operand[0], Operand[1]);
 	if(Address)
 		Address++;
 	zStore(Address);
@@ -425,9 +437,13 @@ void opGetPropAddr() {
  *************************************************************************/
 
  void opGetSibling() {
-	 if(!Operand[0]) {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "get_sibling");
+	uzword Object = getSibling(Operand[0]);
+	if(!Operand[0]) {
 		logMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
-		exit(1);
+	//	exit(1);
+		Object = 0;
 	}
 	zStore(getSibling(Operand[0]));
 	zBranch(getSibling(Operand[0]));
@@ -440,6 +456,8 @@ void opGetPropAddr() {
  *************************************************************************/
 
 void opInc() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "inc");
 	zword Value = zSign(getZVar(Operand[0]));
 	setZVar(Operand[0], zUnsign(++Value));
 }
@@ -451,6 +469,8 @@ void opInc() {
  *************************************************************************/
  
 void opIncChk() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "inc_chk");
 	// Check the new value;
 	zword Variable = zSign(getZVar(Operand[0]));
 	setZVar(Operand[0], zUnsign(++Variable));
@@ -470,6 +490,8 @@ void opIncChk() {
  
 void opRemoveObj();
 void opInsertObj() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "insert_obj");
 	opRemoveObj();
 	uzword Child = getChild(Operand[1]);
 	setSibling(Operand[0], Child);
@@ -485,6 +507,8 @@ void opInsertObj() {
  *************************************************************************/
 
 void opJe() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "je");
 	zBranch(Operand[0] == Operand[1]);
 }
 
@@ -495,8 +519,10 @@ void opJe() {
  *************************************************************************/
 
 void opJg() {
-	zword A = Operand[0];
-	zword B = Operand[1];
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "jg");
+	zword A = zSign(Operand[0]);
+	zword B = zSign(Operand[1]);
 	zBranch(A > B);
 }
 
@@ -507,6 +533,8 @@ void opJg() {
  *************************************************************************/
 
 void opJin() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "jin");
 	zBranch(getParent(Operand[0]) == Operand[1]);
 }
 
@@ -517,6 +545,8 @@ void opJin() {
  * ***********************************************************************/
 
 void opJl() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "jl");
 	zBranch(Operand[0] < Operand[1]);
 }
 
@@ -532,6 +562,8 @@ void opJl() {
  *************************************************************************/
 
 void opJump() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "jump");
 	CurrentZFrame->PC += zSign(Operand[0]) - 2;
 }
 
@@ -542,6 +574,8 @@ void opJump() {
  *************************************************************************/
 
 void opJz() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "jz");
 	zBranch(!Operand[0]);
 }
 
@@ -553,6 +587,8 @@ void opJz() {
  *************************************************************************/
 
 void opLoadb() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "loadb");
 	zStore(getByte(Operand[0]+Operand[1]));
 }
 
@@ -564,6 +600,8 @@ void opLoadb() {
  *************************************************************************/
 
 void opLoadw() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "loadw");
 	zStore(getWord(Operand[0]+2*Operand[1]));
 }
 
@@ -577,6 +615,8 @@ void opLoadw() {
  *************************************************************************/
 
 void opLogShift() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "log_shift");
 	uzword Number = zSign(Operand[0]);
 	zword Places = zSign(Operand[1]);
 	if(Places >= 0)
@@ -594,6 +634,8 @@ void opLogShift() {
  *************************************************************************/
 
 void opMod() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "mod");
 	zword Base = zSign(Operand[0]);
 	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
@@ -610,9 +652,11 @@ void opMod() {
  *************************************************************************/
  
 void opMul() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "mul");
 	zword Multiple = zSign(Operand[0]);
 	zword Multiplied = zSign(Operand[1]);
-	zStore(zUnsign((Multiple * Multiplied)&0xFFFF));
+	zStore(zUnsign(Multiple * Multiplied));
 }
 
 /**********************
@@ -623,6 +667,8 @@ void opMul() {
 
 // Print a newline.
 void opNewLine() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "new_line");
 	zPrint("\n");
 }
 
@@ -653,6 +699,8 @@ void opNop() {
  *************************************************************************/
 
 void opOr() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "or");
 	zStore(Operand[0] | Operand[1]);
 }
 
@@ -666,6 +714,8 @@ void opOr() {
  *************************************************************************/
 
 void opPiracy() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "piracy");
 	zBranch(true);
 }
 
@@ -676,6 +726,8 @@ void opPiracy() {
  *************************************************************************/
 
 void opPrint() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print");
 	// The string on this operation is stored on teh byte now pointed to
 	// by the program counter.
 	char* String = zGetStringFromPC();
@@ -694,6 +746,8 @@ void opPrint() {
  *************************************************************************/ 
 
 void opPrintChar() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print_char");
 	// TODO: Make this operation standard compliant.
 	printf("%c",Operand[0]);
 }
@@ -706,6 +760,8 @@ void opPrintChar() {
 
 void opPrintNum() {
 	// TODO: Fix zPrint so that this can use that instead of printf.
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print_num");
 	printf("%i",Operand[0]);
 }
 
@@ -718,9 +774,11 @@ void opPrintNum() {
  *************************************************************************/
 
 void opPrintObj() {
-	// TODO: Implement %s in zprint to fix this potential code injecction
+	// TODO: Implement %s in zprint to fix this potential code injection
 	// exploit.
-	uzword PropertyTableAddress = getPropertyTableAdr(Operand[0]);
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print_obj");
+	uzword PropertyTableAddress = getPropertyTableAddress(Operand[0]);
 	 PropertyTableAddress++;
 	char* ObjectName = zCharsToZSCII(getZChars( PropertyTableAddress));
 	zPrint(ObjectName);
@@ -735,6 +793,8 @@ void opPrintObj() {
  *************************************************************************/
 
 void opPrintPaddr() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print_paddr");
 	char* String = zCharsToZSCII(getZChars(expandPaddedAddress(Operand[0])));
 	zPrint(String);
 	free(String);
@@ -752,6 +812,8 @@ void opNewLine();
 void opRtrue();
 
 void opPrintRet() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "print_ret");
 	opPrint();
 	opNewLine();
 	opRtrue();
@@ -768,6 +830,8 @@ void opPrintRet() {
  *************************************************************************/
  
 void opPull() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "pull");
 	setZVar(Operand[0],popZStack());
 }
 
@@ -778,6 +842,8 @@ void opPull() {
  *************************************************************************/
 
 void opPush() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "push");
 	pushZStack(Operand[0]);
 }
 
@@ -795,8 +861,10 @@ void opPush() {
  *************************************************************************/
 
 void opPutProp() {
-	uzword Address = getPropertyAdr(Operand[0],Operand[1]);
-	unsigned int Size = getByte(Address++);
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "put_prop");
+	uzword Address = getPropertyAddress(Operand[0],Operand[1]);
+	uzbyte Size = ((getByte(Address++) - Operand[1])/32) + 1;
 	if(Size == 1) {
 		setByte(Address,Operand[2]);
 	} else if(Size == 2) {
@@ -822,6 +890,11 @@ void opPutProp() {
  *************************************************************************/
 
 void opRandom() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "random");
+
+	zword Seed = zSign(Operand[0]);
+
 	// This state varibale represents the current value of the LFSR. 
 	// Since in normal operation, a LFSR will never reach state 0, we
 	// can assume a value of 0 means we have not yet initilized the LFSR.
@@ -834,11 +907,11 @@ void opRandom() {
 		Next = (State&15)^((State>>2)&13)^((State>>2)&13)^((State>>6)&10);
 		State = ((State<<1)) + (Next);
 	}
-	if(Operand[0] > 0) {
-		zStore(State%Operand[0]);
-	} else if(Operand[0] < 0) {
+	if(Seed > 0) {
+		zStore(State%Seed);
+	} else if(Seed < 0) {
 		zStore(0);
-		State = Operand[0];
+		State = Seed;
 	} else {
 		zStore(0);
 		State = time(NULL)%0xFFFF;
@@ -929,6 +1002,8 @@ void opRandom() {
  *************************************************************************/
  
 void opRead() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "read");
 	readString(0);
 }
 
@@ -940,6 +1015,8 @@ void opRead() {
  *************************************************************************/
  
 void opRemoveObj() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "remove_obj");
 	uzword Parent = getParent(Operand[0]);
 	if(Parent != 0) {
 		if(getChild(Parent) == Operand[0]) {
@@ -962,6 +1039,8 @@ void opRemoveObj() {
  *************************************************************************/
 
 void opRet() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "ret");
 	popZFrame();
 	if(CurrentZFrame->ReturnVar == 1)
 		setZVar(getByte(CurrentZFrame->PC++), Operand[0]);
@@ -976,6 +1055,8 @@ void opRet() {
  *************************************************************************/
 
 void opRetPopped() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "ret_popped");
 	Operand[0] = popZStack();
 	opRet();
 }
@@ -987,6 +1068,8 @@ void opRetPopped() {
  *************************************************************************/
  
 void opRfalse() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "rfalse");
 	Operand[0] = 0;
 	opRet();
 }
@@ -998,6 +1081,8 @@ void opRfalse() {
  *************************************************************************/
 
 void opRtrue() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "rtrue");
 	Operand[0] = 1;
 	opRet();
 }
@@ -1009,6 +1094,8 @@ void opRtrue() {
  *************************************************************************/
  
 void opSetAttr() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "set_attr");
 	setObjectFlagValue(Operand[0], Operand[1], 1);
 }
 
@@ -1019,6 +1106,8 @@ void opSetAttr() {
  *************************************************************************/
  
 void opStore() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "store");
 	setZVar(Operand[0],Operand[1]);
 }
 
@@ -1031,6 +1120,8 @@ void opStore() {
  *************************************************************************/
 
 void opStoreb() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "storeb");
 	setByte(Operand[0]+Operand[1], Operand[2]);
 }
 
@@ -1043,6 +1134,8 @@ void opStoreb() {
  *************************************************************************/
 
 void opStorew() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "storew");
 	setWord(Operand[0]+2*Operand[1], Operand[2]);
 }
 
@@ -1053,6 +1146,8 @@ void opStorew() {
  *************************************************************************/
 
 void opSub() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "sub");
 	zword Value = zSign(Operand[0]);
 	zword Smaller = zSign(Operand[1]);
 	zStore(zUnsign((Value - Smaller)&0xFFFF));
@@ -1066,6 +1161,8 @@ void opSub() {
  *************************************************************************/
 
 void opTest() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "test");
 	zBranch((Operand[0] & Operand[1]) == Operand[1]);
 }
 
@@ -1076,6 +1173,8 @@ void opTest() {
  *************************************************************************/ 
 
 void opTestAttr() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "test_attr");
 	zBranch(getObjectFlag(Operand[0], Operand[1]));
 }
 
@@ -1089,6 +1188,8 @@ void opTestAttr() {
  *************************************************************************/
 
 void opThrow() {
+	if(g_VerboseDebug >= 50)
+		logMessage(MNull, "CallOperation()", "throw");
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
 		fputs("Tried to throw bad frame pointer.\n",stderr);
 		exit(1);

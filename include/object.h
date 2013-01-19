@@ -4,35 +4,37 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include "zint.h"
 
 // Get the address of a property on an object. This function does not check to see if the object is 0.
-uint16_t getPropertyAdr(uint16_t obj, uint16_t prop);
+uzword getPropertyAddress(uzword Object, uzword Property);
 
 // Get a flag off an object, if it is valid.
-uint16_t getObjectFlag(uint16_t obj, uint16_t flag);
+bool getObjectFlag(uzword Object, uzword Flag);
 
 // Set the parent of an object.
-void setParent(uint16_t obj, uint16_t val);
+void setParent(uzword Object, uzword val);
 
 // Set the child of an object.
-void setChild(uint16_t obj, uint16_t val);
+void setChild(uzword Object, uzword Value);
 
 // Set the sibling of an object.
-void setSibling(uint16_t obj, uint16_t val);
+void setSibling(uzword Object, uzword Value);
 
 // Set a flag of an object to either on or off.
-void setObjectFlagValue(uint16_t obj, uint16_t flag, uint16_t val);
+void setObjectFlagValue(uzword Object, uzword Flag, bool Value);
 
 // Get the parent of an object.
-uint16_t getParent(uint16_t obj);
+uzword getParent(uzword Object);
 
 // Get the child of an object.
-uint16_t getChild(uint16_t obj);
+uzword getChild(uzword Object);
 
 // Get the sibling of an object.
-uint16_t getSibling(uint16_t obj);
+uzword getSibling(uzword Object);
 
 // Get the property table address of an object. This is a bit useless outside of the other object functions.
-uint16_t getPropertyTableAdr(uint16_t obj);
+uzword getPropertyTableAddress(uzword Object);
 
 #endif /* object.h */
