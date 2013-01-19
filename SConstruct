@@ -1,7 +1,10 @@
 #imports
 import sys, os
 #env initialization
-env = Environment()
+env = Environment(
+	CCCOMSTR="[CC] $SOURCES",
+	LINKCOMSTR="[LD] $TARGET: $SOURCES"
+	)
 builddir= "generic"
 # Compile flags.
 flags='--std=c99 -pipe'

@@ -636,12 +636,14 @@ void opNewLine() {
  
 void opNop() {
 	// This is "probably" standard compliant.
-	logMessage(MWarning, "nop", 
+	logMessage(MFatal, "nop", 
 		"Nop wastes both cpu cycles, and is\n"
 		"not fully defined in the standard,\n"
 		"and is therefore undefined\n"
 		"behavior. Don't use it."
-		);
+	);
+	exit(1);
+
 }
 
 /******************************
