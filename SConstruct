@@ -104,7 +104,6 @@ else:
 	env['CXX']='g++'
 	env['LD']='ld'
 
-Progress(['[EVAL] -','[EVAL] \\', '[EVAL] |', '[EVAL] /'], interval=5, overwrite=True)
 Install = env.Program(Executable, Sources, LIBS=Libraries)
 
 #option reading
