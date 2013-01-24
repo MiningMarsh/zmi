@@ -1,43 +1,100 @@
 #imports
-import sys, os
+import sys, os, fnmatch
 #env initialization
 env = Environment(
-	CCCOMSTR="[CC] $SOURCES",
-	LINKCOMSTR="[LD] $TARGET: $SOURCES"
+		CCCOMSTR='[CC] $SOURCES',
+		LINKCOMSTR='[LD] $TARGET: $SOURCES'
 	)
-builddir= "generic"
+
+HeaderDirectory = "include"
+SourceDirectory = "src"
+SourceExtensions = ["c", "cpp"]
+DefaultVariant = "generic"
+BuildPrefix = "build/objects"
+
 # Compile flags.
-flags='--std=c99 -pipe'
+Flags = '--std=c99 -pipe'
 
 #options
-AddOption('--debugging', dest='debug', action='store_true', default=False, help='Compile a debug release')
-AddOption('--strict', dest='strict', action='store_true', default=False, help='Compile a debug release')
-AddOption('--fast', dest='fast', action='store_true', default=False, help='Compile for speed')
-AddOption('--small', dest='small', action='store_true', default=False, help='Compile for a small executable')
-AddOption('--tool-prefix', dest='tool-prefix', type='string', nargs=1, action='store', metavar='TOOL', help='tool prefix')
-AddOption('--mingw32', dest='mingw32', action='store_true', default=False, help='Cross compile for windows')
+AddOption(
+	'--debugging', 
+	dest='debug', 
+	action='store_true', 
+	default=False, 
+	help='Compile a debug release'
+)
+
+AddOption('--strict', 
+	dest='strict', 
+	action='store_true', 
+	default=False, 
+	help='Stop compiling whenever the compiler issues a warning.'
+)
+
+AddOption(
+	'--fast', 
+	dest='fast', 
+	action='store_true', 
+	default=False, 
+	help='Compile a fast executable'
+)
+
+AddOption(
+	'--small', 
+	dest='small', 
+	action='store_true', 
+	default=False, 
+	help='Compile a small executable'
+)
+
+AddOption(
+	'--tool-prefix', 
+	dest='tool-prefix', 
+	type='string', 
+	nargs=1, 
+	action='store', 
+	metavar='TOOL', 
+	help='tool prefix'
+
+)
+AddOption(
+	'--mingw32', 
+	dest='mingw32', 
+	action='store_true', 
+	default=False, 
+	help='Cross compile for windows'
+)
+
+Variant = DefaultVariant
 
 if(GetOption('mingw32')):
 	env.Append(CCFLAGS='-mwindows')
-	lib=['mingw32']
-	variant='windows'
-	exe='out.exe'
+	Libraries = ['mingw32']
+	Variant = 'windows'
+	Executable = 'out.exe'
 else:
-	lib=[]
-	exe= 'out'
-	variant= 'linux'
+	Libraries = []
+	Executable = 'out'
+	Variant = 'linux'
+
+BuildPrefix = BuildPrefix + '/' + Variant
 
 #source directories
-env.VariantDir('build/objects/'+variant,'src', duplicate=0)
-sources = Glob("build/objects/" + variant + "/*.c")
-exe="build/" + variant + "/" + exe
+env.VariantDir(BuildPrefix, SourceDirectory, duplicate=0)
+Sources = []
+for Extension in SourceExtensions:
+	for Root, Directories, Files in os.walk(SourceDirectory):
+		for Files in fnmatch.filter(Files, '*.' + Extension):
+			Sources.append((os.path.join(Root, Files)).replace(SourceDirectory, BuildPrefix, 1))
+
+Executable = 'build/' + Variant + '/' + Executable
 
 # Include directories
-incdirs=["./include"]
+Headers = [HeaderDirectory]
 
 #env setup
-env.Append(CCFLAGS=flags)
-env.Append(CPPPATH=incdirs)
+env.Append(CCFLAGS=Flags)
+env.Append(CPPPATH=Headers)
 if(GetOption('tool-prefix')):
 	env['CC']=GetOption('tool-prefix')+'-gcc'
 	env['CXX']=GetOption('tool-prefix')+'-g++'
@@ -47,18 +104,20 @@ else:
 	env['CXX']='g++'
 	env['LD']='ld'
 	
-zmi = env.Program(exe,sources,LIBS=lib)
+Install = env.Program(Executable, Sources, LIBS=Libraries)
+
 #option reading
-if(GetOption("debug")):
+if(GetOption('debug')):
 	env.Append(CCFLAGS='-ggdb -Wall -Wextra')
-if(GetOption("strict")):
+if(GetOption('strict')):
 	env.Append(CCFLAGS='-Werror')
-if(GetOption("small")):
+if(GetOption('small')):
 	env.Append(CCFLAGS='-Os')
-if(GetOption("fast")):
+if(GetOption('fast')):
 	env.Append(CCFLAGS='-O3')
+
 #install
-env.Install("/usr/bin",zmi)
+env.Install('/usr/bin', Install)
 
 #aliases
 env.Alias('install',['/usr/bin'])
