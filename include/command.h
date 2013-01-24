@@ -2,9 +2,10 @@
 #define COMMAND_H
 
 #include <stdint.h>
+#include "zint.h"
 
 // The operands to the operation.
-uint16_t Operand[8];
+zword Operand[8];
 
 // Execute the instruction pointed at by the PC and advance it to the next available instruction.
 void execNextInstruction();

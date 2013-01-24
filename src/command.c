@@ -3,17 +3,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "memory.h"
-#include "routine.h"
-#include "object.h"
-#include "zscii.h"
 #include "input.h"
 #include "output.h"
 #include "exit.h"
 #include "globalvars.h"
 #include "log.h"
+#include "command.h"
+#include "opcodes.h"
 
 // Holds arguments to opcodes.
-uint16_t Operand[8];
+zword Operand[8];
 
 // Used for easy identification of operand types.
 enum operandType {
@@ -22,9 +21,6 @@ enum operandType {
 	Variable = 2,
 	Omitted = 3
 };
-
-// Include the operation code functions.
-#include "opcodes.h"
 
 // Initiate the machine with a default set of values.
 void initZM() {
