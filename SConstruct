@@ -1,9 +1,9 @@
 #imports
-import sys, os, fnmatch
+import sys, os, fnmatch, shutil
 #env initialization
 env = Environment(
-		CCCOMSTR='[CC] $SOURCES',
-		LINKCOMSTR='[LD] $TARGET: $SOURCES'
+		CCCOMSTR='\r[COMPILE] $SOURCES',
+		LINKCOMSTR='\r[LINK] $TARGET'
 	)
 
 HeaderDirectory = "include"
@@ -103,7 +103,8 @@ else:
 	env['CC']='gcc'
 	env['CXX']='g++'
 	env['LD']='ld'
-	
+
+Progress(['[EVAL] -','[EVAL] \\', '[EVAL] |', '[EVAL] /'], interval=5, overwrite=True)
 Install = env.Program(Executable, Sources, LIBS=Libraries)
 
 #option reading
@@ -115,6 +116,10 @@ if(GetOption('small')):
 	env.Append(CCFLAGS='-Os')
 if(GetOption('fast')):
 	env.Append(CCFLAGS='-O3')
+if env.GetOption('clean'):
+	if os.path.isdir('build'):
+		shutil.rmtree('build')
+
 
 #install
 env.Install('/usr/bin', Install)
