@@ -2,8 +2,8 @@
 import sys, os, fnmatch, shutil
 #env initialization
 env = Environment(
-		CCCOMSTR='\r[COMPILE] $SOURCES',
-		LINKCOMSTR='\r[LINK] $TARGET'
+		CCCOMSTR='[CC] $SOURCES',
+		LINKCOMSTR='[LD] $TARGET'
 	)
 
 HeaderDirectory = "include"
@@ -57,6 +57,7 @@ AddOption(
 	help='tool prefix'
 
 )
+
 AddOption(
 	'--mingw32', 
 	dest='mingw32', 
