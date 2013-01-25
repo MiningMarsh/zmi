@@ -4,7 +4,6 @@
 #include "routine.h"
 #include "command.h"
 #include "globalvars.h"
-#include "opcodes.h"
 
 /*********************************
  * 2OP:23 17 div a b -> (result) *

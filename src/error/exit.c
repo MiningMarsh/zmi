@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "input.h"
 #include "output.h"
 #include "memory.h"
@@ -9,7 +8,6 @@ uint8_t* RAM;
 
 // Clean things instead of letting the OS do it.
 void clean() {
-	putchar('\n');
 	const char* const Prefix = "clean()";
 	logMessage(MNull, "", "");
 	logMessage(MNull, Prefix, "Begin cleanup.");
@@ -24,7 +22,7 @@ void clean() {
 	// Free the storyfile from ram.
 	free(RAM);
 	// Print a Stacktrace in debug mode.
-	if(VerboseDebug >= 5)
+	if(g_VerboseDebug >= 5)
 		traceZStack();
 	while(CurrentZFrame->OldFrame != NULL) {
 		if(g_VerboseDebug)

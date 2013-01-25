@@ -1,10 +1,7 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include "log.h"
-#include "zint.h"
-#include "routine.h"
 #include "command.h"
 #include "globalvars.h"
-#include "opcodes.h"
 
 /**********************************************
  * VAR:229 5 print_char output-character-code *

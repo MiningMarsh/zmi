@@ -20,7 +20,7 @@ void opThrow() {
 	if(g_VerboseDebug >= 50)
 		logMessage(MNull, "CallOperation()", "throw");
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
-		fputs("Tried to throw bad frame pointer.\n",stderr);
+		logMessage(MFatal, "opThrow()", "Tried to throw bad frame pointer");
 		exit(1);
 	}
 	while(Operand[1] < zFrameNumber(CurrentZFrame))

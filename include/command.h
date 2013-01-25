@@ -1,7 +1,6 @@
 #ifndef COMMAND_H
-#define COMMAND_H
+#define COMMAND_H 1
 
-#include <stdint.h>
 #include "zint.h"
 
 // The operands to the operation.

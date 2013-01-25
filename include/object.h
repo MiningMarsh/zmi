@@ -1,9 +1,6 @@
 #ifndef OBJECT_H
-#define OBJECT_H
+#define OBJECT_H 1
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include "zint.h"
 

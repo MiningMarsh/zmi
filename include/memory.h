@@ -1,16 +1,13 @@
-// Allow getZRev() to get the current story file z-code revision.
-
 #ifndef MEMORY_H
-#define MEMORY_H
+#define MEMORY_H 1
 
-#include <stdint.h>
 #include "zint.h"
 
 // Holds the current routine state. Holds: PC, Stack, local variables,
 // and return information for routine handling.
 struct stackframe { // Holds the current routine state.
 	struct stackframe* OldFrame;
-	uint32_t PC;
+	unsigned int PC;
 	uzword* Locals;
 	uzword* Stack;
 	uzbyte ReturnVar;
@@ -27,7 +24,7 @@ void loadRAM(char* file);
 void traceZStack();
 
 // Expand a padded address.
-uint32_t expandPaddedAddress(uzword PaddedAddress);
+uzword expandPaddedAddress(uzword PaddedAddress);
 
 // Get a word from a ram address.
 uzword getWord(unsigned int Address);

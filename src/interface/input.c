@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include "memory.h"
-#include "command.h"
 #include "input.h"
 // Used to hold what the terminal settings were before this program started.
 static struct termios TerminalSettings;

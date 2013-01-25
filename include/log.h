@@ -1,10 +1,5 @@
 #ifndef LOG_H
-#define LOG_H
-
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#define LOG_H 1
 
 enum log_message_type {
 	MWarning = 1,

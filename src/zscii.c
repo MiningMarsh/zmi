@@ -8,7 +8,7 @@
 const uint32_t default_string_size = 64;
 
 // Return a buffer of z-characters, read from a series of compressed character packets at adr.
-uint32_t* getZChars(uint16_t adr)
+uint32_t* getZChars(uint16_t Address)
 {
 	uint32_t size = default_string_size; // Default size of the string buffer is 1kb.
 	uint32_t* buffer = malloc(sizeof(uint32_t)*size); // Get the string buffer.
@@ -32,11 +32,11 @@ uint32_t* getZChars(uint16_t adr)
 				exit(1);
 			}
 		}
-		cell = getWord(adr); // A character packet is the size of a word.
+		cell = getWord(Address); // A character packet is the size of a word.
 		buffer[buffer[0] - 2] = (cell>>10)&31; // Extract the three compressed characters from the packet.
 		buffer[buffer[0] - 1] = (cell>>5)&31;
 		buffer[buffer[0]] = cell&31;
-		adr += 2; // Advance the stream location by a word.
+		Address += 2; // Advance the stream location by a word.
 	}
 	// Next line would save a tiny bit of memory for a few seconds, but ommiting it helps against memory fragmentation.
 	/* buffer = realloc(buffer,(buffer[0]+1)*sizeof(uint32_t)); */
@@ -115,7 +115,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 				// If there is no shift to apply, we engage a string indirection.
 				if(buffer[0]) // Check if
 				{
-					if(StrIndirection) // Check if we print string indirection sequences.
+					if(g_StrIndirection) // Check if we print string indirection sequences.
 						zscii[ptr++] = '<';
 					uint16_t adr = 32*(zchar-1)
 						+ buffer[buffc - buffer[0]-- + 1];
@@ -140,7 +140,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 					while(append[i])
 						zscii[ptr++] = append[i++];
 					free(append);
-					if(StrIndirection)
+					if(g_StrIndirection)
 						zscii[ptr++] = '>';
 					recurseabr--;
 				}

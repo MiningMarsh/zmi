@@ -1,5 +1,5 @@
 #ifndef ROUTINE_H
-#define ROUTINE_H
+#define ROUTINE_H 1
 
 #include "zint.h"
 #include <stdbool.h>

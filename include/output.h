@@ -1,7 +1,6 @@
 #ifndef OUTPUT_H
-#define OUTPUT_H
+#define OUTPUT_H 1
 
-#include <stdint.h>
 #include <stdarg.h>
 
 // Printf for the Z-Machine.

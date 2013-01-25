@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
 #include "memory.h"
 #include "globalvars.h"
 #include "log.h"

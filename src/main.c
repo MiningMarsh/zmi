@@ -1,12 +1,9 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "memory.h"
 #include "command.h"
 #include "globalvars.h"
-#include "output.h"
 #include "log.h"
 
 
@@ -18,7 +15,7 @@ int main(int ArgCount, char** Arguments) {
 	// By default print no debug messages.
 	g_VerboseDebug = 0;
 	// Don't print <> around string pointers.
-	StrIndirection = 0;
+	g_StrIndirection = 0;
 
 	// Loop through all the arguments.
 	int CurArg = 0;

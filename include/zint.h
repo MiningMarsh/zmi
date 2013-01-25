@@ -1,5 +1,5 @@
-#ifndef ZINT_H_
-#define ZINT_H_
+#ifndef ZINT_H
+#define ZINT_H 1
 
 #include <stdint.h>
 

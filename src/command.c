@@ -1,7 +1,5 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include "memory.h"
 #include "input.h"
 #include "output.h"
@@ -167,7 +165,7 @@ void execNextInstruction() {
 				// Variable values are grabbed from memory.
 				uint8_t var = getByte(CurrentZFrame->PC++);
 				Operand[I] = getZVar(var);
-				if(VerboseDebug >= 10) {
+				if(g_VerboseDebug >= 10) {
 					char Message[256];
 					sprintf(Message, "Var %u: %u", var, Operand[I]);
 					logMessage(MNull,"Operand", Message);

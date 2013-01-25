@@ -1,8 +1,5 @@
 #ifndef INPUT_H
-#define INPUT_H
-
-#include <stdint.h>
-#include <globalvars.h>
+#define INPUT_H 1
 
 // Initiate the input modes of the Z-Machine and terminal.
 void initInput();

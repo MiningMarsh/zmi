@@ -1,7 +1,5 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "command.h"
 #include "memory.h"
 #include "globalvars.h"
 #include "log.h"
@@ -192,7 +190,7 @@ void setByte(unsigned int Address, uzbyte Value)
 }
 
 // Return the expanded packed address depending on the machine.
-uint32_t expandPaddedAddress(uzword PaddedAddress)
+uzword expandPaddedAddress(uzword PaddedAddress)
 {
 	if(getZRev() <= 3)
 		return 2*PaddedAddress;

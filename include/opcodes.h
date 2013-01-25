@@ -1,6 +1,5 @@
 #ifndef OPCODES_H
 #define OPCODES_H 1
-#include "zint.h"
 
 // Opcodes.
 void opAdd();

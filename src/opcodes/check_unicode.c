@@ -1,10 +1,6 @@
-#include <stdlib.h>
 #include "log.h"
-#include "zint.h"
 #include "routine.h"
-#include "command.h"
 #include "globalvars.h"
-#include "opcodes.h"
 
 /********************************************************
  * EXT:12 C 5 / * check_unicode char-number -> (result) *

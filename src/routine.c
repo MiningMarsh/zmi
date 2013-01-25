@@ -1,9 +1,6 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdbool.h>
 #include "memory.h"
-#include "command.h"
 #include "zscii.h"
 #include "globalvars.h"
 #include "log.h"
