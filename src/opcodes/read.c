@@ -1,10 +1,3 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
-#include "routine.h"
-#include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "input.h"
 
 /*********************************************************
@@ -91,7 +84,5 @@
  *************************************************************************/
  
 void opRead() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "read");
 	readString(0);
 }

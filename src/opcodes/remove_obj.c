@@ -1,10 +1,7 @@
 #include <stdlib.h>
+#include "command.h"
 #include "log.h"
 #include "zint.h"
-#include "routine.h"
-#include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "object.h"
 
 /*******************************
@@ -15,8 +12,10 @@
  *************************************************************************/
  
 void opRemoveObj() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "remove_obj");
+	if(!Operand[0]) {
+		logMessage(MFatal, "remove_obj", "Tried to remove object 0 from the object tree.");
+		exit(1);
+	}
 	uzword Parent = getParent(Operand[0]);
 	if(Parent != 0) {
 		if(getChild(Parent) == Operand[0]) {
@@ -27,7 +26,7 @@ void opRemoveObj() {
 				LastChild = getSibling(LastChild);
 			setSibling(LastChild, getSibling(Operand[0]));
 		}
+		setParent(Operand[0], 0);
 	}
-	setParent(Operand[0], 0);
 	setSibling(Operand[0], 0);
 }

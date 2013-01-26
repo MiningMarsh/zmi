@@ -1,10 +1,6 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
 #include "routine.h"
+#include "zint.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 
 /***************************
  * 2OP:2 2 jl a b ?(label) *
@@ -13,8 +9,8 @@
  * ***********************************************************************/
 
 void opJl() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "jl");
-	zBranch(Operand[0] < Operand[1]);
+	zword A = zSign(Operand[0]);
+	zword B = zSign(Operand[1]);
+	zBranch(A < B);
 }
 

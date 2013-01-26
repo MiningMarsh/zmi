@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include "log.h"
 #include "command.h"
-#include "globalvars.h"
 
 /**********************************************
  * VAR:229 5 print_char output-character-code *
@@ -12,8 +10,6 @@
  *************************************************************************/ 
 
 void opPrintChar() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "print_char");
 	// TODO: Make this operation standard compliant.
 	printf("%c",Operand[0]);
 }

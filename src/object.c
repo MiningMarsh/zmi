@@ -136,20 +136,19 @@ void setSibling(uzword Object, uzword Value) {
 	setPSC(Object, Value, 1); // Set ID 1 (sibling);
 }
 
-uint16_t getParent(uzword Object) {
+uzword getParent(uzword Object) {
 	return getPSC(Object, 0); // Get ID 0 (parent)
 }
 
-uint16_t getChild(uzword Object) {
+uzword getChild(uzword Object) {
 	return getPSC(Object, 2); // Get ID 2 (child).
 }
-uint16_t getSibling(uzword Object) {
+uzword getSibling(uzword Object) {
 	return getPSC(Object, 1); // Get ID 1 (sibling).
 }
 
 // Get the property table address of an object.
-uzword getPropertyTableAddress(uzword Object)
-{
+uzword getPropertyTableAddress(uzword Object) {
 	uzword Address = getObjectAddress(Object);
 	Address += 7; // Add property offset.
 	if(getZRev() > 3)
@@ -157,52 +156,49 @@ uzword getPropertyTableAddress(uzword Object)
 	return getWord(Address); // Return the last word of the object (the address of its property table).
 }
 
-
-// Get the address of the start of an objects property.
-uzword getPropertyAddress(uzword Object, uzword Property) {
-	uzword Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
-	uzword Size = 0; // Holds the size of the current property.
-	uzbyte HeaderTextSize = getByte(Address); // Get the size header.
-	Address += 1+2*HeaderTextSize; // Skip the header, getting to the properties.
-	if(getZRev() < 4) // TODO: Currently the revision 5 z-machine is not supported in this area.
-	{
-		uzword PropertyNumber = 0xFFFF;
-		while(PropertyNumber != Property)
-		{
-			Address += Size; // Skip last property scanned
-			uzbyte Cell = getByte(Address); // Get the property size.
-			PropertyNumber = Cell&31; // Get the property number.
-			if(PropertyNumber < Property) // Check if the property we are looking for doesn't seem to exist on this object.
-			{
-				PropertyNumber = Property; // Terminate the loop.
-				Address = 0; // Return 0 to signify the property does not exist.
-			}
-			Size = ((Cell>>5)&7)+2; // Get size of this property
-		}
-	}
-	return Address; // Return pointer to the property (including size byte).
-}
-
 uzword propertyAddress(uzword Object, uzword Property) {
 	uzword Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
 	uzword Size = 0; // Holds the size of the current property.
 	uzbyte HeaderTextSize = getByte(Address); // Get the size header.
 	Address += 1+2*HeaderTextSize; // Skip the header, getting to the properties.
-	if(getZRev() < 4) // TODO: Currently the revision 5 z-machine is not supported in this area.
-	{
-		uzword PropertyNumber = 0xFFFF;
-		while(PropertyNumber != Property)
-		{
+	uzword PropertyNumber;
+	if(getZRev() < 4) {
+		PropertyNumber = 0xFFFF;
+		while(PropertyNumber != Property) {
 			Address += Size; // Skip last property scanned
 			uzbyte Cell = getByte(Address); // Get the property size.
 			PropertyNumber = Cell&31; // Get the property number.
-			if(PropertyNumber < Property) // Check if the property we are looking for doesn't seem to exist on this object.
-			{
+			if(PropertyNumber < Property) { // Check if the property we are looking for doesn't seem to exist on this object.
 				PropertyNumber = Property; // Terminate the loop.
 				Address = 0; // Return 0 to signify the property does not exist.
 			}
 			Size = ((Cell>>5)&7)+2; // Get size of this property
 		}
+	} else {
+		PropertyNumber = 0 - 1;
+		while(PropertyNumber != Property) {
+			Address += Size;
+			uzword PropertyData = getByte(Address);
+			PropertyNumber = PropertyData&63;
+			if(Address>>7) 
+				Size = getByte(++Address)&63;
+			else
+				Size = ((PropertyData>>6)&1)+1;
+			if(PropertyNumber < Property) { // Check if the property we are looking for doesn't seem to exist on this object.
+				PropertyNumber = Property; // Terminate the loop.
+				Address = 0; // Return 0 to signify the property does not exist.
+			}
+		}
+	}
+	return Address;
+}
+
+// A small wrapper meant to error out if an object doesn't exist instead of returning 0.
+uzword getPropertyAddress(uzword Object, uzword Property) {
+	uzword Address = propertyAddress(Object, Property);
+	if(!Address) {
+		logMessage(MFatal, "getPropertyAddress()", "Tried to get property address of nonexisting property.");
+		exit(1);
 	}
 	return Address;
 }
@@ -211,4 +207,37 @@ bool propertyExists(uzword Object, uzword Property) {
 	return propertyAddress(Object, Property);
 }
 
-uzword getPropertySize(uzword Object, uzword)
+uzword getPropertySize(uzword Object, uzword Property) {
+	uzword Address = propertyAddress(Object, Property);
+	if(!Address) {
+		logMessage(MFatal, "getPropertySize()", "Tried to get property size of nonexisting property.");
+		exit(1);
+	}
+	if(getZRev() < 4) {
+		return getByte(Address);
+	} else {
+		uzword PropertyData = getByte(Address);
+		if(Address>>7) {
+			return getByte(++Address)&63;
+		} else {
+			return ((PropertyData>>6)&1)+1;
+		}
+	}
+}
+
+uzword getPropertyValueAddress(uzword Object, uzword Property) {
+	uzword Address = propertyAddress(Object, Property);
+	if(!Address) {
+		logMessage(MFatal, "getPropertyValueAddress()", "Tried to get property value address of nonexisting property.");
+		exit(1);
+	}
+	if(getZRev() < 4)
+		return Address + 1;
+	if(getByte(Address)>>7)
+		return Address + 2;
+	return Address + 1;
+}
+
+uzword getDefaultPropertyValue(uzword Property) {
+	return getWord(objectTable() + (2*Property));
+}

@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
+#include "stdlib.h"
 #include "routine.h"
-#include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "output.h"
 
 /*******************
@@ -14,8 +9,6 @@
  *************************************************************************/
 
 void opPrint() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "print");
 	// The string on this operation is stored on teh byte now pointed to
 	// by the program counter.
 	char* String = zGetStringFromPC();

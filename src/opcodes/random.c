@@ -1,11 +1,9 @@
 #include <stdlib.h>
 #include <time.h>
-#include "log.h"
+#include <stdint.h>
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 
 /**************************************
  * VAR:231 7 random range -> (result) *
@@ -22,22 +20,20 @@
  *************************************************************************/
 
 void opRandom() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "random");
 
 	zword Seed = zSign(Operand[0]);
 
 	// This state varibale represents the current value of the LFSR. 
 	// Since in normal operation, a LFSR will never reach state 0, we
 	// can assume a value of 0 means we have not yet initilized the LFSR.
-	static uzword State = 0;
+	static uint64_t State = 0;
 	// Set the inital random value to the current clock.
-	if(!State)
-		State = time(NULL)%0xFFFF;
-	uzbyte Next; // Holds the next value of the LFSR.
-	for(int I = 0; I != 16; I++) {
-		Next = (State&15)^((State>>2)&13)^((State>>2)&13)^((State>>6)&10);
-		State = ((State<<1)) + (Next);
+	while(!State)
+		State = time(NULL)%0xFFFF - clock();
+	bool Next;
+	for(unsigned int I = 0; I < 64; I++) {
+		Next = 1&((State>>63)^(State>>62)^(State>>60)^(State>>59));
+		State = ((State<<1)) | (Next);
 	}
 	if(Seed > 0) {
 		zStore(State%Seed);

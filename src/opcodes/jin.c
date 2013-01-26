@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "object.h"
 
 /**********************************
@@ -14,7 +9,5 @@
  *************************************************************************/
 
 void opJin() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "jin");
 	zBranch(getParent(Operand[0]) == Operand[1]);
 }

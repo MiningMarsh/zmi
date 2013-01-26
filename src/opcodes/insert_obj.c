@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
-#include "routine.h"
 #include "command.h"
-#include "globalvars.h"
+#include "zint.h"
 #include "opcodes.h"
 #include "object.h"
 
@@ -17,13 +13,10 @@
  * legally have parent zero.)                                            *
  *************************************************************************/
  
-void opRemoveObj();
 void opInsertObj() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "insert_obj");
 	opRemoveObj();
 	uzword Child = getChild(Operand[1]);
 	setSibling(Operand[0], Child);
 	setParent(Operand[0], Operand[1]);
-	setChild(Operand[1],Operand[0]);
+	setChild(Operand[1], Operand[0]);
 }

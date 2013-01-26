@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include "log.h"
-#include "zint.h"
-#include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 #include "opcodes.h"
 #include "memory.h"
 
@@ -17,8 +14,6 @@
  *************************************************************************/
 
 void opThrow() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "throw");
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
 		logMessage(MFatal, "opThrow()", "Tried to throw bad frame pointer");
 		exit(1);

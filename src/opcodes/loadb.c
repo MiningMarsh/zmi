@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "memory.h"
 
 /************************************************
@@ -15,7 +10,5 @@
  *************************************************************************/
 
 void opLoadb() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "loadb");
 	zStore(getByte(Operand[0]+Operand[1]));
 }

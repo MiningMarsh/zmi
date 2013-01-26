@@ -31,19 +31,6 @@ void opArtShift() {
 			// Restore the sign bit as well as shifting it down.
 			Number = Number|(Sign<<15)|(Sign<<16);
 		}
-	} else {
-		// Print a little warning if they shift by zero, as this
-		// does nothing more than waste cpu cycles.
-		static bool AlreadyReported = false;
-		if(!AlreadyReported) {
-			AlreadyReported = true;
-			logMessage(
-				MWarning, 
-				"art_shift",
-				"Shifting by 0 detected. This is innefficient.\n"
-				"This is only reported once."
-			);
-		}
 	}
 	// Store the result.
 	zStore(zUnsign(Number));

@@ -1,10 +1,7 @@
 #include <stdlib.h>
 #include "log.h"
 #include "zint.h"
-#include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "memory.h"
 #include "object.h"
 
@@ -22,16 +19,21 @@
  *************************************************************************/
 
 void opPutProp() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "put_prop");
-	uzword Address = getPropertyAddress(Operand[0],Operand[1]);
-	uzbyte Size = ((getByte(Address++) - Operand[1])/32) + 1;
-	if(Size == 1) {
-		setByte(Address,Operand[2]);
-	} else if(Size == 2) {
-		setWord(Address, Operand[2]);
+	// Get the property address.
+	if(propertyExists(Operand[0], Operand[1])) {
+		uzword Address = getPropertyValueAddress(Operand[0], Operand[1]);
+		// If it existed, find its size.
+		uzbyte Size = getPropertySize(Operand[0], Operand[1]);
+		if(Size == 1) {
+			setByte(Address, Operand[2]);
+		} else if(Size == 2) {
+			setWord(Address, Operand[2]);
+		} else {
+			logMessage(MFatal, "put_prop", "Property size is greater then 2.");
+			//exit(1);
+		}
 	} else {
-		logMessage(MFatal, "put_prop", "Property size is greater then 2.");
+		logMessage(MFatal, "put_prop", "Tried to set nonexistant property.");
 		exit(1);
 	}
 }

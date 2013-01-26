@@ -1,10 +1,5 @@
 #include <stdlib.h>
 #include "log.h"
-#include "zint.h"
-#include "routine.h"
-#include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 
 /*********************
  * 0OP:180 4 1/- nop *

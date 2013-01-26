@@ -6,8 +6,10 @@
 
 // Get the address of a property on an object. This function does not check to see if the object is 0.
 uzword getPropertyAddress(uzword Object, uzword Property);
+
 uzword getPropertyValueAddress(uzword Object, uzword Property);
-uzword getPropertyTableAddress(uzword Object, uzword Property);
+uzword getPropertySize(uzword Object, uzword Property);
+
 bool propertyExists(uzword Object, uzword Property);
 
 // Get a flag off an object, if it is valid.
@@ -36,5 +38,7 @@ uzword getSibling(uzword Object);
 
 // Get the property table address of an object. This is a bit useless outside of the other object functions.
 uzword getPropertyTableAddress(uzword Object);
+
+uzword getDefaultPropertyValue(uzword Property);
 
 #endif /* object.h */

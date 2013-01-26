@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include "log.h"
 #include "command.h"
-#include "globalvars.h"
 #include "memory.h"
 
 /*******************************************
@@ -13,7 +10,5 @@
  *************************************************************************/
 
 void opStorew() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "storew");
 	setWord(Operand[0]+2*Operand[1], Operand[2]);
 }

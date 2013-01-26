@@ -1,10 +1,4 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
-#include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "memory.h"
 
 /*******************************
@@ -18,8 +12,6 @@
  *************************************************************************/
  
 void opPull() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "pull");
 	setZVar(Operand[0],popZStack());
 }
 

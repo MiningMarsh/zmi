@@ -3,8 +3,6 @@
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "object.h"
 
 /*****************************************************
@@ -14,14 +12,11 @@
  *************************************************************************/
 
  void opGetSibling() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "get_sibling");
 	uzword Object = getSibling(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
-	//	exit(1);
-		Object = 0;
+		exit(1);
 	}
-	zStore(getSibling(Operand[0]));
-	zBranch(getSibling(Operand[0]));
+	zStore(Object);
+	zBranch(Object);
 }

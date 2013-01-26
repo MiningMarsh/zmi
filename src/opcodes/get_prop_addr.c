@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
-#include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "object.h"
 #include "memory.h"
 
@@ -17,10 +12,9 @@
  *************************************************************************/
 
 void opGetPropAddr() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "get_prop_addr");
-	uzword Address = getPropertyAddress(Operand[0], Operand[1]);
-	if(Address)
-		Address++;
-	zStore(Address);
+	if(!propertyExists(Operand[0], Operand[1])) {
+		zStore(0);
+		return;
+	}
+	zStore(getPropertyValueAddress(Operand[0], Operand[1]));
 }

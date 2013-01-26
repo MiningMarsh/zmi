@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "log.h"
 #include "zint.h"
-#include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 #include "memory.h"
 
 /***************************
@@ -19,7 +14,5 @@
  *************************************************************************/
 
 void opJump() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "jump");
 	CurrentZFrame->PC += zSign(Operand[0]) - 2;
 }

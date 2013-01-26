@@ -1,10 +1,6 @@
-#include <stdlib.h>
-#include "log.h"
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
-#include "opcodes.h"
 
 /*************************************************
  * EXT:2 2 5 log_shift number places -> (result) *
@@ -16,8 +12,6 @@
  *************************************************************************/
 
 void opLogShift() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "log_shift");
 	uzword Number = zSign(Operand[0]);
 	zword Places = zSign(Operand[1]);
 	if(Places >= 0)

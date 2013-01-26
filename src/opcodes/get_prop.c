@@ -19,19 +19,19 @@
 // Get a property of an object.
 void opGetProp() {
 	// Get the property address.
-	uzword Address = getPropertyValueAddress(Operand[0],Operand[1]);
-	if(Address != 0) {
+	if(propertyExists(Operand[0], Operand[1])) {
+		uzword Address = getPropertyValueAddress(Operand[0], Operand[1]);
 		// If it existed, find its size.
-		uzbyte Size = getProperySize(Operand[0], Operand[1]);
+		uzbyte Size = getPropertySize(Operand[0], Operand[1]);
 		if(Size == 1) {
 			zStore(getByte(Address));
 		} else if(Size == 2) {
 			zStore(getWord(Address));
 		} else {
 			logMessage(MFatal, "get_prop", "Property size is greater then 2.");
-			exit(1);
+			//exit(1);
 		}
 	} else {
-		zStore(getWord(getWord(0x0a) + (2*Operand[1])));
+		zStore(getDefaultPropertyValue(Operand[1]));
 	}
 }
