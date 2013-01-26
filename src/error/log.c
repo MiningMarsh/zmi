@@ -81,3 +81,7 @@ void logClose() {
 		fclose(Log);
 	}
 }
+
+bool isLogOpen() {
+	return Log;
+}

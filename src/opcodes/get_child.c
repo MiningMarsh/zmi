@@ -1,8 +1,7 @@
-#include "log.h"
 #include "zint.h"
+#include "log.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 #include "object.h"
 
 /***************************************************
@@ -13,8 +12,6 @@
  *************************************************************************/
 
 void opGetChild() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "get_child");
 	uzword Address = getChild(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_child", "Tried to get object in object 0.");

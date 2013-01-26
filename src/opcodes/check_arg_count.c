@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include "log.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 #include "memory.h"
 
 /************************************************
@@ -15,18 +12,5 @@
  *************************************************************************/
 
 void opCheckArgCount() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "check_arg_count");
-	if(g_VerboseDebug >= 25) {
-		char Message[256];
-		sprintf(
-			Message,
-			"%u <= %u -> %u",
-			Operand[0] - 1,
-			CurrentZFrame->OldFrame->PassedArgs,
-			Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs
-		);
-		logMessage(MNull, "check_arg_count", Message);
-	}
 	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
 }

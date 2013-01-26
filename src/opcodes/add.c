@@ -3,7 +3,6 @@
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 
 /*********************************
  * 2OP:20 14 add a b -> (result) *
@@ -12,8 +11,6 @@
  *************************************************************************/
 
 void opAdd() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "add");
 	// The first number to add, casted from its unsigned form in memory.
 	zword Number1 = zSign(Operand[0]);
 	// The second number to add, casted from its unsigned form in memory.

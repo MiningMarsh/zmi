@@ -1,6 +1,4 @@
-#include "log.h"
 #include "routine.h"
-#include "globalvars.h"
 
 /********************************************************
  * EXT:12 C 5 / * check_unicode char-number -> (result) *
@@ -13,11 +11,6 @@
  *************************************************************************/
 
 void opCheckUnicode() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "check_unicode");
-	if(g_VerboseDebug >= 25) {
-		logMessage(MNull, "check_unicode", "Unicode not supported.");
-	}
 	// No unicode support yet.
 	zStore(0);
 }

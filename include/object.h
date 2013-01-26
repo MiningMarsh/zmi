@@ -6,6 +6,9 @@
 
 // Get the address of a property on an object. This function does not check to see if the object is 0.
 uzword getPropertyAddress(uzword Object, uzword Property);
+uzword getPropertyValueAddress(uzword Object, uzword Property);
+uzword getPropertyTableAddress(uzword Object, uzword Property);
+bool propertyExists(uzword Object, uzword Property);
 
 // Get a flag off an object, if it is valid.
 bool getObjectFlag(uzword Object, uzword Flag);

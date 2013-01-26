@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include "log.h"
 #include "routine.h"
-#include "globalvars.h"
 #include "memory.h"
 
 /***********************************
@@ -12,16 +9,5 @@
  *************************************************************************/
 
 void opCatch() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "catch");
-	if(g_VerboseDebug >= 25) {
-		char Message[256];
-		sprintf(
-			Message,
-			"Frame number: %u",
-			zFrameNumber(CurrentZFrame)
-		);
-		logMessage(MNull, "catch", Message);
-	}
 	zStore(zFrameNumber(CurrentZFrame));
 }

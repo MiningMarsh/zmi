@@ -1,9 +1,6 @@
-#include <stdlib.h>
-#include "log.h"
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 #include "memory.h"
 
 /***********************************************
@@ -14,8 +11,6 @@
  *************************************************************************/
 
 void opDecChk() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "dec_chk");
 	// Check the new value;
 	zword Variable = zSign(getZVar(Operand[0]));
 	setZVar(Operand[0], zUnsign(--Variable));

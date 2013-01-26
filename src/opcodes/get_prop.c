@@ -2,7 +2,6 @@
 #include "log.h"
 #include "routine.h"
 #include "command.h"
-#include "globalvars.h"
 #include "object.h"
 #include "memory.h"
 
@@ -19,13 +18,11 @@
 
 // Get a property of an object.
 void opGetProp() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "get_prop");
 	// Get the property address.
-	uzword Address = getPropertyAddress(Operand[0],Operand[1]);
+	uzword Address = getPropertyValueAddress(Operand[0],Operand[1]);
 	if(Address != 0) {
 		// If it existed, find its size.
-		uzbyte Size = ((getByte(Address++) - Operand[1])/32) + 1;
+		uzbyte Size = getProperySize(Operand[0], Operand[1]);
 		if(Size == 1) {
 			zStore(getByte(Address));
 		} else if(Size == 2) {

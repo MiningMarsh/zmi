@@ -16,8 +16,6 @@
  *************************************************************************/
 
 void opCall() {
-	if(g_VerboseDebug >= 50)
-		logMessage(MNull, "CallOperation()", "call");
 	// If address 0 is called, we instantly return 0 and nothing happens.
 	if(!Operand[0]) {
 		if(CurrentZFrame->ReturnVar == 1)
