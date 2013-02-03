@@ -1,10 +1,25 @@
 #imports
 import sys, os, fnmatch, shutil
-#env initialization
+
+# Needed for coloured output.
+
+class color:
+	escape = '\033['
+	endEscape = 'm'
+	black = '\033[30m'
+	blue = '\033[34m'
+	green = '\033[32m'
+	cyan = '\033[36m'
+	red = '\033[31m'
+	purple = '\033[35m'
+	white = '\033[37m'
+	endc = '\033[0m'
+
+# Environment initialization
 env = Environment(
-		CCCOMSTR='[CC] $SOURCES',
-		LINKCOMSTR='[LD] $TARGET'
-	)
+		CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +'] ' + color.endc + '$SOURCES',
+		LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan + '] ' + color.endc + '$TARGET'
+)
 
 HeaderDirectory = "include"
 SourceDirectory = "src"
@@ -15,7 +30,7 @@ BuildPrefix = "build/objects"
 # Compile flags.
 Flags = '--std=c99 -pipe'
 
-#options
+# Options
 AddOption(
 	'--debugging', 
 	dest='debug', 
