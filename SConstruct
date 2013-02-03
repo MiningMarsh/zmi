@@ -131,10 +131,6 @@ if(GetOption('small')):
 	env.Append(CCFLAGS='-Os')
 if(GetOption('fast')):
 	env.Append(CCFLAGS='-O3')
-if env.GetOption('clean'):
-	if os.path.isdir('build'):
-		shutil.rmtree('build')
-
 
 #install
 env.Install('/usr/bin', Install)
