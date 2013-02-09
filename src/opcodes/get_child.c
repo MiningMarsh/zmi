@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "zint.h"
 #include "log.h"
 #include "routine.h"
@@ -15,8 +16,7 @@ void opGetChild() {
 	uzword Address = getChild(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_child", "Tried to get object in object 0.");
-		//exit(1);
-		Address = 0;
+		exit(1);
 	}
 	// Get the address of the child.
 	zStore(Address);

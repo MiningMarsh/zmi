@@ -11,6 +11,8 @@ unsigned int g_StorySize;
 unsigned int g_RAMSize;
 unsigned int g_MaxStorySize;
 
+char* g_ProgramName;
+
 #define d_VersionMajor 0
 #define d_VersionMinor 5
 

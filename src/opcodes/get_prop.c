@@ -29,7 +29,7 @@ void opGetProp() {
 			zStore(getWord(Address));
 		} else {
 			logMessage(MFatal, "get_prop", "Property size is greater then 2.");
-			//exit(1);
+			exit(1);
 		}
 	} else {
 		zStore(getDefaultPropertyValue(Operand[1]));

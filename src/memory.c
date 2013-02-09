@@ -26,8 +26,9 @@ void loadRAM(char* Filename)
 	// File pointer to the story.
 	FILE* StoryFile;
 	StoryFile = fopen(Filename, "rb");
-	if(StoryFile == NULL)
-	{
+	if(StoryFile == NULL){
+		fputs(g_ProgramName, stderr);
+		fputs(": ", stderr);
 		perror(Filename);
 		exit (1);
 	}

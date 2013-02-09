@@ -17,6 +17,7 @@ class color:
 
 # Environment initialization
 env = Environment(
+		CXXCOMSTR= color.cyan + '[' + color.green + 'CPP' + color.cyan +'] ' + color.endc + '$SOURCES',
 		CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +'] ' + color.endc + '$SOURCES',
 		LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan + '] ' + color.endc + '$TARGET'
 )
@@ -73,22 +74,42 @@ AddOption(
 
 )
 
-AddOption(
-	'--mingw32', 
-	dest='mingw32', 
-	action='store_true', 
-	default=False, 
-	help='Cross compile for windows'
-)
+Targets = [
+	'linux',
+	'windows'
+]
+
+Architectures = [
+	32,
+	64
+]
+
+for Target in Targets:
+	for Architecture in Architectures:
+		AddOption(
+			'--' + Target + str(Architecture),
+			dest = 'arch_' + Target + str(Architecture),
+			action = 'store_true',
+			default = False,
+			help = 'Compile for ' + Target + ' ' + str(Architecture) + 'bit.'
+		)
 
 Variant = DefaultVariant
 
-if(GetOption('mingw32')):
+if(True):
 	env.Append(CCFLAGS='-mwindows')
 	Libraries = ['mingw32']
 	Variant = 'windows'
 	Executable = 'out.exe'
-else:
+	MingSearch = ['test']
+	for Prefix in MingSearch:
+		try:
+			env['CC'] = shutil.which(Prefix + '-gcc')
+		except shutil.Error:
+			print(Prefix+'-gcc not detected.')
+			break
+
+if(True):
 	Libraries = []
 	Executable = 'out'
 	Variant = 'linux'

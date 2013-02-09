@@ -172,7 +172,7 @@ uzword propertyAddress(uzword Object, uzword Property) {
 				PropertyNumber = Property; // Terminate the loop.
 				Address = 0; // Return 0 to signify the property does not exist.
 			}
-			Size = ((Cell>>5)&7)+2; // Get size of this property
+			Size = (Cell>>5)+2; // Get size of this property
 		}
 	} else {
 		PropertyNumber = 0 - 1;
@@ -214,7 +214,7 @@ uzword getPropertySize(uzword Object, uzword Property) {
 		exit(1);
 	}
 	if(getZRev() < 4) {
-		return getByte(Address);
+		return (getByte(Address)>>5) + 1;
 	} else {
 		uzword PropertyData = getByte(Address);
 		if(Address>>7) {

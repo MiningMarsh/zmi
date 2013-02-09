@@ -17,6 +17,8 @@ int main(int ArgCount, char** Arguments) {
 	// Don't print <> around string pointers.
 	g_StrIndirection = 0;
 
+	g_ProgramName = Arguments[0];
+
 	// Loop through all the arguments.
 	int CurArg = 0;
 	while(--ArgCount) {
@@ -49,16 +51,23 @@ int main(int ArgCount, char** Arguments) {
 		}
 
 		// A lookup table mapping long options to flags.
-		const char const LookupTable[][30] = {
+		#define MaxLookupSize 20
+		const char const LookupTable[][MaxLookupSize] = {
 			"help","h",
 			"string-indirection","i",
 			"debug","d",
-			"log-file","l",
-			0 };
-
+			"log-file","l"
+		};
+		int LookupTableSize = sizeof(LookupTable)/(sizeof(char)*MaxLookupSize);
 		switch(ArgType) {
 			// We are dealing with a flag.
 			case 1:
+				if(strlen(Key) != 1) {
+					fputs("FATAL: Bad flag format: -", stderr);
+					fputs(Key, stderr);
+					fputs("\n", stderr);
+					exit(1);
+				}
 				Flag = *Key;
 				break;
 
@@ -66,12 +75,17 @@ int main(int ArgCount, char** Arguments) {
 			// to a flag with the lookup table.
 			case 2: {
 				if(Key == Value) {
+					if(ArgCount > 2 || ((ArgCount > 1) && Filename)) {
+						fputs("FATAL: More then one filename passed.\n", stderr);
+						exit(1);
+					}
+					Filename = Arguments[++CurArg];
 					ArgCount = 1;
 					continue;
 				}
 				int LookupIndex = 0;
 				// The table is null terminated.
-				while(LookupTable[LookupIndex][0] != 0) {
+				while(LookupIndex < LookupTableSize) {
 					if(!strcmp(Key,LookupTable[LookupIndex])) {
 						Flag = LookupTable[1+LookupIndex][0];
 					}
@@ -81,6 +95,10 @@ int main(int ArgCount, char** Arguments) {
 
 			// We are dealing with a filename.
 			default:
+				if(Filename) {
+					fputs("FATAL: More then one filename passed.\n", stderr);
+					exit(1);
+				}
 				Filename = Key;
 				break;
 
@@ -98,7 +116,9 @@ int main(int ArgCount, char** Arguments) {
 					"-i,--string-indirection  Show pointer indirection in Z-Strings by\n"
 					"                         surrounding them like <this>.\n"
 					"-h,--help                Display this message.\n"
-					"-d,--debug=#             Set the verboseness.\n",
+					"-d,--debug=#             Set the verboseness.\n"
+					"-l,--log=<file>          File to log interpretr messages to.\n"
+					"                         Use 'err' to log to stderr.\n",
 					d_VersionMajor,
 					d_VersionMinor,
 					d_StandardMajor,
@@ -131,8 +151,9 @@ int main(int ArgCount, char** Arguments) {
 				if(!ArgType)
 					break;
 				fputs("Unrecognized option: ",stderr);
-				fputs(Key,stderr);
+				fputs(Arguments[CurArg] ,stderr);
 				fputs("\n",stderr);
+				exit(1);
 				break;
 		}
 	}
@@ -142,7 +163,7 @@ int main(int ArgCount, char** Arguments) {
 		printf(
 			"MM's and Triclops200's Z-machine Interpreter.\n"
 			"Usage: %s <filename> [OPTS]\n",
-			Arguments[0]
+			g_ProgramName
 		);
 		exit(1);
 	}

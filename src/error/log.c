@@ -63,11 +63,15 @@ int logOpen(const char* const FileName) {
 		logMessage(MWarning,"LogOpen()", "Message log already open.");
 		return 0;
 	}
+	if(!strcmp(FileName, "err")) {
+		Log = stderr;
+		return 1;
+	}
 	// Open the log.
 	Log = fopen(FileName, "wba");
 	if(!Log) {
 		fputs(logMessages[MWarning],stderr);
-		fputs("Failed to open log file.\n",stderr);
+		fputs(": Failed to open log file.\n",stderr);
 		return 0;
 	}
 	logMessage(MNull, "LogOpen()", "Log opened.");
@@ -77,7 +81,8 @@ int logOpen(const char* const FileName) {
 void logClose() {
 	// Close a log if one is open.
 	if(Log) {
-		logMessage(MNull, "LogClose()", "Log closed.");
+		if(Log != stderr) 
+			logMessage(MNull, "LogClose()", "Log closed.");
 		fclose(Log);
 	}
 }
