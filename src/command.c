@@ -46,7 +46,8 @@ void initZM() {
 	// Stack always starts out empty.
 	CurrentZFrame->Stack = NULL;
 	// Don't change this, it breaks all return values.
-	CurrentZFrame->ReturnVar=1;
+	CurrentZFrame->ReturnVar = 1;
+	CurrentZFrame->Depth = 0;
 
 	// Populate the operation index.
 	initOpCodes();
@@ -64,7 +65,7 @@ void execNextInstruction() {
 		logMessage(MNull, "Main loop", "Operation started.");
 	
 	// Clean the operands by setting them all to omitted.
-	uint8_t OperandType[8] = {
+	uzbyte OperandType[8] = {
 		Omitted, 
 		Omitted,
 		Omitted,
@@ -76,7 +77,7 @@ void execNextInstruction() {
 	};
 
 	// Get the next operation and advance the PC.
-	uint8_t Operation = getByte(CurrentZFrame->PC++);
+	uzword Operation = getByte(CurrentZFrame->PC++);
 
 	// Print the operation in debug mode.
 	if(g_VerboseDebug >= 10) {
@@ -94,7 +95,7 @@ void execNextInstruction() {
 		// Else we are either in extended form or variable form.
 		
 		// Holds the operation if we are in extended mode.
-		uint8_t ExtendedOperation = 0;
+		uzbyte ExtendedOperation = 0;
 
 		// If opcode is 190, and we are in revision 5 or greater, this is
 		// an extended operation.
@@ -106,7 +107,7 @@ void execNextInstruction() {
 		// the first value is set to any value, as it will always be replaced 
 		// by the next byte. The second cell is set to 255 so that if only
 		// 1 byte is provided, all its operand types resolve to omitted.
-		int8_t Args[2] = {0, 255};
+		uzbyte Args[2] = {0, 255};
 
 		// Get the first packet of operands.
 		Args[0] = getByte(CurrentZFrame->PC++);

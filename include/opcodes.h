@@ -40,6 +40,7 @@ void opNop();
 void opOr();
 void opPiracy();
 void opPrint();
+void opPrintAddr();
 void opPrintChar();
 void opPrintNum();
 void opPrintObj();

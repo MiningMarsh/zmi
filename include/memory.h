@@ -12,40 +12,41 @@ struct stackframe { // Holds the current routine state.
 	uzword* Stack;
 	uzbyte ReturnVar;
 	uzbyte PassedArgs;
+	uzword Depth;
 }; typedef struct stackframe stackframe_t;
 
 // The current Stack frame.
 stackframe_t* CurrentZFrame;
 
 // Load a story file into ram.
-void loadRAM(char* file);
+void loadRAM(const char* const FileName);
 
 // Print a simple Stacktrace of the Stack frames.
 void traceZStack();
 
 // Expand a padded address.
-uzword expandPaddedAddress(uzword PaddedAddress);
+uzword expandPaddedAddress(const uzword PaddedAddress);
 
 // Get a word from a ram address.
-uzword getWord(unsigned int Address);
+uzword getWord(const unsigned int Address);
 
 // Get a byte from a ram address.
-uzbyte getByte(unsigned int Address);
+uzbyte getByte(const unsigned int Address);
 
 // Set a word at a ram address.
-void setWord(unsigned int Address, uzword Value);
+void setWord(const unsigned int Address, const uzword Value);
 
 // Set a byte at a ram address.
-void setByte(unsigned int Address, uzbyte Value);
+void setByte(const unsigned int Address, const uzbyte Value);
 
 // Get a variable from a variable reference.
-uzword getZVar(uzbyte Variable);
+uzword getZVar(const uzbyte Variable);
 
 // Set a variable reference to a value.
-void setZVar(uzbyte Variable, uzword Value);
+void setZVar(const uzbyte Variable, const uzword Value);
 
 // Push a value to the local Stack.
-void pushZStack(uzword Value);
+void pushZStack(const uzword Value);
 
 // Pop a value from the local Stack.
 uzword popZStack();

@@ -51,8 +51,8 @@ void zBranch(bool Condition) {
 		);
 		logMessage(MNull, "zBranch()", Message);
 	}
-	// The nxt byte in the stream could be appended to the jump offset.
-	if(BranchData>>5 & 1) {
+	// The next byte in the stream could be appended to the jump offset.
+	if((BranchData>>5)& 1) {
 		Offset = (Offset<<8)+getByte(CurrentZFrame->PC++);
 		if(g_VerboseDebug >= 40) {
 			char Message[256];
@@ -76,12 +76,15 @@ void zBranch(bool Condition) {
 		} else {
 			popZFrame();
 			if(CurrentZFrame->ReturnVar == 1)
-				setZVar(getByte(CurrentZFrame->PC++), Offset);
+				setZVar(getByte(CurrentZFrame->PC), Offset);
+			CurrentZFrame->PC++;
 			CurrentZFrame->ReturnVar = 1;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Returning offset.");
 		}
 	} else {
+		if( Offset <= 1)
+			CurrentZFrame->PC++;
 		if(g_VerboseDebug >= 40)
 			logMessage(MNull, "zBranch()", "Not jumping.");
 	}

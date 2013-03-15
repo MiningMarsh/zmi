@@ -50,6 +50,7 @@ void initOpCodes() {
 		CallOpCode[131+16*I] = &opGetParent;
 		CallOpCode[133+16*I] = &opInc;
 		CallOpCode[134+16*I] = &opDec;
+		CallOpCode[135+16*I] = &opPrintAddr;
 		if(getZRev() >= 4)
 			CallOpCode[136+16*I] = &opCall;
 		CallOpCode[138+16*I] = &opPrintObj;

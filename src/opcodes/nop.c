@@ -11,12 +11,10 @@
  
 void opNop() {
 	// This is "probably" standard compliant.
-	logMessage(MFatal, "nop", 
+	logMessage(MWarning, "nop", 
 		"Nop wastes both cpu cycles, and is\n"
 		"not fully defined in the standard,\n"
 		"and is therefore undefined\n"
 		"behavior. Don't use it."
 	);
-	exit(1);
-
 }

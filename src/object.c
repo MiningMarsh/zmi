@@ -57,9 +57,9 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 	// Get the address of the object.
 	uzword ObjectAddress = getObjectAddress(Object);
 	// The flags are a series of bytes at the beggining of the object in
-	// the format 7.6.5.4.3.2.1.0 15.14.13.12.11.10.9.8 ...
+	// the format 0.1.2.3.4 ...
 	uzbyte ByteAddress = getByte(ObjectAddress+(Flag/8)); //calculate the flag byte.
-	return ((ByteAddress>>(Flag - (Flag/8)*8))&1);
+	return ((ByteAddress>>(7 - (Flag%8))&1));
 }
 
 // Set a flag on an object.
@@ -79,8 +79,11 @@ void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 	// See getObjectFlag.
 	uzword ObjectAddress = getObjectAddress(Object);
 	uzbyte Address = ObjectAddress+Flag/8;
-	uzbyte Mask = 1<<(Flag - (Flag/8)*8);
-	setByte(Address, getByte(Address)&Mask);
+	uzbyte Mask = 1<<(7 - (Flag%8));
+	uzbyte CurrentFlags = getByte(Address) & (~Mask);
+	CurrentFlags += Mask;
+	CurrentFlags &= Value<<(7-(Flag&8));
+	setByte(Address, CurrentFlags);
 }
 
 uzword getPSC(uzword Object, int PSC) {
@@ -104,7 +107,7 @@ void setPSC(uzword Object, uzword Value, int PSC) {
 	uzword Address = getObjectAddress(Object) + 4;
 	if(getZRev() > 3) { // Revision 4 and higher have an extra two bytes of flags.
 		// Check if a bad value was passed.
-		if(Value > 0xFFFF) {
+		if(Value > 0xFF) {
 			char Message[256];
 			sprintf(
 				Message,

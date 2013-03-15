@@ -36,7 +36,7 @@ int logMessage(const unsigned char Type, const char* const Prefix, const char* c
 		fputs(": ", Log);
 	}
 
-	for(int I = 0; I < strlen(Message); I++) {
+	for(unsigned int I = 0; I < strlen(Message); I++) {
 		if(Message[I] == '\n') {
 			fputc('\n', Log);
 			// Prints the Message type, if it exists.
@@ -63,8 +63,14 @@ int logOpen(const char* const FileName) {
 		logMessage(MWarning,"LogOpen()", "Message log already open.");
 		return 0;
 	}
-	if(!strcmp(FileName, "err")) {
+	if(!strcmp(FileName, "stdout")) {
+		Log = stdout;
+		logMessage(MNull, "LogOpen()", "Log opened.");
+		return 1;
+	}
+	if(!strcmp(FileName, "stderr")) {
 		Log = stderr;
+		logMessage(MNull, "LogOpen()", "Log opened.");
 		return 1;
 	}
 	// Open the log.

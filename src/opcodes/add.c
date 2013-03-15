@@ -29,7 +29,7 @@ void opAdd() {
 				"%s detected. This is undefined behavior.\n"
 				"Operands of %i and %i with result of %i.\n"
 				"This is only reported once.",
-				(char*)(Number1 > 32767 ? "Overflow" : "Underflow"),
+				(char*)(Result > 32767 ? "Overflow" : "Underflow"),
 				Number1,
 				Number2,
 				Result

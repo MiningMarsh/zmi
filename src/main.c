@@ -16,6 +16,9 @@ int main(int ArgCount, char** Arguments) {
 	g_VerboseDebug = 0;
 	// Don't print <> around string pointers.
 	g_StrIndirection = 0;
+	// Don't be a pirate. Too bad, bein' a pirate of the seven seas
+	// be for me. Yaaarrr!
+	g_TripPiracy = false;
 
 	g_ProgramName = Arguments[0];
 
@@ -57,6 +60,7 @@ int main(int ArgCount, char** Arguments) {
 			"string-indirection","i",
 			"debug","d",
 			"log-file","l"
+			"piracy","p"
 		};
 		int LookupTableSize = sizeof(LookupTable)/(sizeof(char)*MaxLookupSize);
 		switch(ArgType) {
@@ -107,7 +111,7 @@ int main(int ArgCount, char** Arguments) {
 			// Print a help message.
 			case 'h':
 				printf(
-					"MM's and Triclops200's Z-machine Interpreter.\n"
+					"MM's and Triclops200's Z-Machine Interpreter.\n"
 					"Version %i.%i\n"
 					"Compliant with standard %i.%i\n"
 					"Arguments take form as:  -<flag>=<value>\n"
@@ -117,8 +121,10 @@ int main(int ArgCount, char** Arguments) {
 					"                         surrounding them like <this>.\n"
 					"-h,--help                Display this message.\n"
 					"-d,--debug=#             Set the verboseness.\n"
-					"-l,--log=<file>          File to log interpretr messages to.\n"
-					"                         Use 'err' to log to stderr.\n",
+					"-l,--log=<file>          File to log interpreter messages to.\n"
+					"                         Use 'stderr' to log to stderr.\n"
+					"                         Use 'stdout' to log to stdout.\n"
+					"-p,--piracy              Trip the piracy opcoe. We be pirates!\n",
 					d_VersionMajor,
 					d_VersionMinor,
 					d_StandardMajor,
@@ -146,6 +152,11 @@ int main(int ArgCount, char** Arguments) {
 				logOpen(Value);
 				break;
 
+			// Yaarr!
+			case 'p':
+				g_TripPiracy = true;
+				break;
+
 			// A bad flag has been passed.
 			default:
 				if(!ArgType)
@@ -161,8 +172,9 @@ int main(int ArgCount, char** Arguments) {
 	// Check if a filename was passed.
 	if (!Filename) {
 		printf(
-			"MM's and Triclops200's Z-machine Interpreter.\n"
-			"Usage: %s <filename> [OPTS]\n",
+			"Usage: %s <filename> [options]\n"
+			"To see a list of options, use: %s --help\n",
+			g_ProgramName,
 			g_ProgramName
 		);
 		exit(1);
