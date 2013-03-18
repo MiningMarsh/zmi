@@ -76,15 +76,15 @@ void zBranch(bool Condition) {
 		} else {
 			popZFrame();
 			if(CurrentZFrame->ReturnVar == 1)
-				setZVar(getByte(CurrentZFrame->PC), Offset);
-			CurrentZFrame->PC++;
+				setZVar(getByte(CurrentZFrame->PC++), Offset);
 			CurrentZFrame->ReturnVar = 1;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Returning offset.");
 		}
 	} else {
 		if( Offset <= 1)
-			CurrentZFrame->PC++;
+			if(CurrentZFrame->OldFrame->ReturnVar)
+				CurrentZFrame->PC++;
 		if(g_VerboseDebug >= 40)
 			logMessage(MNull, "zBranch()", "Not jumping.");
 	}
