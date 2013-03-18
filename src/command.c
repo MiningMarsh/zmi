@@ -10,7 +10,7 @@
 #include "opcodes.h"
 
 // Holds arguments to opcodes.
-zword Operand[8];
+uzword Operand[8];
 
 // Used for easy identification of operand types.
 enum operandType {
