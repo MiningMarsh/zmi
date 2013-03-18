@@ -18,7 +18,7 @@
 void opCall() {
 	// If address 0 is called, we instantly return 0 and nothing happens.
 	if(!Operand[0]) {
-		if(CurrentZFrame->ReturnVar == 1)
+		if(CurrentZFrame->ReturnVar)
 			setZVar(getByte(CurrentZFrame->PC++), 0);
 		CurrentZFrame->ReturnVar = 1;
 		return;

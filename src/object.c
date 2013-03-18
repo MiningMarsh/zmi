@@ -19,7 +19,7 @@ uzword getObjectAddress(uzword Object) {
 			Message, 
 			"Getting address of bad object %u.\n"
 			"Only 255 objects supported in\n"
-			"	revision 3 and below.",
+			"revision 3 and below.",
 			Object
 		);
 		logMessage(MFatal, "getObjectAddress()", Message);

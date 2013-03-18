@@ -9,8 +9,7 @@
 
 void opRet() {
 	popZFrame();
-	if(CurrentZFrame->ReturnVar == 1)
-		setZVar(getByte(CurrentZFrame->PC), Operand[0]);
-	CurrentZFrame->PC++;
+	if(CurrentZFrame->ReturnVar)
+		setZVar(getByte(CurrentZFrame->PC++), Operand[0]);
 	CurrentZFrame->ReturnVar = 1;
 }

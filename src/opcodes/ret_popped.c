@@ -10,6 +10,8 @@
  *************************************************************************/
 
 void opRetPopped() {
+	// Get the value from the stack.
 	Operand[0] = popZStack();
+	// Transfer to standard return call.
 	opRet();
 }
