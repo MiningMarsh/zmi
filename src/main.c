@@ -124,7 +124,7 @@ int main(int ArgCount, char** Arguments) {
 					"-l,--log=<file>          File to log interpreter messages to.\n"
 					"                         Use 'stderr' to log to stderr.\n"
 					"                         Use 'stdout' to log to stdout.\n"
-					"-p,--piracy              Trip the piracy opcoe. We be pirates!\n",
+					"-p,--piracy              Trip the piracy opcode. We be pirates!\n",
 					d_VersionMajor,
 					d_VersionMinor,
 					d_StandardMajor,

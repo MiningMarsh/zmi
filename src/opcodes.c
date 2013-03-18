@@ -75,6 +75,6 @@ void initOpCodes() {
 	CallOpCode[231] = &opRandom;
 	CallOpCode[232] = &opPush;
 	CallOpCode[233] = &opPull;
-	if(getZRev > 4)
+	if(getZRev() > 4)
 		CallOpCode[248] = &opNot;
 }
