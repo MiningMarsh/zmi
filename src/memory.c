@@ -269,7 +269,7 @@ void traceZStack() {
 		char Message[256];
 		sprintf(Message,"   Frame %u",zFrameNumber(frame));
 		logMessage(MNull, NULL,Message);
-		sprintf(Message, "      PC: %u",frame->PC);
+		sprintf(Message, "      PC: %u (%p)",frame->PC, (void*)frame->PC);
 		logMessage(MNull,NULL,Message);
 		sprintf(Message, "      Arguments passed: %u",frame->PassedArgs);
 		logMessage(MNull,NULL,Message);
@@ -279,7 +279,7 @@ void traceZStack() {
 			unsigned int count = 1;
 			logMessage(MNull, NULL, "      Stack:");
 			for(uzword cell = frame->Stack[0]; cell > 0; cell--) {
-				sprintf(Message, "         %04u: %u", count++, frame->Stack[cell]);
+				sprintf(Message, "         %04u: %u (%p)", count++, frame->Stack[cell], (void*)frame->Stack[cell]);
 				logMessage(MNull, NULL, Message);
 			}
 		} else {
@@ -288,7 +288,7 @@ void traceZStack() {
 		if(!(frame->Locals == NULL || frame->Locals[0] < 1)) {
 			logMessage(MNull, NULL, "      Locals:");
 			for(uzword cell = 1; cell <= frame->Locals[0]; cell++) {
-				sprintf(Message, "          %01u: %u", cell, frame->Locals[cell]);
+				sprintf(Message, "          %01u: %u (%p)", cell, frame->Locals[cell], (void*)frame->Locals[cell]);
 				logMessage(MNull, NULL, Message);
 			}
 		} else {
