@@ -58,8 +58,8 @@ void zBranch(bool Condition) {
 			char Message[256];
 			sprintf(
 				Message,
-				"Extended branch offset is %u.",
-				Offset
+				"Extended branch offset is %i.",
+				zSign(Offset)
 			);
 			logMessage(MNull, "zBranch()", Message);
 		}
@@ -68,7 +68,7 @@ void zBranch(bool Condition) {
 	// The eigth bit is used to tell if we jump on true or false.
 	if(Condition ^ (!((BranchData>>7)&1))) {
 		if(Offset > 1) {
-			CurrentZFrame->PC += (Offset>8191 ? Offset-16384:Offset) - 2;
+			CurrentZFrame->PC += zSign(Offset) - 2;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Jumping by offset.");
 
