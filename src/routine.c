@@ -75,7 +75,7 @@ void zBranch(bool Condition) {
 		// We are returning instead of jumping.
 		} else {
 			popZFrame();
-			if(CurrentZFrame->ReturnVar == 1)
+			if(CurrentZFrame->ReturnVar)
 				setZVar(getByte(CurrentZFrame->PC++), Offset);
 			CurrentZFrame->ReturnVar = 1;
 			if(g_VerboseDebug >= 40)
