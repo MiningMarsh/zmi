@@ -1,0 +1,987 @@
+LogOpen(): Log opened.
+Main loop: Operation started.
+PC: 20229 (0x4f05) OP: 224 (0xe0)
+Operand: Large: 10809 (0x2a39)
+Operand: Large: 32784 (0x8010)
+Operand: Large: 65535 (0xffff)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21625 (0x5479) OP: 224 (0xe0)
+Operand: Large: 10819 (0x2a43)
+Operand: Var 1 (0x1): 10809 (0x2a39)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21649 (0x5491) OP: 84 (0x54)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Small: 180 (0xb4)
+zStore(): Storing 9373 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21653 (0x5495) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 180 (0xb4)
+zStore(): Storing 9373 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21657 (0x5499) OP: 97 (0x61)
+Operand: Var 4 (0x4): 9373 (0x249d)
+Operand: Var 3 (0x3): 9373 (0x249d)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 24.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21661 (0x549d) OP: 85 (0x55)
+Operand: Var 146 (0x92): 180 (0xb4)
+Operand: Small: 6 (0x6)
+zStore(): Storing 174 into var 146.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21665 (0x54a1) OP: 160 (0xa0)
+Operand: Var 2 (0x2): 10809 (0x2a39)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 6.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21668 (0x54a4) OP: 85 (0x55)
+Operand: Var 147 (0x93): 180 (0xb4)
+Operand: Small: 6 (0x6)
+zStore(): Storing 174 into var 147.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21672 (0x54a8) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 174 (0xae)
+zStore(): Storing 9367 into var 5.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21676 (0x54ac) OP: 225 (0xe1)
+Operand: Var 5 (0x5): 9367 (0x2497)
+Operand: Small: 2 (0x2)
+Operand: Var 1 (0x1): 10819 (0x2a43)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21681 (0x54b1) OP: 171 (0xab)
+Operand: Var 5 (0x5): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21631 (0x547f) OP: 225 (0xe1)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Operand: Small: 1 (0x1)
+Operand: Var 2 (0x2): 32784 (0x8010)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21636 (0x5484) OP: 171 (0xab)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20238 (0x4f0e) OP: 225 (0xe1)
+Operand: Var 0 ((nil)): 9367 (0x2497)
+Operand: Small: 0 ((nil))
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20243 (0x4f13) OP: 224 (0xe0)
+Operand: Large: 10809 (0x2a39)
+Operand: Large: 32892 (0x807c)
+Operand: Large: 65535 (0xffff)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21625 (0x5479) OP: 224 (0xe0)
+Operand: Large: 10819 (0x2a43)
+Operand: Var 1 (0x1): 10809 (0x2a39)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21649 (0x5491) OP: 84 (0x54)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Small: 180 (0xb4)
+zStore(): Storing 9373 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21653 (0x5495) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 174 (0xae)
+zStore(): Storing 9367 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21657 (0x5499) OP: 97 (0x61)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Var 3 (0x3): 9373 (0x249d)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 24.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21683 (0x54b3) OP: 79 (0x4f)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10819 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21687 (0x54b7) OP: 97 (0x61)
+Operand: Var 0 ((nil)): 10819 (0x2a43)
+Operand: Var 1 (0x1): 10819 (0x2a43)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 4.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21691 (0x54bb) OP: 171 (0xab)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21631 (0x547f) OP: 225 (0xe1)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Operand: Small: 1 (0x1)
+Operand: Var 2 (0x2): 32892 (0x807c)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21636 (0x5484) OP: 171 (0xab)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20252 (0x4f1c) OP: 224 (0xe0)
+Operand: Large: 10809 (0x2a39)
+Operand: Large: 33008 (0x80f0)
+Operand: Large: 65535 (0xffff)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21625 (0x5479) OP: 224 (0xe0)
+Operand: Large: 10819 (0x2a43)
+Operand: Var 1 (0x1): 10809 (0x2a39)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21649 (0x5491) OP: 84 (0x54)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Small: 180 (0xb4)
+zStore(): Storing 9373 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21653 (0x5495) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 174 (0xae)
+zStore(): Storing 9367 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21657 (0x5499) OP: 97 (0x61)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Var 3 (0x3): 9373 (0x249d)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 24.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21683 (0x54b3) OP: 79 (0x4f)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10819 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21687 (0x54b7) OP: 97 (0x61)
+Operand: Var 0 ((nil)): 10819 (0x2a43)
+Operand: Var 1 (0x1): 10819 (0x2a43)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 4.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21691 (0x54bb) OP: 171 (0xab)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21631 (0x547f) OP: 225 (0xe1)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Operand: Small: 1 (0x1)
+Operand: Var 2 (0x2): 33008 (0x80f0)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21636 (0x5484) OP: 171 (0xab)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20261 (0x4f25) OP: 225 (0xe1)
+Operand: Var 0 ((nil)): 9367 (0x2497)
+Operand: Small: 0 ((nil))
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20266 (0x4f2a) OP: 224 (0xe0)
+Operand: Large: 10809 (0x2a39)
+Operand: Large: 28522 (0x6f6a)
+Operand: Small: 40 (0x28)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21625 (0x5479) OP: 224 (0xe0)
+Operand: Large: 10819 (0x2a43)
+Operand: Var 1 (0x1): 10809 (0x2a39)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21649 (0x5491) OP: 84 (0x54)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Small: 180 (0xb4)
+zStore(): Storing 9373 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21653 (0x5495) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 174 (0xae)
+zStore(): Storing 9367 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21657 (0x5499) OP: 97 (0x61)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Var 3 (0x3): 9373 (0x249d)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 24.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21683 (0x54b3) OP: 79 (0x4f)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10819 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21687 (0x54b7) OP: 97 (0x61)
+Operand: Var 0 ((nil)): 10819 (0x2a43)
+Operand: Var 1 (0x1): 10819 (0x2a43)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 4.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21691 (0x54bb) OP: 171 (0xab)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21631 (0x547f) OP: 225 (0xe1)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Operand: Small: 1 (0x1)
+Operand: Var 2 (0x2): 28522 (0x6f6a)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21636 (0x5484) OP: 171 (0xab)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20274 (0x4f32) OP: 224 (0xe0)
+Operand: Large: 10809 (0x2a39)
+Operand: Large: 28501 (0x6f55)
+Operand: Small: 200 (0xc8)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21625 (0x5479) OP: 224 (0xe0)
+Operand: Large: 10819 (0x2a43)
+Operand: Var 1 (0x1): 10809 (0x2a39)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21649 (0x5491) OP: 84 (0x54)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Small: 180 (0xb4)
+zStore(): Storing 9373 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21653 (0x5495) OP: 116 (0x74)
+Operand: Var 148 (0x94): 9193 (0x23e9)
+Operand: Var 146 (0x92): 174 (0xae)
+zStore(): Storing 9367 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21657 (0x5499) OP: 97 (0x61)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Var 3 (0x3): 9373 (0x249d)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 24.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21683 (0x54b3) OP: 79 (0x4f)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10819 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21687 (0x54b7) OP: 97 (0x61)
+Operand: Var 0 ((nil)): 10819 (0x2a43)
+Operand: Var 1 (0x1): 10819 (0x2a43)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 4.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21691 (0x54bb) OP: 171 (0xab)
+Operand: Var 4 (0x4): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21631 (0x547f) OP: 225 (0xe1)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Operand: Small: 1 (0x1)
+Operand: Var 2 (0x2): 28501 (0x6f55)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 21636 (0x5484) OP: 171 (0xab)
+Operand: Var 3 (0x3): 9367 (0x2497)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20282 (0x4f3a) OP: 227 (0xe3)
+Operand: Small: 156 (0x9c)
+Operand: Small: 6 (0x6)
+Operand: Small: 4 (0x4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20287 (0x4f3f) OP: 84 (0x54)
+Operand: Var 32 (0x20): 10787 (0x2a23)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10789 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20291 (0x4f43) OP: 225 (0xe1)
+Operand: Var 26 (0x1a): 10921 (0x2aa9)
+Operand: Small: 1 (0x1)
+Operand: Var 0 ((nil)): 10789 (0x2a25)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20296 (0x4f48) OP: 84 (0x54)
+Operand: Var 32 (0x20): 10787 (0x2a23)
+Operand: Small: 4 (0x4)
+zStore(): Storing 10791 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20300 (0x4f4c) OP: 225 (0xe1)
+Operand: Var 26 (0x1a): 10921 (0x2aa9)
+Operand: Small: 2 (0x2)
+Operand: Var 0 ((nil)): 10791 (0x2a27)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20305 (0x4f51) OP: 84 (0x54)
+Operand: Var 30 (0x1e): 10833 (0x2a51)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10835 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20309 (0x4f55) OP: 225 (0xe1)
+Operand: Var 25 (0x19): 10927 (0x2aaf)
+Operand: Small: 2 (0x2)
+Operand: Var 0 ((nil)): 10835 (0x2a53)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20314 (0x4f5a) OP: 84 (0x54)
+Operand: Var 30 (0x1e): 10833 (0x2a51)
+Operand: Small: 4 (0x4)
+zStore(): Storing 10837 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20318 (0x4f5e) OP: 225 (0xe1)
+Operand: Var 25 (0x19): 10927 (0x2aaf)
+Operand: Small: 3 (0x3)
+Operand: Var 0 ((nil)): 10837 (0x2a55)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20323 (0x4f63) OP: 84 (0x54)
+Operand: Var 29 (0x1d): 10857 (0x2a69)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10859 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20327 (0x4f67) OP: 225 (0xe1)
+Operand: Var 24 (0x18): 10935 (0x2ab7)
+Operand: Small: 1 (0x1)
+Operand: Var 0 ((nil)): 10859 (0x2a6b)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20332 (0x4f6c) OP: 84 (0x54)
+Operand: Var 28 (0x1c): 10879 (0x2a7f)
+Operand: Small: 2 (0x2)
+zStore(): Storing 10881 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20336 (0x4f70) OP: 225 (0xe1)
+Operand: Var 24 (0x18): 10935 (0x2ab7)
+Operand: Small: 3 (0x3)
+Operand: Var 0 ((nil)): 10881 (0x2a81)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20341 (0x4f75) OP: 13 (0xd)
+Operand: Small: 16 (0x10)
+Operand: Small: 180 (0xb4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20344 (0x4f78) OP: 224 (0xe0)
+Operand: Large: 19096 (0x4a98)
+Operand: Small: 160 (0xa0)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 38195 (0x9533) OP: 45 (0x2d)
+Operand: Small: 123 (0x7b)
+Operand: Var 1 (0x1): 19096 (0x4a98)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 38198 (0x9536) OP: 45 (0x2d)
+Operand: Small: 122 (0x7a)
+Operand: Var 16 (0x10): 180 (0xb4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 38201 (0x9539) OP: 171 (0xab)
+Operand: Var 122 (0x7a): 180 (0xb4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20350 (0x4f7e) OP: 74 (0x4a)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 3 (0x3)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 8.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20354 (0x4f82) OP: 224 (0xe0)
+Operand: Large: 14192 (0x3770)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28387 (0x6ee3) OP: 178 (0xb2)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28456 (0x6f28) OP: 178 (0xb2)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28473 (0x6f39) OP: 187 (0xbb)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28474 (0x6f3a) OP: 16 (0x10)
+Operand: Small: 0 ((nil))
+Operand: Small: 1 (0x1)
+zStore(): Storing 0 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28478 (0x6f3e) OP: 73 (0x49)
+Operand: Var 0 ((nil)): 0 ((nil))
+Operand: Small: 8 (0x8)
+zStore(): Storing 0 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28482 (0x6f42) OP: 160 (0xa0)
+Operand: Var 0 ((nil)): 0 ((nil))
+zBranch(): Condition passed is 1.
+           Success condition is 1.
+           Branch offset is 26.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28509 (0x6f5d) OP: 178 (0xb2)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28552 (0x6f88) OP: 15 (0xf)
+Operand: Small: 0 ((nil))
+Operand: Small: 1 (0x1)
+zStore(): Storing 88 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28556 (0x6f8c) OP: 201 (0xc9)
+Operand: Var 0 ((nil)): 88 (0x58)
+Operand: Large: 2047 (0x7ff)
+zStore(): Storing 88 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28562 (0x6f92) OP: 230 (0xe6)
+Operand: Var 0 ((nil)): 88 (0x58)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28565 (0x6f95) OP: 178 (0xb2)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28580 (0x6fa4) OP: 5 (0x5)
+Operand: Small: 1 (0x1)
+Operand: Small: 23 (0x17)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 5.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28584 (0x6fa8) OP: 140 (0x8c)
+Operand: Large: 12 (0xc)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28597 (0x6fb5) OP: 187 (0xbb)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 28598 (0x6fb6) OP: 176 (0xb0)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20359 (0x4f87) OP: 187 (0xbb)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20360 (0x4f88) OP: 13 (0xd)
+Operand: Small: 82 (0x52)
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20363 (0x4f8b) OP: 13 (0xd)
+Operand: Small: 127 (0x7f)
+Operand: Small: 4 (0x4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20366 (0x4f8e) OP: 45 (0x2d)
+Operand: Small: 144 (0x90)
+Operand: Var 127 (0x7f): 4 (0x4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20369 (0x4f91) OP: 110 (0x6e)
+Operand: Var 127 (0x7f): 4 (0x4)
+Operand: Var 16 (0x10): 180 (0xb4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 20372 (0x4f94) OP: 224 (0xe0)
+Operand: Large: 16130 (0x3f02)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 32261 (0x7e05) OP: 224 (0xe0)
+Operand: Large: 17997 (0x464d)
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36003 (0x8ca3) OP: 160 (0xa0)
+Operand: Var 1 (0x1): 17997 (0x464d)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 8.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36006 (0x8ca6) OP: 232 (0xe8)
+Operand: Var 1 (0x1): 17997 (0x464d)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36009 (0x8ca9) OP: 140 (0x8c)
+Operand: Large: 5 (0x5)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36015 (0x8caf) OP: 233 (0xe9)
+Operand: Small: 2 (0x2)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36018 (0x8cb2) OP: 160 (0xa0)
+Operand: Var 82 (0x52): 1 (0x1)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 49.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36068 (0x8ce4) OP: 74 (0x4a)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 3 (0x3)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 8.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36072 (0x8ce8) OP: 75 (0x4b)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 3 (0x3)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36075 (0x8ceb) OP: 13 (0xd)
+Operand: Small: 2 (0x2)
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36078 (0x8cee) OP: 74 (0x4a)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 5 (0x5)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 5.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36085 (0x8cf5) OP: 70 (0x46)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 82 (0x52)
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 19.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36089 (0x8cf9) OP: 170 (0xaa)
+Operand: Var 16 (0x10): 180 (0xb4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36091 (0x8cfb) OP: 163 (0xa3)
+Operand: Var 127 (0x7f): 4 (0x4)
+zStore(): Storing 180 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36094 (0x8cfe) OP: 74 (0x4a)
+Operand: Var 4 (0x4): 180 (0xb4)
+Operand: Small: 27 (0x1b)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 9.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36105 (0x8d09) OP: 187 (0xbb)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36106 (0x8d0a) OP: 160 (0xa0)
+Operand: Var 1 (0x1): 17997 (0x464d)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 5.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36112 (0x8d10) OP: 163 (0xa3)
+Operand: Var 127 (0x7f): 4 (0x4)
+zStore(): Storing 180 into var 4.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36115 (0x8d13) OP: 160 (0xa0)
+Operand: Var 2 (0x2): 1 (0x1)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 14.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36118 (0x8d16) OP: 81 (0x51)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 17 (0x11)
+zStore(): Storing 19102 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36122 (0x8d1a) OP: 224 (0xe0)
+Operand: Var 0 ((nil)): 19102 (0x4a9e)
+Operand: Small: 3 (0x3)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 38207 (0x953f) OP: 65 (0x41)
+Operand: Var 1 (0x1): 19102 (0x4a9e)
+Operand: Small: 3 (0x3)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 0.
+zBranch(): Returning offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36127 (0x8d1f) OP: 160 (0xa0)
+Operand: Var 0 ((nil)): 0 ((nil))
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 1.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36130 (0x8d22) OP: 160 (0xa0)
+Operand: Var 2 (0x2): 1 (0x1)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 15.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36133 (0x8d25) OP: 81 (0x51)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 11 (0xb)
+zStore(): Storing 0 into var 3.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36137 (0x8d29) OP: 160 (0xa0)
+Operand: Var 3 (0x3): 0 ((nil))
+zBranch(): Condition passed is 1.
+           Success condition is 1.
+           Branch offset is 8.
+zBranch(): Jumping by offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36146 (0x8d32) OP: 81 (0x51)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Small: 17 (0x11)
+zStore(): Storing 19102 into var 0.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36150 (0x8d36) OP: 224 (0xe0)
+Operand: Var 0 ((nil)): 19102 (0x4a9e)
+Operand: Small: 4 (0x4)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 38207 (0x953f) OP: 65 (0x41)
+Operand: Var 1 (0x1): 19102 (0x4a9e)
+Operand: Small: 3 (0x3)
+zBranch(): Condition passed is 0.
+           Success condition is 0.
+           Branch offset is 0.
+zBranch(): Returning offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36155 (0x8d3b) OP: 97 (0x61)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Var 4 (0x4): 180 (0xb4)
+zBranch(): Condition passed is 1.
+           Success condition is 1.
+           Branch offset is 1.
+zBranch(): Returning offset.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 32267 (0x7e0b) OP: 160 (0xa0)
+Operand: Var 0 ((nil)): 1 (0x1)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 0.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 32270 (0x7e0e) OP: 224 (0xe0)
+Operand: Large: 18087 (0x46a7)
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36177 (0x8d51) OP: 160 (0xa0)
+Operand: Var 82 (0x52): 1 (0x1)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 31.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36180 (0x8d54) OP: 162 (0xa2)
+Operand: Var 16 (0x10): 180 (0xb4)
+zStore(): Storing 4 into var 0.
+zBranch(): Condition passed is 1.
+           Success condition is 0.
+           Branch offset is 0.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36184 (0x8d58) OP: 160 (0xa0)
+Operand: Var 1 (0x1): 18087 (0x46a7)
+zBranch(): Condition passed is 0.
+           Success condition is 1.
+           Branch offset is 8.
+zBranch(): Not jumping.
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36187 (0x8d5b) OP: 232 (0xe8)
+Operand: Var 1 (0x1): 18087 (0x46a7)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36190 (0x8d5e) OP: 140 (0x8c)
+Operand: Large: 5 (0x5)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36196 (0x8d64) OP: 233 (0xe9)
+Operand: Small: 1 (0x1)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36199 (0x8d67) OP: 224 (0xe0)
+Operand: Large: 18261 (0x4755)
+Operand: Var 16 (0x10): 180 (0xb4)
+Operand: Var 1 (0x1): 18087 (0x46a7)
+Operand: Large: 65535 (0xffff)
+Main loop: Operation finished.
+           
+Main loop: Operation started.
+PC: 36543 (0x8ebf) OP: 162 (0xa2)
+Operand: Var 1 (0x1): 18261 (0x4755)
+FATAL: getObjectAddress(): Getting address of bad object 18261.
+FATAL:                     Only 255 objects supported in
+FATAL:                     	revision 3 and below.
+
+clean(): Begin cleanup.
+clean(): Reverting IO modes.
+clean(): Cleaning RAM.
+tZS(): Begin Stacktrace.
+   Frame 3
+      PC: 36545 (0x8ec1)
+      Arguments passed: 1
+      Return: Yes.
+      Empty Stack.
+      Locals:
+          1: 18261 (0x4755)
+          2: 180 (0xb4)
+          3: 18087 (0x46a7)
+          4: 65535 (0xffff)
+          5: 0 ((nil))
+          6: 0 ((nil))
+          7: 0 ((nil))
+          8: 0 ((nil))
+          9: 0 ((nil))
+          10: 0 ((nil))
+   Frame 2
+      PC: 36207 (0x8d6f)
+      Arguments passed: 4
+      Return: Yes.
+      Stack:
+         0001: 4 (0x4)
+      Locals:
+          1: 18087 (0x46a7)
+   Frame 1
+      PC: 32275 (0x7e13)
+      Arguments passed: 2
+      Return: Yes.
+      Empty Stack.
+      No local variables.
+   Frame 0
+      PC: 20376 (0x4f98)
+      Arguments passed: 1
+      Return: Yes.
+      Stack:
+         0001: 1 (0x1)
+         0002: 180 (0xb4)
+         0003: 9367 (0x2497)
+         0004: 9367 (0x2497)
+         0005: 9367 (0x2497)
+      No local variables.
+tZS(): End Stacktrace.
+clean(): Cleaning frame.
+clean(): Cleaning frame.
+clean(): Cleaning frame.
+clean(): Cleaning final frame.
+LogClose(): Log closed.

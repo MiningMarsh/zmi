@@ -52,7 +52,7 @@ void zBranch(bool Condition) {
 		logMessage(MNull, "zBranch()", Message);
 	}
 	// The next byte in the stream could be appended to the jump offset.
-	if(!((BranchData>>5)& 1)) {
+	if(!((BranchData>>6)& 1)) {
 		Offset = (Offset<<8)+(getByte(CurrentZFrame->PC++));
 		if(g_VerboseDebug >= 40) {
 			char Message[256];
@@ -65,7 +65,7 @@ void zBranch(bool Condition) {
 		}
 	}
 
-	// The eigth bit is used to tell if we jump on true or false.
+	// The seventh bit is used to tell if we jump on true or false.
 	if(Condition ^ (!((BranchData>>7)&1))) {
 		if(Offset > 1) {
 			CurrentZFrame->PC += zSign(Offset) - 2;
