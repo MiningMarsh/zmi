@@ -13,7 +13,6 @@ void opPrint() {
 	// by the program counter.
 	char* String = zGetStringFromPC();
 	zPrint(String);
-	
 	// zPrint does not autofree.
 	free(String);
 }

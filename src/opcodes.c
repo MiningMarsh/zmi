@@ -66,6 +66,7 @@ void initOpCodes() {
 		CallOpCode[187+16*I] = &opNewLine;
 	}
 	CallOpCode[224] = &opCall;
+	CallOpCode[225] = &opStorew;
 	CallOpCode[226] = &opStoreb;
 	CallOpCode[227] = &opPutProp;
 	CallOpCode[228] = &opRead;
