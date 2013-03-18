@@ -57,6 +57,8 @@ void initOpCodes() {
 		CallOpCode[139+16*I] = &opRet;
 		CallOpCode[140+16*I] = &opJump;
 		CallOpCode[141+16*I] = &opPrintPaddr;
+		if(getZRev() <= 4)
+			CallOpCode[143+16*I] = &opNot;
 		CallOpCode[176+16*I] = &opRtrue;
 		CallOpCode[177+16*I] = &opRfalse;
 		CallOpCode[178+16*I] = &opPrint;
@@ -64,7 +66,6 @@ void initOpCodes() {
 		CallOpCode[187+16*I] = &opNewLine;
 	}
 	CallOpCode[224] = &opCall;
-	CallOpCode[225] = &opStorew;
 	CallOpCode[226] = &opStoreb;
 	CallOpCode[227] = &opPutProp;
 	CallOpCode[228] = &opRead;
@@ -73,4 +74,6 @@ void initOpCodes() {
 	CallOpCode[231] = &opRandom;
 	CallOpCode[232] = &opPush;
 	CallOpCode[233] = &opPull;
+	if(getZRev > 4)
+		CallOpCode[248] = &opNot;
 }
