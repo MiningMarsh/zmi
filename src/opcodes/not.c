@@ -15,5 +15,7 @@
 
 
 void opNot() {
-	
+	uzword Number = Operand[0]; //Get the number to reverse
+	Number ^= 0xFFFF; //negate the bits
+	zStore(Number); //store the result	
 }
