@@ -44,16 +44,16 @@ void zBranch(bool Condition) {
 			Message,
 			"Condition passed is %u.\n"
 			"Success condition is %u.\n"
-			"Branch offset is %u.",
+			"Branch offset is %i.",
 			Condition,
 			(BranchData>>7)&1,
-			Offset
+			zSign(Offset)
 		);
 		logMessage(MNull, "zBranch()", Message);
 	}
 	// The next byte in the stream could be appended to the jump offset.
-	if((BranchData>>5)& 1) {
-		Offset = (Offset<<8)+getByte(CurrentZFrame->PC++);
+	if(!((BranchData>>5)& 1)) {
+		Offset = (Offset<<8)+(getByte(CurrentZFrame->PC++));
 		if(g_VerboseDebug >= 40) {
 			char Message[256];
 			sprintf(
@@ -82,9 +82,6 @@ void zBranch(bool Condition) {
 				logMessage(MNull, "zBranch()", "Returning offset.");
 		}
 	} else {
-		if( Offset <= 1)
-			if(CurrentZFrame->OldFrame->ReturnVar)
-				CurrentZFrame->PC++;
 		if(g_VerboseDebug >= 40)
 			logMessage(MNull, "zBranch()", "Not jumping.");
 	}
