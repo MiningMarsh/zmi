@@ -5,6 +5,13 @@
 #include "globalvars.h"
 #include "log.h"
 
+void zReturn(uzword Value) {
+	popZFrame();
+	if(CurrentZFrame->ReturnVar)
+		setZVar(getByte(CurrentZFrame->PC++), Value);
+	CurrentZFrame->ReturnVar = 1;
+}
+
 // Store commands use the next byte as the variable to store into.
 // all store commans execute this to store things.
 void zStore(uzword Value) {
@@ -74,10 +81,7 @@ void zBranch(bool Condition) {
 
 		// We are returning instead of jumping.
 		} else {
-			popZFrame();
-			if(CurrentZFrame->ReturnVar)
-				setZVar(getByte(CurrentZFrame->PC++), Offset);
-			CurrentZFrame->ReturnVar = 1;
+			zReturn(Offset);
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Returning offset.");
 		}

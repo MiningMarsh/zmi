@@ -13,4 +13,7 @@ void zStore(uzword value);
 // Grab some zscii text from the PC stream and return it.
 char* zGetStringFromPC();
 
+// Return from  zRoutine.
+void zReturn(uzword Value);
+
 #endif /* routine.h */

@@ -1,5 +1,6 @@
 #include "command.h"
 #include "memory.h"
+#include "routine.h"
 
 /***********************
  * 1OP:139 B ret value *
@@ -8,8 +9,5 @@
  *************************************************************************/
 
 void opRet() {
-	popZFrame();
-	if(CurrentZFrame->ReturnVar)
-		setZVar(getByte(CurrentZFrame->PC++), Operand[0]);
-	CurrentZFrame->ReturnVar = 1;
+	zReturn(Operand[0]);
 }
