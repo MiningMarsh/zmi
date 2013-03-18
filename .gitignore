@@ -6,3 +6,7 @@ zmi
 .*
 !.gitignore
 build/*
+*#
+#*
+*~
+*.stamp

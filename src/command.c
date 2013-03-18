@@ -10,7 +10,7 @@
 #include "opcodes.h"
 
 // Holds arguments to opcodes.
-zword Operand[8];
+uzword Operand[8];
 
 // Used for easy identification of operand types.
 enum operandType {
@@ -86,7 +86,7 @@ void execNextInstruction() {
 		logMessage(MNull,"", Message);
 	}
 
-   	// Extract argument types based on the opcodeco
+   	// Extract argument types based on the opcode.
 	if((Operation>>6) == 2) {
 		// We are in short form. Bits 4 and 5 give the type.
 		OperandType[0] = ((Operation >> 4) & 3);

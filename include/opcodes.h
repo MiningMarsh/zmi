@@ -37,6 +37,7 @@ void opMul();
 void opNonexistant();
 void opNewLine();
 void opNop();
+void opNot();
 void opOr();
 void opPiracy();
 void opPrint();

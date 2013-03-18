@@ -44,47 +44,44 @@ void zBranch(bool Condition) {
 			Message,
 			"Condition passed is %u.\n"
 			"Success condition is %u.\n"
-			"Branch offset is %u.",
+			"Branch offset is %i.",
 			Condition,
 			(BranchData>>7)&1,
-			Offset
+			zSign(Offset)
 		);
 		logMessage(MNull, "zBranch()", Message);
 	}
 	// The next byte in the stream could be appended to the jump offset.
-	if((BranchData>>5)& 1) {
-		Offset = (Offset<<8)+getByte(CurrentZFrame->PC++);
+	if(!((BranchData>>6)& 1)) {
+		Offset = (Offset<<8)+(getByte(CurrentZFrame->PC++));
 		if(g_VerboseDebug >= 40) {
 			char Message[256];
 			sprintf(
 				Message,
-				"Extended branch offset is %u.",
-				Offset
+				"Extended branch offset is %i.",
+				zSign(Offset)
 			);
 			logMessage(MNull, "zBranch()", Message);
 		}
 	}
 
-	// The eigth bit is used to tell if we jump on true or false.
+	// The seventh bit is used to tell if we jump on true or false.
 	if(Condition ^ (!((BranchData>>7)&1))) {
 		if(Offset > 1) {
-			CurrentZFrame->PC += (Offset>8191 ? Offset-16384:Offset) - 2;
+			CurrentZFrame->PC += zSign(Offset) - 2;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Jumping by offset.");
 
 		// We are returning instead of jumping.
 		} else {
 			popZFrame();
-			if(CurrentZFrame->ReturnVar == 1)
-				setZVar(getByte(CurrentZFrame->PC), Offset);
-			CurrentZFrame->PC++;
+			if(CurrentZFrame->ReturnVar)
+				setZVar(getByte(CurrentZFrame->PC++), Offset);
 			CurrentZFrame->ReturnVar = 1;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Returning offset.");
 		}
 	} else {
-		if( Offset <= 1)
-			CurrentZFrame->PC++;
 		if(g_VerboseDebug >= 40)
 			logMessage(MNull, "zBranch()", "Not jumping.");
 	}
