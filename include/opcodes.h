@@ -16,6 +16,7 @@ void opDecChk();
 void opDiv();
 void opDummy();
 void opGetChild();
+void opGetNextProp();
 void opGetParent();
 void opGetProp();
 void opGetPropAddr();

@@ -14,5 +14,5 @@
  *************************************************************************/
 
 void opJump() {
-	CurrentZFrame->PC += zSign(Operand[0]) - 2;
+	CurrentZFrame->PC += zSign(Operand[0]);
 }
