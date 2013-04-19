@@ -30,8 +30,14 @@ void initOutput() {
 #	ifdef PLATFORM_LINUX
 	struct winsize TerminalSize;
 	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
-	TerminalWidth = TerminalSize.ws_col;
+	TerminalWidth = TerminalSize.ws_row;
 	TerminalHeight = TerminalSize.ws_col;
+#	endif
+#	ifdef PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO ConsoleInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConsoleInfo);
+	TerminalHeight = ConsoleInfo.srWindow.Right - ConsoleInfo.srWindow.Left + 1;
+	TerminalWidth = ConsoleInfo.srWindow.Bottom - ConsoleInfo.srWindow.Top + 1;
 #	endif
 }
 
