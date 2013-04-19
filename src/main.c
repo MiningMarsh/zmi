@@ -44,11 +44,11 @@ int main(int ArgCount, char** Arguments) {
 
 		// Set the keys value to everything after the '='
 		// if it exists. Otherwise the value is null.
-		while(*Value != 0 && *Value != '=')
+		while(*Value && *Value != '=')
 			Value++;
 
 		// seperate the key and value, but not if it is a filename.
-		if(*Value != 0 && ArgType) {
+		if(*Value && ArgType) {
 			*Value = 0;	
 			Value++;
 		}

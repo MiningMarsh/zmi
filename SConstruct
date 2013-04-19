@@ -25,7 +25,7 @@ HeaderDirectory = "include"
 SourceDirectory = "src"
 SourceExtensions = ["c", "cpp"]
 DefaultVariant = "generic"
-BuildPrefix = "build/objects"
+BuildPrefix = "build/.objects"
 
 # Compile flags.
 Flags = '--std=c99 -pipe'

@@ -2,34 +2,42 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
-#include <termios.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include "memory.h"
 #include "input.h"
+#include "platform.h"
+
+#ifdef PLATFORM_LINUX
+#	include <termios.h>
+#	include <sys/ioctl.h>
+#endif
+
+#ifdef PLATFORM_WINDOWS
+#	include <windows.h>
+#endif
+
+#ifdef PLATFORM_LINUX
 // Used to hold what the terminal settings were before this program started.
 static struct termios TerminalSettings;
+#endif
+
 // Holds the terminals width and height.
 int TerminalWidth, TerminalHeight;
-void initInput()
-{
-	// Default terminal size, if it can't be extracted.
+
+void initInput() {
+	// Default terminal size if it can't be extracted.
 	TerminalWidth = 80;
 	TerminalHeight = 24;
 
 	// OS specific terminal size extraction.
-#ifdef TIOCGSIZE
-	struct ttysize TerminalSize;
-	ioctl(STDIN_FILENO, TIOCGSIZE, &TerminalSize);
-	TerminalWidth = TerminalSize.ts_cols;
-	TerminalHeight = TerminalSize.ts_lines;
-#elif defined(TIOCGWINSZ)
+#	ifdef PLATFORM_LINUX
 	struct winsize TerminalSize;
 	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
 	TerminalWidth = TerminalSize.ws_col;
-	TerminalHeight = TerminalSize.ws_row;
-#endif /* TIOCGSIZE */
+	TerminalHeight = TerminalSize.ws_col;
+#	endif
 
+#	ifdef PLATFORM_LINUX
 	// Save current terminal state in TerminalSettings.
 	tcgetattr(STDIN_FILENO,&TerminalSettings);
 
@@ -39,22 +47,24 @@ void initInput()
 	NewTerminalSettings.c_cc[VTIME] = 1;
 	NewTerminalSettings.c_cc[VMIN] = 0;
 	tcsetattr(STDIN_FILENO,TCSAFLUSH,&NewTerminalSettings);
+#	endif
+
 }
-void cleanInput()
-{
+
+void cleanInput() {
+#	ifdef PLATFORM_LINUX
 	// Restore the terminal state.
 	tcsetattr(STDIN_FILENO,TCSANOW,&TerminalSettings);
+#	endif
 }
 
 // Read a character in from the terminal.
-char readChar()
-{
+char readChar() {
 	return 0;
 }
 
 // The Z-Machine prompt reading.
-void readString()
-{
+void readString() {
 	// THIS IS A TEMPORARY EXIT POINT FOR USE WITH VALGRIND.
 	exit(0);
 	/* unsigned int maxsz = getByte(Operand[0]);
@@ -69,20 +79,16 @@ void readString()
 	line = calloc(sizeof(char), maxsz+ 2);
 	int loop = 1;
 	int strptr=0;
-	while(loop)
-	{
+	while(loop) {
 		char c = 0;
 		int i =read(STDIN_FILENO,&c,1);
-		if (c==0x1b)
-		{
+		if (c==0x1b) {
 			int i =read(STDIN_FILENO,&c,1);
 			if(i) {};
-			if (c=='[')
-			{
+			if (c=='[') {
 				int i = read(STDIN_FILENO,&c,1);
 				if(i) {};
-				switch(c)
-				{
+				switch(c) {
 					case 'A':
 						//up
 						break;
@@ -91,16 +97,14 @@ void readString()
 						break;
 					case 'C':
 						//right
-						if(strptr < maxsz-1)
-						{
+						if(strptr < maxsz-1) {
 							printf("\x1b[C");
 							strptr++;
 						}
 						break;
 					case 'D':
 						//left
-						if(strptr > 0)
-						{
+						if(strptr > 0) {
 							printf("\x1b[D");
 							strptr--;
 						}
@@ -109,28 +113,22 @@ void readString()
 			}
 			c = 0;
 		}
-		if(c == 10)
-		{
+		if(c == 10) {
 			loop = 0;
 			c = 0;
 		}
-		if(c == 127)
-		{
-			if(strptr>0)
-			{
+		if(c == 127) {
+			if(strptr>0) {
 				c = 126;
 				strptr--;
 				printf("\x1b[D");
-			}else
-			{
+			} else {
 				c=0;
 			}
 		}
-		if(c == 126)
-		{
+		if(c == 126) {
 			int x;
-			for(x = strptr; x < maxsz-1; x++)
-			{
+			for(x = strptr; x < maxsz-1; x++) {
 				line[x] = line[x+1];
 				char v = line[x];
 				if(v==0)
@@ -139,25 +137,20 @@ void readString()
 			}
 			line[maxsz-1]=0;
 			printf("\x1b[C\x08 ");
-			for(x = strptr; x < maxsz; x++)
-			{
+			for(x = strptr; x < maxsz; x++) {
 				printf("\x1b[D");
 			}
 			c=0;
 		}
-		if(c != 0)
-		{
-			if(line[maxsz-1] == 0)
-			{
+		if(c != 0) {
+			if(line[maxsz-1] == 0) {
 				int x;
-				for(x = maxsz -1; x > strptr; x--)
-				{
+				for(x = maxsz -1; x > strptr; x--) {
 					line[x] = line[x-1];
 					printf("\x1b[C");
 				}
 				printf("\x1b[C");
-				for(x = maxsz-1; x >strptr; x--)
-				{
+				for(x = maxsz-1; x >strptr; x--) {
 					char v = line[x];
 					if(v==0)
 						v=32;
@@ -168,15 +161,11 @@ void readString()
 				strptr++;
 			}
 		}
-		if(i == 0)
-		{
-		}
 		fflush(stdout);
 	}
 	int i;
 	int mxpos=0;
-	for(i = 0; i < maxsz; i++)
-	{
+	for(i = 0; i < maxsz; i++) {
 		if(line[i] != 0)
 			mxpos = i;
 		else
