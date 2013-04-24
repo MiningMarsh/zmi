@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H 1
+#ifndef LOG_H_
+#define LOG_H_ 1
 
 #include <stdbool.h>
 
@@ -19,4 +19,4 @@ void logClose();
 
 bool isLogOpen();
 
-#endif
+#endif /* LOG_H_ */
