@@ -1,7 +1,7 @@
-#ifndef EXIT_H
-#define EXIT_H 1
+#ifndef EXIT_H_
+#define EXIT_H_ 1
 
 // Clean up the machine.
 void clean(); 
 
-#endif /* exit.h */
+#endif /* EXIT_H_ */
