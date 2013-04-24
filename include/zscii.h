@@ -1,5 +1,5 @@
-#ifndef ZSCII_H
-#define ZSCII_H 1
+#ifndef ZSCII_H_
+#define ZSCII_H_ 1
 
 #include <stdint.h>
 
@@ -9,4 +9,4 @@ uint32_t* getZChars(uzword Address);
 // Convert raw z-characters into a usable c style string.
 char* zCharsToZSCII(uint32_t* Buffer);
 
-#endif /* zscii.h */
+#endif /* ZSCII_H_ */
