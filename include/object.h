@@ -1,5 +1,5 @@
-#ifndef OBJECT_H
-#define OBJECT_H 1
+#ifndef OBJECT_H_
+#define OBJECT_H_ 1
 
 #include <stdbool.h>
 #include "zint.h"
@@ -41,4 +41,4 @@ uzword getPropertyTableAddress(uzword Object);
 
 uzword getDefaultPropertyValue(uzword Property);
 
-#endif /* object.h */
+#endif /* OBJECT_H_ */
