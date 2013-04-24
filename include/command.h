@@ -3,8 +3,8 @@
 
 #include "zint.h"
 
-// Hols the operands to opcodes.
-uzword Operand[8];
+// Holds the operands to opcodes.
+extern uzword Operand[8];
 
 // Execute the instruction pointed at by the PC and advance it to the next 
 // available instruction.
