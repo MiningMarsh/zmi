@@ -1,5 +1,5 @@
-#ifndef GLOBALVARS_H
-#define GLOBALVARS_H 1
+#ifndef GLOBALVARS_H_
+#define GLOBALVARS_H_ 1
 
 #include <stdbool.h>
 
@@ -24,4 +24,4 @@ char* g_ProgramName;
 #define d_StandardMajor 1
 #define d_StandardMinor 0
 
-#endif /* globalvars.h */
+#endif /* GLOBALVARS_H_ */
