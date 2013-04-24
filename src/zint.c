@@ -6,9 +6,8 @@
 // casting works.
 
 zword zSign(uzword Input) {
-	if(Input <= 32767) {
+	if(Input <= 32767)
 		return Input;
-	}
 	return -(0xFFFF - Input + 1);
 }
 
