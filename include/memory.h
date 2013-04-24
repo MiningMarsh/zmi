@@ -1,5 +1,5 @@
-#ifndef MEMORY_H
-#define MEMORY_H 1
+#ifndef MEMORY_H_
+#define MEMORY_H_ 1
 
 #include "zint.h"
 
@@ -62,4 +62,4 @@ void pushZFrame();
 
 uzbyte getZRev();
 
-#endif /* memory.h */
+#endif /* MEMORY_H_ */
