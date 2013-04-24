@@ -1,16 +1,16 @@
 #ifndef INPUT_H_
 #define INPUT_H_ 1
 
-// Initiate the input modes of the Z-Machine and terminal.
+// Initiate the input modes of the Z-Machine and the host OS.
 void initInput();
 
-// Revert the input modes of the terminal.
+// Revert the input modes of the host OS.
 void cleanInput();
 
-// Read the next pressed key from the terminal.
+// Read the next pressed key from the OS.
 char readChar();
 
-// Read a string from the terminal. Optionally parse it and execute a command to handle it.
+// Read a string from the OS.
 void readString();
 
 #endif /* INPUT_H_ */
