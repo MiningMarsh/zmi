@@ -1,9 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "log.h"
+
 FILE* Log = NULL;
 
+// This array holds the string version of the enum values.
 char logMessages[][30] = {
 	"",
 	"WARNING",
@@ -11,8 +14,6 @@ char logMessages[][30] = {
 	"FATAL",
 	"OK"
 };
-
-unsigned long MessageNumber = 0;
 
 int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
 	// Return if no log is open.
