@@ -1,5 +1,5 @@
-#ifndef COMMAND_H
-#define COMMAND_H 1
+#ifndef COMMAND_H_
+#define COMMAND_H_ 1
 
 #include "zint.h"
 
@@ -13,4 +13,4 @@ void execNextInstruction();
 // Initiate the Z-Machine VM opcode index, it's PC, and its memory.
 void initZM();
 
-#endif /* memory.h */
+#endif /* COMMAND_H_ */
