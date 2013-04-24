@@ -1,5 +1,5 @@
-#ifndef OUTPUT_H
-#define OUTPUT_H 1
+#ifndef OUTPUT_H_
+#define OUTPUT_H_ 1
 
 #include <stdarg.h>
 
@@ -12,4 +12,4 @@ void initOutput();
 // Revert terminal output modes.
 void cleanOutput();
 
-#endif /* output.h */
+#endif /* OUTPUT_H_ */
