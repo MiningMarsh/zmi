@@ -1,5 +1,5 @@
-#ifndef ROUTINE_H
-#define ROUTINE_H 1
+#ifndef ROUTINE_H_
+#define ROUTINE_H_ 1
 
 #include "zint.h"
 #include <stdbool.h>
@@ -16,4 +16,4 @@ char* zGetStringFromPC();
 // Return from  zRoutine.
 void zReturn(uzword Value);
 
-#endif /* routine.h */
+#endif /* ROUTINE_H_ */
