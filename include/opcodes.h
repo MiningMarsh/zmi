@@ -1,5 +1,5 @@
-#ifndef OPCODES_H
-#define OPCODES_H 1
+#ifndef OPCODES_H_
+#define OPCODES_H_ 1
 
 // Opcodes.
 void opAdd();
@@ -71,4 +71,4 @@ void (*CallOpCode[256+30])(void);
 
 void initOpCodes();
 
-#endif /* OPCODES_H */
+#endif /* OPCODES_H_ */
