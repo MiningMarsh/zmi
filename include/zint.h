@@ -1,5 +1,5 @@
-#ifndef ZINT_H
-#define ZINT_H 1
+#ifndef ZINT_H_
+#define ZINT_H_ 1
 
 #include <stdint.h>
 
@@ -15,4 +15,4 @@ typedef uint32_t uzlong;
 zword zSign(uzword Input);
 uzword zUnsign(zword Input);
 
-#endif /* zint.h */
+#endif /* ZINT_H_ */
