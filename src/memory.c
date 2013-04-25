@@ -89,6 +89,7 @@ void loadRAM(const char* const Filename) {
 
 // Get the word beginning at ram address adr.
 uzword getWord(const unsigned int Address) {
+	// Error is the address is out of bounds of RAM.
 	if(Address+1 > g_RAMSize) {
 		char Message[256];
 		sprintf(
@@ -106,6 +107,7 @@ uzword getWord(const unsigned int Address) {
 
 // Get the byte beginning at ram address adr.
 uzbyte getByte(const unsigned int Address) {
+	// Error is the address is out of bounds of RAM.
 	if(Address > g_RAMSize) {
 		char Message[256];
 		sprintf(
@@ -123,7 +125,7 @@ uzbyte getByte(const unsigned int Address) {
 
 // Get the current story file revision.
 uzbyte getZRev() {
-	return RAM[0];
+	return getByte(0);
 }
 
 // Set the word beginning at ram address adr to value.
@@ -132,7 +134,7 @@ void setWord(const unsigned int Address, const uzword Value) {
 		char  Message[256];
 		sprintf(
 			Message,
-			"Tried to set byte 0 (Z-Revision) to %i.",
+			"Tried to set byte 0 (Z-Revision) to %u.",
 			Value
 		);
 		logMessage(MFatal,"setWord()",Message);
@@ -159,7 +161,7 @@ void setByte(const unsigned int Address, const uzbyte Value) {
 		char Message[256];
 		sprintf(
 			Message,
-			"Tried to set byte 0 (Z-Revision) to %i.",
+			"Tried to set byte 0 (Z-Revision) to %u.",
 			Value
 		);
 		logMessage(MFatal,"setWord()",Message);
@@ -183,9 +185,10 @@ void setByte(const unsigned int Address, const uzbyte Value) {
 uzword expandPaddedAddress(const uzword PaddedAddress) {
 	if(getZRev() <= 3)
 		return 2*PaddedAddress;
-	if(getZRev() <=7)
+	else if(getZRev() <=7)
 		return 4*PaddedAddress;
-	return 8*PaddedAddress;
+	else 
+		return 8*PaddedAddress;
 }
 
 // Pop from the Stack.
@@ -206,7 +209,11 @@ void pushZStack(const uzword Value) {
 	}
 	CurrentZFrame->Stack[0]++;
 	if(CurrentZFrame->Stack == NULL) {
-		logMessage(MFatal, "pushZStack()", "Ran out of memory while PUSHing to the stack");
+		logMessage(
+			MFatal, 
+			"pushZStack()", 
+			"Ran out of memory while PUSHing to the stack"
+		);
 		exit(1);
 	}
 	CurrentZFrame->Stack[CurrentZFrame->Stack[0]] = Value;
@@ -216,7 +223,8 @@ void pushZStack(const uzword Value) {
 uzword getZVar(const uzbyte Variable) {
 	if(Variable > 15)
 		return getWord(getWord(0x06*2) + 2*(Variable - 16));
-	return Variable > 0 ? CurrentZFrame->Locals[Variable] : popZStack();
+	else 
+		return Variable > 0 ? CurrentZFrame->Locals[Variable] : popZStack();
 }
 
 // Set the value of a variable reference Variable.
@@ -231,13 +239,17 @@ void setZVar(const uzbyte Variable, const uzword Value) {
 
 // Push a copy of the current routine (Stack frame).
 void pushZFrame() {
-	stackframe_t* new_frame = malloc(sizeof(stackframe_t));
-	if(new_frame == NULL) {
-		logMessage(MFatal, "pushZFrame()", "Ran out of memory while PUSHing a new stack frame.");
+	stackframe_t* NewFrame = malloc(sizeof(stackframe_t));
+	if(NewFrame == NULL) {
+		logMessage(
+			MFatal, 
+			"pushZFrame()", 
+			"Ran out of memory while PUSHing a new stack frame."
+		);
 		exit(1);
 	}
-	new_frame->OldFrame = CurrentZFrame;
-	CurrentZFrame = new_frame;
+	NewFrame->OldFrame = CurrentZFrame;
+	CurrentZFrame = NewFrame;
 	CurrentZFrame->Depth = CurrentZFrame->OldFrame->Depth + 1;
 	CurrentZFrame->Locals = NULL;
 	CurrentZFrame->Stack = NULL;
@@ -254,7 +266,9 @@ void popZFrame() {
 	free(CurrentZFrame->Stack);
 	stackframe_t* DeadFrame = CurrentZFrame;
 	CurrentZFrame = DeadFrame->OldFrame;
-	free(DeadFrame); //Summon Cthulhu to take the soul of the dead frame to the place of ultimate evil
+	//Summon Cthulhu to take the soul of the dead frame to the place of ultimate
+	// evil.
+	free(DeadFrame); 
 }
 
 uzword zFrameNumber(const stackframe_t* Frame) {
@@ -262,39 +276,116 @@ uzword zFrameNumber(const stackframe_t* Frame) {
 }
 
 void traceZStack() {
-	char* prefix = "tZS()";
-	logMessage(MNull, prefix, "Begin Stacktrace.");
-	stackframe_t* frame = CurrentZFrame;
-	while(frame != NULL) {
+	char* Prefix = "tZS()";
+	logMessage(
+		MNull, 
+		Prefix, 
+		"Begin Stacktrace."
+	);
+	stackframe_t* Frame = CurrentZFrame;
+	while(Frame != NULL) {
 		char Message[256];
-		sprintf(Message,"   Frame %u",zFrameNumber(frame));
-		logMessage(MNull, NULL,Message);
-		sprintf(Message, "      PC: %u (%p)",frame->PC, (void*)frame->PC);
-		logMessage(MNull,NULL,Message);
-		sprintf(Message, "      Arguments passed: %u",frame->PassedArgs);
-		logMessage(MNull,NULL,Message);
-		sprintf(Message, "      Return: %s.", frame->ReturnVar ? "Yes" : "No");
-		logMessage(MNull, NULL, Message);
-		if(!(frame->Stack == NULL || frame->Stack[0] < 1)) {
-			unsigned int count = 1;
-			logMessage(MNull, NULL, "      Stack:");
-			for(uzword cell = frame->Stack[0]; cell > 0; cell--) {
-				sprintf(Message, "         %04u: %u (%p)", count++, frame->Stack[cell], (void*)frame->Stack[cell]);
-				logMessage(MNull, NULL, Message);
+		sprintf(
+			Message,
+			"   Frame %u",
+			zFrameNumber(Frame)
+		);
+		logMessage(
+			MNull, 
+			NULL,
+			Message
+		);
+		sprintf(
+			Message, 
+			"      PC: %u (%p)",
+			Frame->PC, 
+			(void*)Frame->PC
+		);
+		logMessage(
+			MNull,
+			NULL,
+			Message
+		);
+		sprintf(
+			Message, 
+			"      Arguments passed: %u",
+			Frame->PassedArgs
+		);
+		logMessage(
+			MNull,
+			NULL,
+			Message
+		);
+		sprintf(
+			Message, 
+			"      Return: %s.", 
+			Frame->ReturnVar ? "Yes" : "No"
+		);
+		logMessage(
+			MNull, 
+			NULL, 
+			Message
+		);
+		if(!(Frame->Stack == NULL || Frame->Stack[0] < 1)) {
+			unsigned int Count = 1;
+			logMessage(
+				MNull, 
+				NULL, 
+				"      Stack:"
+			);
+			for(uzword Cell = Frame->Stack[0]; Cell > 0; Cell--) {
+				sprintf(
+					Message, 
+					"         %04u: %u (%p)", 
+					Count++, 
+					Frame->Stack[Cell], 
+					(void*)Frame->Stack[Cell]
+				);
+				logMessage(
+					MNull, 
+					NULL, 
+					Message
+				);
 			}
 		} else {
-			logMessage(MNull, NULL,"      Empty Stack.");
+			logMessage(
+				MNull, 
+				NULL,
+				"      Empty Stack."
+			);
 		}
-		if(!(frame->Locals == NULL || frame->Locals[0] < 1)) {
-			logMessage(MNull, NULL, "      Locals:");
-			for(uzword cell = 1; cell <= frame->Locals[0]; cell++) {
-				sprintf(Message, "          %01u: %u (%p)", cell, frame->Locals[cell], (void*)frame->Locals[cell]);
-				logMessage(MNull, NULL, Message);
+		if(!(Frame->Locals == NULL || Frame->Locals[0] < 1)) {
+			logMessage(
+				MNull, 
+				NULL, 
+				"      Locals:"
+			);
+			for(uzword Cell = 1; Cell <= Frame->Locals[0]; Cell++) {
+				sprintf(
+					Message, 
+					"          %01u: %u (%p)", 
+					Cell, 
+					Frame->Locals[Cell], 
+					(void*)Frame->Locals[Cell]
+				);
+				logMessage(
+					MNull, 
+					NULL, 
+					Message
+				);
 			}
 		} else {
-			logMessage(MNull, NULL, "      No local variables.");
+			logMessage(
+				MNull, 
+				NULL, 
+				"      No local variables."
+			);
 		}
-		frame = frame->OldFrame;
+		Frame = Frame->OldFrame;
 	}
-	logMessage(MNull, prefix, "End Stacktrace.");
+	logMessage(
+		MNull, 
+		Prefix, 
+		"End Stacktrace."
+	);
 }
