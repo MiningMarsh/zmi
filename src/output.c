@@ -3,12 +3,20 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <time.h>
-#include <termios.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <string.h>
 #include "memory.h"
 #include "command.h"
+#include "platform.h"
+
+#ifdef PLATFORM_LINUX
+#	include <termios.h>
+#	include <sys/ioctl.h>
+#endif
+
+#ifdef PLATFORM_WINDOWS
+#	include <windows.h>
+#endif
 
 // Holds the terminals width and height.
 int TerminalWidth, TerminalHeight;
@@ -19,17 +27,18 @@ void initOutput() {
 	TerminalHeight = 24;
 
 	// OS specific terminal size extraction.
-#ifdef TIOCGSIZE
-	struct ttysize TerminalSize;
-	ioctl(STDIN_FILENO, TIOCGSIZE, &TerminalSize);
-	TerminalWidth = TerminalSize.ts_cols;
-	TerminalHeight = TerminalSize.ts_lines;
-#elif defined(TIOCGWINSZ)
+#	ifdef PLATFORM_LINUX
 	struct winsize TerminalSize;
 	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
-	TerminalWidth = TerminalSize.ws_col;
-	TerminalHeight = TerminalSize.ws_row;
-#endif /* TIOCGSIZE */
+	TerminalWidth = TerminalSize.ws_row;
+	TerminalHeight = TerminalSize.ws_col;
+#	endif
+#	ifdef PLATFORM_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO ConsoleInfo;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConsoleInfo);
+	TerminalHeight = ConsoleInfo.srWindow.Right - ConsoleInfo.srWindow.Left + 1;
+	TerminalWidth = ConsoleInfo.srWindow.Bottom - ConsoleInfo.srWindow.Top + 1;
+#	endif
 }
 
 void cleanOutput() {

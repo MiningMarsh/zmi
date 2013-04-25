@@ -27,6 +27,7 @@ void initOpCodes() {
 		CallOpCode[16+32*I] = &opLoadb;
 		CallOpCode[17+32*I] = &opGetProp;
 		CallOpCode[18+32*I] = &opGetPropAddr;
+		CallOpCode[19+32*I] = &opGetNextProp;
 		CallOpCode[20+32*I] = &opAdd;
 		CallOpCode[21+32*I] = &opSub;
 		CallOpCode[22+32*I] = &opMul;
