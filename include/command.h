@@ -1,5 +1,14 @@
-#ifndef COMMAND_H_
+/*
+ * command.h
+ *
+ * The functions in this header are used to execute new opcodes.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #define COMMAND_H_ 1
+#ifndef COMMAND_H_
 
 #include "zint.h"
 

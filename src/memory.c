@@ -297,9 +297,8 @@ void traceZStack() {
 		);
 		sprintf(
 			Message, 
-			"      PC: %u (%p)",
-			Frame->PC, 
-			(void*)Frame->PC
+			"      PC: %u",
+			Frame->PC
 		);
 		logMessage(
 			MNull,
@@ -336,10 +335,9 @@ void traceZStack() {
 			for(uzword Cell = Frame->Stack[0]; Cell > 0; Cell--) {
 				sprintf(
 					Message, 
-					"         %04u: %u (%p)", 
+					"         %04u: %u", 
 					Count++, 
-					Frame->Stack[Cell], 
-					(void*)Frame->Stack[Cell]
+					Frame->Stack[Cell]
 				);
 				logMessage(
 					MNull, 
@@ -363,10 +361,9 @@ void traceZStack() {
 			for(uzword Cell = 1; Cell <= Frame->Locals[0]; Cell++) {
 				sprintf(
 					Message, 
-					"          %01u: %u (%p)", 
+					"          %01u: %u", 
 					Cell, 
-					Frame->Locals[Cell], 
-					(void*)Frame->Locals[Cell]
+					Frame->Locals[Cell]
 				);
 				logMessage(
 					MNull, 

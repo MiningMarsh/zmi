@@ -1,3 +1,12 @@
+/*
+ * zscii.h
+ *
+ * The functions in this header are used to convert zstrings to c strings.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef ZSCII_H_
 #define ZSCII_H_ 1
 

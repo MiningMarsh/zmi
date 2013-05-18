@@ -1,3 +1,12 @@
+/*
+ * object.h
+ *
+ * The functions in this header are used to access machine objects.
+ *
+ *  Created on: November 17, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef LOG_H_
 #define LOG_H_ 1
 

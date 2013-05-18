@@ -1,3 +1,12 @@
+/*
+ * input.h
+ *
+ * The functions in this header are used to display output.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef INPUT_H_
 #define INPUT_H_ 1
 
