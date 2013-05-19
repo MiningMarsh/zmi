@@ -7,8 +7,8 @@
  *      Author: Joshua Songy
  */
 
-#define COMMAND_H_ 1
 #ifndef COMMAND_H_
+#define COMMAND_H_ 1
 
 #include "zint.h"
 

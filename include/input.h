@@ -1,7 +1,7 @@
 /*
  * input.h
  *
- * The functions in this header are used to display output.
+ * The functions in this header are used to get user input.
  *
  *  Created on: July 1, 2012
  *      Author: Joshua Songy

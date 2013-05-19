@@ -1,3 +1,12 @@
+/*
+ * output.h
+ *
+ * The functions in this header are used to send output to user.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef OUTPUT_H_
 #define OUTPUT_H_ 1
 

@@ -1,3 +1,12 @@
+/*
+ * globalvars.h
+ *
+ * Global variables.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef GLOBALVARS_H_
 #define GLOBALVARS_H_ 1
 
@@ -12,8 +21,13 @@ bool g_StrIndirection;
 // Do we trip the piracy opcode?
 bool g_TripPiracy;
 
+// Size of the game file we are working with, in bytes.
 unsigned int g_StorySize;
+
+// Size of the RAM the Z-Machine has.
 unsigned int g_RAMSize;
+
+// Not quite sure...
 unsigned int g_MaxStorySize;
 
 char* g_ProgramName;

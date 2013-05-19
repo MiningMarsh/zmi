@@ -1,3 +1,12 @@
+/*
+ * memory.h
+ *
+ * The functions in this header are used to manipulate Z-Machine memory.
+ *
+ *  Created on: November 17, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef MEMORY_H_
 #define MEMORY_H_ 1
 
@@ -60,6 +69,7 @@ void popZFrame();
 // Push a Stack frame, and assign it some default values (call).
 void pushZFrame();
 
+// Get the Z-Machine revision number of the game file being run.
 uzbyte getZRev();
 
 #endif /* MEMORY_H_ */

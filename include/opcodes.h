@@ -1,7 +1,16 @@
+/*
+ * opcodes.h
+ *
+ * Specifies the opcode jumptable.
+ *
+ *  Created on: July 1, 2012
+ *      Author: Joshua Songy
+ */
+
 #ifndef OPCODES_H_
 #define OPCODES_H_ 1
 
-// Opcodes.
+// Opcodes. Screw you if you think I am commenting all these.
 void opAdd();
 void opAnd();
 void opArtShift();
@@ -70,6 +79,7 @@ void opThrow();
 // Table of opcodes.
 void (*CallOpCode[256+30])(void);
 
+// Populates the table.
 void initOpCodes();
 
 #endif /* OPCODES_H_ */
