@@ -65,13 +65,13 @@ void opCall() {
 		// arguments. Get them and assign them here. revisions 4 and up 
 		// use 0 for all default values.
 		for(char I = 1; I < CurrentZFrame->Locals[0] + 1; I++) {
-			CurrentZFrame->Locals[I] = getWord(CurrentZFrame->PC);
+			CurrentZFrame->Locals[(int)I] = getWord(CurrentZFrame->PC);
 			CurrentZFrame->PC += 2;
 		}
 	// Pass the supplied arguments to the routine being called
 	// by putting them on the stack frame.
 	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs; I++)
 		if(NumberLocals >= I)
-			CurrentZFrame->Locals[I] = Operand[I - 1];
+			CurrentZFrame->Locals[(int)I] = Operand[(int)(I - 1)];
 }
 
