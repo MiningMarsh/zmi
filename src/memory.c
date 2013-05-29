@@ -84,6 +84,14 @@ void loadRAM(const char* const Filename) {
 		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
+	if(getZRev() > 8) {
+		sprintf(Message, 
+			"Bad Z-Revision: %u.",
+			getZRev()
+		);
+		logMessage(MFatal, LogPrefix, Message);
+		exit (1);
+	}
 	fclose(StoryFile);
 }
 
