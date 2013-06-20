@@ -25,7 +25,7 @@ HeaderDirectory = "include"
 SourceDirectory = "src"
 SourceExtensions = ["c", "cpp"]
 DefaultVariant = "generic"
-BuildPrefix = "build/.objects"
+BuildPrefix = os.path.join("build", ".objects")
 
 # Compile flags.
 Flags = '--std=c99 -pipe'
@@ -93,7 +93,7 @@ else:
 	Executable = 'out'
 	Variant = 'linux'
 
-BuildPrefix = BuildPrefix + '/' + Variant
+BuildPrefix = os.path.join(BuildPrefix, Variant)
 
 #source directories
 env.VariantDir(BuildPrefix, SourceDirectory, duplicate=0)
@@ -103,7 +103,7 @@ for Extension in SourceExtensions:
 		for Files in fnmatch.filter(Files, '*.' + Extension):
 			Sources.append((os.path.join(Root, Files)).replace(SourceDirectory, BuildPrefix, 1))
 
-Executable = 'build/' + Variant + '/' + Executable
+Executable = os.path.join('build',  os.path.join(Variant, Executable))
 
 # Include directories
 Headers = [HeaderDirectory]
