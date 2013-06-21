@@ -82,7 +82,7 @@ void execNextInstruction() {
 	// Print the operation in debug mode.
 	if(g_VerboseDebug >= 10) {
 		char Message[256];
-		sprintf(Message,"PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, CurrentZFrame->PC - 1, Operation, Operation);
+		sprintf(Message,"PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
 		logMessage(MNull,"", Message);
 	}
 
@@ -151,7 +151,7 @@ void execNextInstruction() {
 				CurrentZFrame->PC += 2;
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message,"Large: %u (%p)", Operand[I], Operand[I]);
+					sprintf(Message,"Large: %u (%p)", Operand[I], (void*)(long)Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break;
@@ -160,7 +160,7 @@ void execNextInstruction() {
 				Operand[I] = getByte(CurrentZFrame->PC++);
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message,"Small: %u (%p)", Operand[I], Operand[I]);
+					sprintf(Message,"Small: %u (%p)", Operand[I], (void*)(long)Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break;
@@ -170,7 +170,7 @@ void execNextInstruction() {
 				Operand[I] = getZVar(Variable);
 				if(g_VerboseDebug >= 10) {
 					char Message[256];
-					sprintf(Message, "Var %u (%p): %u (%p)", Variable, Variable, Operand[I], Operand[I]);
+					sprintf(Message, "Var %u (%p): %u (%p)", Variable, (void*)(long)Variable, Operand[I], (void*)(long)Operand[I]);
 					logMessage(MNull,"Operand", Message);
 				}
 				break; }

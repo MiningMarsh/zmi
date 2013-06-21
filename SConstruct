@@ -36,17 +36,25 @@ Flags = '--std=c99 -pipe'
 
 # Options
 AddOption(
+	'--lto', 
+	dest='lto', 
+	action='store_true', 
+	default=False, 
+	help='Link time optimization.'
+)
+
+AddOption(
 	'--debugging', 
 	dest='debug', 
 	action='store_true', 
-	default=False, 
+	default=True, 
 	help='Compile a debug release'
 )
 
 AddOption('--strict', 
 	dest='strict', 
 	action='store_true', 
-	default=False, 
+	default=True, 
 	help='Stop compiling whenever the compiler issues a warning.'
 )
 
@@ -135,6 +143,9 @@ if(GetOption('small')):
 	env.Append(CCFLAGS='-Os')
 if(GetOption('fast')):
 	env.Append(CCFLAGS='-O3')
+if(GetOption('lto')):
+	env.Append(CCFLAGS='-flto')
+	env.Append(LINKFLAGS='-flto')
 
 #install
 env.Install('/usr/bin', Install)
