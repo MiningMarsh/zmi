@@ -4,6 +4,8 @@
 
 void (*CallOpCode[256+30])(void) = {NULL};
 
+// If you say bloody mary three while spinning in front of a mirror, this code 
+// appears.
 void initOpCodes() {
 	for(int I = 0; I < 256+30; I++)
 		CallOpCode[I] = &opNonexistant;
