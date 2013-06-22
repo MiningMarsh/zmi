@@ -12,11 +12,11 @@
  *************************************************************************/
 
  void opGetSibling() {
-	uzword Object = getSibling(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
 		exit(1);
 	}
+	uzword Object = getSibling(Operand[0]);
 	zStore(Object);
 	zBranch(Object);
 }

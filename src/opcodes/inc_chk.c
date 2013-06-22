@@ -11,7 +11,7 @@
  
 void opIncChk() {
 	zword Variable = zSign(getZVar(Operand[0]));
-	setZVar(Operand[0], zUnsign(++Variable));
+	setZVar(Operand[0], zSign(++Variable));
 	zword Value = zSign(Operand[1]);
 	// Check the new value;
 	zBranch(Variable > Value);

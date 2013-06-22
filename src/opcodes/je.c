@@ -12,7 +12,6 @@
 void opJe() {
 	switch(CurrentZFrame->PassedArgs) {
 	case 1:
-		zBranch(!Operand[0]);
 		break;
 	case 4:
 		if(Operand[0] == Operand[3]) {

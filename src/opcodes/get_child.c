@@ -13,11 +13,11 @@
  *************************************************************************/
 
 void opGetChild() {
-	uzword Address = getChild(Operand[0]);
 	if(!Operand[0]) {
 		logMessage(MFatal, "get_child", "Tried to get object in object 0.");
 		exit(1);
 	}
+	uzword Address = getChild(Operand[0]);
 	// Get the address of the child.
 	zStore(Address);
 	zBranch(Address);

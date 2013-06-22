@@ -10,5 +10,5 @@
 
 void opInc() {
 	zword Value = zSign(getZVar(Operand[0]));
-	setZVar(Operand[0], zUnsign(++Value));
+	setZVar(Operand[0], zSign(++Value));
 }
