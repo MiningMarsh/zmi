@@ -38,15 +38,17 @@ void initZM() {
 	}
 
 	// Set up the values in the inital stack frame.
+	// This is the first frame, so there is no previous frame.
 	CurrentZFrame->OldFrame = NULL;
-	// The initial PC is at 0x06
+	// The initial PC is at 0x06.
 	CurrentZFrame->PC = getWord(0x06);
 	// First stack frame is not a routine, so no locals.
 	CurrentZFrame->Locals = NULL;
 	// Stack always starts out empty.
 	CurrentZFrame->Stack = NULL;
-	// Don't change this, it breaks all return values.
+	// Return value metadata, don't change this.
 	CurrentZFrame->ReturnVar = 1;
+	// The stack frame number, used for efficiency.
 	CurrentZFrame->Depth = 0;
 
 	// Populate the operation index.
@@ -58,7 +60,7 @@ void initZM() {
 		putchar('\n');
 }
 
-// Execute an instruction begininng where the PC is currentl pointing.
+// Execute an instruction begininng where the PC is currently pointing.
 void execNextInstruction() {
 	// Display a debug message.
 	if(g_VerboseDebug >= 5)
