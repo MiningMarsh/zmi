@@ -1,1 +1,0 @@
-Miniwiki, get scons if you don't have it already. Think of it as a make that isn't 20 years outdated. It is in python, and I set up the SConstruct file already. To compile, just run "scons" in terminal. If you want gdb, I added the --gdb flag to it, just "scons --gdb."
