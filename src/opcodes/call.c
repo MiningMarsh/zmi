@@ -72,6 +72,6 @@ void opCall() {
 	// by putting them on the stack frame.
 	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs; I++)
 		if(NumberLocals >= I)
-			CurrentZFrame->Locals[(int)I] = Operand[(int)(I - 1)];
+			CurrentZFrame->Locals[(int)I] = Operand[(int)(I)];
 }
 
