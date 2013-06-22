@@ -6,13 +6,35 @@
 // casting works.
 
 zword zSign(uzword Input) {
-	if(Input <= 32767)
-		return Input;
-	return -(0xFFFF - Input + 1);
+	return zSignBase(Input, 16);
 }
 
 uzword zUnsign(zword Input) {
+	return zUnsignBase(Input, 16);
+}
+
+zword zSignBase(uzword Input, unsigned int Base) {
+	uzword Converter = 1;
+	uzword Limit = 1;
+	uzword HalfBase = Base/2;
+	while(--Base) {
+		Converter = (Converter<<1)|1;
+	}
+	while(--HalfBase) {
+		Limit = (Limit<<1)|1;
+	}
+	if(Input <= Limit)
+		return Input;
+	return -(Converter - Input + 1);
+}
+
+uzword zUnsignBase(zword Input, unsigned int Base) {
+	uzword Converter = 1;
+	while(--Base) {
+		Converter = (Converter<<1)|1;
+	}
 	if(Input >= 0)
 		return Input;
-	return 0xFFFF - Input + 1;
+	return Converter - Input + 1;
 }
+

@@ -12,14 +12,6 @@ void zReturn(uzword Value) {
 	CurrentZFrame->ReturnVar = 1;
 }
 
-// Branch operates on 14bit, not 16bit signed numbers BECAUSE NOTHING CAN BE 
-// FUCKING EASY.
-zword zBranchSign(uzword Input) {
-	if(Input <= 8191)
-		return Input;
-	return -(0x3FFF - Input + 1);
-}
-
 // Store commands use the next byte as the variable to store into.
 // all store commans execute this to store things.
 void zStore(uzword Value) {
@@ -62,7 +54,7 @@ void zBranch(bool Condition) {
 			"Branch offset is %i.",
 			Condition,
 			(BranchData>>7)&1,
-			zBranchSign(Offset)
+			zSignBase(Offset, 14)
 		);
 		logMessage(MNull, "zBranch()", Message);
 	}
@@ -74,7 +66,7 @@ void zBranch(bool Condition) {
 			sprintf(
 				Message,
 				"Extended branch offset is %i.",
-				zBranchSign(Offset)
+				zSignBase(Offset, 14)
 			);
 			logMessage(MNull, "zBranch()", Message);
 		}
@@ -83,7 +75,7 @@ void zBranch(bool Condition) {
 	// The seventh bit is used to tell if we jump on true or false.
 	if(Condition ^ (!((BranchData>>7)&1))) {
 		if(Offset > 1) {
-			CurrentZFrame->PC += zBranchSign(Offset) - 2;
+			CurrentZFrame->PC += zSignBase(Offset, 14) - 2;
 			if(g_VerboseDebug >= 40)
 				logMessage(MNull, "zBranch()", "Jumping by offset.");
 

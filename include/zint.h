@@ -36,4 +36,10 @@ zword zSign(uzword Input);
 // Convert a zword to uzword.
 uzword zUnsign(zword Input);
 
+// Convert a uzword to zword using base Base.
+zword zSignBase(uzword Input, unsigned int Base);
+
+// Convert a zword to uzword using base Base.
+uzword zUnsignBase(zword Input, unsigned int Base);
+
 #endif /* ZINT_H_ */
