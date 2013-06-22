@@ -72,4 +72,7 @@ void pushZFrame();
 // Get the Z-Machine revision number of the game file being run.
 uzbyte getZRev();
 
+// RAM of the Z-Machine.
+uint8_t* RAM;
+
 #endif /* MEMORY_H_ */
