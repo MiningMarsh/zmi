@@ -18,5 +18,5 @@ void opLogShift() {
 		Number = Number << Places;
 	else
 		Number = Number >> (Places*(-1));
-	zStore(zSign(Number));
+	zStore(zUnsign(Number));
 }
