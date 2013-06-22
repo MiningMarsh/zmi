@@ -8,5 +8,5 @@
  *************************************************************************/
 
 void opAnd() {
-	zStore(Operand[0]&Operand[1]);
+	zStore(Operand[0]&Operand[1] & 0xFFFF);
 }

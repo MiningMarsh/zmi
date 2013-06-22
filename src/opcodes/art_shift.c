@@ -26,10 +26,10 @@ void opArtShift() {
 		// Shift right.
 		for(; Places > 0; Places--) {
 			// Get the sign bit.
-			int Sign = (Number>>16)&0x1;
+			int Sign = (Number>>15)&0x1;
 			Number = Number>>1;
 			// Restore the sign bit as well as shifting it down.
-			Number = Number|(Sign<<15)|(Sign<<16);
+			Number = Number|(Sign<<14)|(Sign<<15);
 		}
 	}
 	// Store the result.

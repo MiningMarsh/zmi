@@ -220,6 +220,7 @@ uzword expandPaddedAddress(const uzword PaddedAddress) {
 			return 8*PaddedAddress;
 			break;
 	}
+	return 0;
 }
 
 // Pop from the Stack.
