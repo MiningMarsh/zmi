@@ -17,7 +17,7 @@ void loadRAM(const char* const Filename) {
 		logMessage(
 			MFatal, 
 			LogPrefix, 
-			"Tried to load file while RAM is already initilized.\n"
+			"Tried to load file while RAM is already initialized.\n"
 			"This should NEVER happen, there is something seriously wrong."
 		);
 		exit(1);
