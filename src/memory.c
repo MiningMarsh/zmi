@@ -9,8 +9,11 @@ uzbyte* RAM = NULL; // Holds the file.
 
 // Load a story file into memory.
 void loadRAM(const char* const Filename) {
+	
+	// The prefix all log messages will have.
 	char* LogPrefix = "loadRAM()";
-	char* Message = NULL;
+	// The location to store the text for log messages.
+	char Message[512];
 
 	// Check if the ram is already been initilized. 
 	if(RAM != NULL) {
@@ -22,6 +25,7 @@ void loadRAM(const char* const Filename) {
 		);
 		exit(1);
 	}
+
 	// File pointer to the story.
 	FILE* StoryFile;
 	StoryFile = fopen(Filename, "rb");
