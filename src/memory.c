@@ -39,6 +39,8 @@ void loadRAM(const char* const Filename) {
 	fseek(StoryFile, 0, SEEK_END);
 	g_StorySize = ftell(StoryFile);
 	rewind(StoryFile);
+
+	// Allocate the ram.
 	RAM = (uzbyte*)malloc(sizeof(uzbyte)*g_StorySize);
 	g_RAMSize = g_StorySize;
 
@@ -53,12 +55,24 @@ void loadRAM(const char* const Filename) {
 		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
+
+	// Read the file into the RAM.
 	if(fread(RAM, sizeof(uzbyte), g_StorySize, StoryFile) != g_StorySize) {
 			logMessage(MFatal, LogPrefix, "Failed to read file.");
 			exit(1);
 	}
+	
+	// There is no standard above revision 8.
+	if(getZRev() > 8) {
+		sprintf(Message, 
+			"Bad Z-Revision: %u.",
+			getZRev()
+		);
+		logMessage(MFatal, LogPrefix, Message);
+		exit (1);
+	}
 
-	// Make sure the story fil was not too large.
+	// Make sure the story file was not too large.
 	switch(RAM[0]) {
 		case 1:
 		case 2:
@@ -77,7 +91,9 @@ void loadRAM(const char* const Filename) {
 			g_MaxStorySize = 512;
 			break;
 	}
+	// The size is in KiB, convert into bytes.
 	g_MaxStorySize *= 1024;
+	// Check actual story size against max story size.
 	if(g_StorySize > g_MaxStorySize) {
 		sprintf(Message, 
 			"File is too large.\n"
@@ -88,20 +104,13 @@ void loadRAM(const char* const Filename) {
 		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
-	if(getZRev() > 8) {
-		sprintf(Message, 
-			"Bad Z-Revision: %u.",
-			getZRev()
-		);
-		logMessage(MFatal, LogPrefix, Message);
-		exit (1);
-	}
+	// We no longer need access to the file.
 	fclose(StoryFile);
 }
 
 // Get the word beginning at ram address adr.
 uzword getWord(const unsigned int Address) {
-	// Error is the address is out of bounds of RAM.
+	// The address is out of bounds of RAM.
 	if(Address+1 > g_RAMSize) {
 		char Message[256];
 		sprintf(
@@ -146,7 +155,7 @@ void setWord(const unsigned int Address, const uzword Value) {
 		char  Message[256];
 		sprintf(
 			Message,
-			"Tried to set byte 0 (Z-Revision) to %u.",
+			"Tried to set word 0 (Z-Revision) to %u.",
 			Value
 		);
 		logMessage(MFatal,"setWord()",Message);
@@ -195,12 +204,22 @@ void setByte(const unsigned int Address, const uzbyte Value) {
 
 // Return the expanded packed address depending on the machine.
 uzword expandPaddedAddress(const uzword PaddedAddress) {
-	if(getZRev() <= 3)
-		return 2*PaddedAddress;
-	else if(getZRev() <=7)
-		return 4*PaddedAddress;
-	else 
-		return 8*PaddedAddress;
+	switch(getZRev()) {
+		case 1:
+		case 2:
+		case 3:
+			return 2*PaddedAddress;
+			break;
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+			return 4*PaddedAddress;
+			break;
+		case 8:
+			return 8*PaddedAddress;
+			break;
+	}
 }
 
 // Pop from the Stack.
@@ -233,23 +252,28 @@ void pushZStack(const uzword Value) {
 
 // Get the value of variable reference Variable.
 uzword getZVar(const uzbyte Variable) {
+	// Variable numbers above 15 are global variables.
 	if(Variable > 15)
 		return getWord(getWord(0x06*2) + 2*(Variable - 16));
+	// Variable number 0 is the stack, variable numbers 1-15 are local variables.
 	else 
 		return Variable > 0 ? CurrentZFrame->Locals[Variable] : popZStack();
 }
 
 // Set the value of a variable reference Variable.
 void setZVar(const uzbyte Variable, const uzword Value) {
+	// Variable numbers above 15 are global variables.
 	if(Variable > 15)
 		setWord(getWord(0x06*2) + 2*(Variable - 16), Value);
+	// Variable number 0 is the stack.
 	else if(Variable == 0)
 		pushZStack(Value);
+	// Variable numbers 1-15 are local variables.
 	else
 		CurrentZFrame->Locals[Variable] =Value;
 }
 
-// Push a copy of the current routine (Stack frame).
+// Push a copy of the current routine state (Stack frame).
 void pushZFrame() {
 	stackframe_t* NewFrame = malloc(sizeof(stackframe_t));
 	if(NewFrame == NULL) {
@@ -278,15 +302,17 @@ void popZFrame() {
 	free(CurrentZFrame->Stack);
 	stackframe_t* DeadFrame = CurrentZFrame;
 	CurrentZFrame = DeadFrame->OldFrame;
-	//Summon Cthulhu to take the soul of the dead frame to the place of ultimate
+	// Summon Cthulhu to take the soul of the dead frame to the place of ultimate
 	// evil.
 	free(DeadFrame); 
 }
 
+// Return the current stack depth.
 uzword zFrameNumber(const stackframe_t* Frame) {
 	return Frame->Depth;
 }
 
+// Log a stack trace.
 void traceZStack() {
 	char* Prefix = "tZS()";
 	logMessage(
