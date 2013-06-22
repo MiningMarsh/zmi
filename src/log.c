@@ -15,12 +15,13 @@ char logMessages[][30] = {
 	"OK"
 };
 
-int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
+// Log a message into the current log file/stream. If none is open, the message is thrown away.
+bool logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
 	// Return if no log is open.
 	if(!Log)
-		return 0;
+		return false;
 
-	// Holds the lngth of the mssage pefix.
+	// Holds the lngth of the message prefix.
 	int PrefixLength = 0;
 
 	// Prints the Message type, if it exists.
@@ -36,8 +37,10 @@ int logMessage(const unsigned char Type, const char* const Prefix, const char* c
 		fputs(Prefix, Log);
 		fputs(": ", Log);
 	}
-
+	
+	// Loop through the message and print it, doing special behavior on newlines.
 	for(unsigned int I = 0; I < strlen(Message); I++) {
+		// On newlines we need to advance a line and reprint the message prefix.
 		if(Message[I] == '\n') {
 			fputc('\n', Log);
 			// Prints the Message type, if it exists.
@@ -45,44 +48,53 @@ int logMessage(const unsigned char Type, const char* const Prefix, const char* c
 				fputs(logMessages[(const unsigned int)Type], Log);
 				fputs(": ", Log);
 			}
+			// Print spaces equal to the message type.
 			for(int I = 0; I != PrefixLength; I++)
 				fputc(' ', Log);
 		} else {
+			// Otherwise just print the character.
 			fputc(Message[I], Log);
 		}
 	}
+	// Output trailing newline.
 	fputs("\n", Log);
+	// Flush the message.
 	fflush(Log);
-	return 1;
+	return true;
 }
 
-int logOpen(const char* const FileName) {
+bool logOpen(const char* const FileName) {
 	// Print a warning if a log has already been opened.
 	if(Log) {
 		fputs(logMessages[MWarning],stderr);
 		fputs("Log already open.\n",stderr);
 		logMessage(MWarning,"LogOpen()", "Message log already open.");
-		return 0;
+		return false;
 	}
+	
+	// A filename of stdout means to print to standard output.
 	if(!strcmp(FileName, "stdout")) {
 		Log = stdout;
 		logMessage(MNull, "LogOpen()", "Log opened.");
-		return 1;
+		return true;
 	}
+	
+	// A filename of stderr means to print to standard erroroutput.
 	if(!strcmp(FileName, "stderr")) {
 		Log = stderr;
 		logMessage(MNull, "LogOpen()", "Log opened.");
-		return 1;
+		return true;
 	}
-	// Open the log.
+	
+	// Otherwise, we open a file of the name passed.
 	Log = fopen(FileName, "wba");
 	if(!Log) {
 		fputs(logMessages[MWarning],stderr);
 		fputs(": Failed to open log file.\n",stderr);
-		return 0;
+		return false;
 	}
 	logMessage(MNull, "LogOpen()", "Log opened.");
-	return 1;
+	return true;
 }
 
 void logClose() {
@@ -94,6 +106,7 @@ void logClose() {
 	}
 }
 
+// Return true if a log is open, false otherwise.
 bool isLogOpen() {
 	return Log;
 }

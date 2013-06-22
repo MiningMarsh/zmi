@@ -22,10 +22,10 @@ enum log_message_type {
 };
 
 // Logs a message.
-int logMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
+bool logMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
 
 // Opens a log.
-int logOpen(const char* const FileName);
+bool logOpen(const char* const FileName);
 
 // Closes a log.
 void logClose();
