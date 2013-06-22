@@ -204,7 +204,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 							break;
 						}
 						// There was a mathematical equation for the conversion, but it was failing miserably.
-						// This lookup table des the job though, and as a plus, is character set independent! :D
+						// This lookup table does the job though, and as a plus, is character set independent! :D
 						char ltable[] = {' ','\n','0','1','2','3','4',
 										'5','6','7','8','9','.',
 										',','!','?','_','#','\'',
