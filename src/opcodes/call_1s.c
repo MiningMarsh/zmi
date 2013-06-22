@@ -8,7 +8,7 @@
  *************************************************************************/
 
 void opCall1S() {
-	// Set up metadata saying this stackframe returns anything. While not needed,
+	// Set up metadata saying this stackframe returns something. While not needed,
 	// better safe than sorry.
 	CurrentZFrame->ReturnVar = 1;
 	// Transfer to a standard routine call.
