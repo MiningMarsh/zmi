@@ -70,7 +70,7 @@ void opCall() {
 		}
 	// Pass the supplied arguments to the routine being called
 	// by putting them on the stack frame.
-	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs; I++)
+	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs - 1; I++)
 		if(NumberLocals >= I)
 			CurrentZFrame->Locals[(int)I] = Operand[(int)(I)];
 }
