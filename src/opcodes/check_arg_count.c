@@ -12,5 +12,5 @@
  *************************************************************************/
 
 void opCheckArgCount() {
-	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs);
+	zBranch(Operand[0] - 1 <= CurrentZFrame->OldFrame->PassedArgs - 1);
 }
