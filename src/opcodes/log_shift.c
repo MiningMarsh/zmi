@@ -14,9 +14,11 @@
 void opLogShift() {
 	uzword Number = zSign(Operand[0]);
 	zword Places = zSign(Operand[1]);
-	if(Places >= 0)
+	if(Places > 0) {
 		Number = Number << Places;
-	else
+	} else if (Places < 0) {
 		Number = Number >> (Places*(-1));
+		Number = Number&0x7FFF;
+	}
 	zStore(zUnsign(Number));
 }

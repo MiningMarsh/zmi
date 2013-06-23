@@ -7,7 +7,7 @@
  * 2OP:9 9 art_shift number places -> (result) *
  *************************************************************************
  * Does an arithmetic shift of _number_ by the given number of _places_, *
- * shiftin left (i.e. increasing) , right if negative. In a right shift, *
+ * shifting left (i.e. increasing), right if negative. In a right shift, *
  * the sign bit is preserved as well as being shifted on down. (The      *
  * alternative behavior is 'log_shift'.)                                 *
  *************************************************************************/
@@ -26,10 +26,10 @@ void opArtShift() {
 		// Shift right.
 		for(; Places > 0; Places--) {
 			// Get the sign bit.
-			int Sign = (Number>>15)&0x1;
+			unsigned int Sign = (Number>>15)&0x1;
 			Number = Number>>1;
-			// Restore the sign bit as well as shifting it down.
-			Number = Number|(Sign<<14)|(Sign<<15);
+			// Restore the sign bit.
+			Number = Number|(Sign<<15);
 		}
 	}
 	// Store the result.
