@@ -24,7 +24,7 @@ void opArtShift() {
 		Number = Number<<Places;
 	} else if(Places < 0) {
 		// Shift right.
-		for(; Places > 0; Places--) {
+		for(; Places < 0; Places++) {
 			// Get the sign bit.
 			unsigned int Sign = (Number>>15)&0x1;
 			Number = Number>>1;
