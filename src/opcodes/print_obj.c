@@ -14,8 +14,6 @@
  *************************************************************************/
 
 void opPrintObj() {
-	// TODO: Implement %s in zprint to fix this potential code injection
-	// exploit.
 	uzword PropertyTableAddress = getPropertyTableAddress(Operand[0]);
 	PropertyTableAddress++;
 	char* ObjectName = zCharsToZSCII(getZChars(PropertyTableAddress));
