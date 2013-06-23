@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "command.h"
+#include "output.h"
 
 /*****************************
  * VAR:230 6 print_num value *
@@ -8,7 +9,8 @@
  *************************************************************************/
 
 void opPrintNum() {
-	// TODO: Fix zPrint so that this can use that instead of printf.
-	printf("%i",Operand[0]);
+	char String[256];
+	sprintf(String, "%i", Operand[0]);
+	zPrint(String);
 }
 

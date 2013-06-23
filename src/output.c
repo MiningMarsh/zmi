@@ -18,8 +18,10 @@
 #	include <windows.h>
 #endif
 
-// Holds the terminals width and height.
-int TerminalWidth, TerminalHeight;
+// Holds the terminal's width.
+int TerminalWidth;
+// Holds the terminal's height.
+int TerminalHeight;
 
 void initOutput() {
 	// Default terminal size, if it can't be extracted.
@@ -44,85 +46,51 @@ void initOutput() {
 void cleanOutput() {
 }
 
-void zPrint(char* String, ...) {
-	// Used to access the variable arguments.
-	va_list Arguments;
-	va_start(Arguments, String);
-	if(!TerminalWidth)
-		TerminalWidth=20;
-	// Holds the cursor position, used for word wrapping.
-	int Position = 0;
-	// ditto.
-	int StringSize = 0;
-	// Holds the next word to be printed.
-	char Word[1024];
-	// Holds the size of the last word printed.
-	int WordSize = 0;
-
-	// Parse special characters.
-	while(String[StringSize]) {
-		switch(String[StringSize]) {
-
-			// Used im the same style as printf.
-			case '%': {
-				StringSize++;
-				switch(String[StringSize]) {
-					case 's': {
-						char *ArgString;
-						ArgString = va_arg(Arguments,char*);
-						int Position = 0;
-						while(ArgString[Position]) {
-							Word[WordSize] = ArgString[Position];
-							Position++;
-							WordSize++;
-						}
-						break; }
-					case 'i': {
-
-					}
-					default:
-						printf("Invalid expansion passed to print.\n");
-				}
-			break; }
-			case '\n':
-			case '\r':
-				Word[WordSize] = 0;
-				printf("%s\n",Word);
-				WordSize = 0;
-				Position = 0;
-				break;
-			case '\b':
-				Position--;
-				putchar('\b');
-				break;
-			case ' ':
-				if(Position + WordSize > TerminalWidth) {
-					Position = 0;
-					putchar('\n');
-				}
-				Word[WordSize] = 0;
-				printf("%s",Word);
-				if(WordSize + Position != TerminalWidth)
-					putchar(' ');
-				Position += WordSize + 1;
-				WordSize = 0;
-				break;
-			default:
-				Word[WordSize] = String[StringSize];
-				WordSize++;
-				break;
+void zPrint(char* String) {
+	if(!String) {
+		return;
+	}
+	printf("%s", String);
+	/*static char* OutputBuffer = NULL;
+	static char* OutputBufferSize = 0;
+	static unsigned int CurrentPos = 0;
+	
+	if(OutputBuffer = NULL) {
+		OutputBufferSize = strlen(String);
+		OutputBuffer = malloc(sizeof(char)*OutputBufferSize);
+		if(!OutputBuffer) {
+			OutputBufferSize = 0;
+			printf("%s", String);
+			OutputBuffer = NULL;
+			OutputBufferSize = 0;
+			CurrentPos = 0;
+			return;
 		}
-		StringSize++;
+	} else {
+		OutputBufferSize += strlen(String);
+		char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize);
+		if(!NewOutputBuffer) {
+			printf("%s", OutputBuffer);
+			printf("%s\n", String);
+			free(OutputBuffer);
+			OutputBuffer = NULL;
+			OutputBufferSize = 0;
+			CurrentPos = 0;
+			return;
+		}
 	}
-	if(WordSize) {
-	if(Position + WordSize > TerminalWidth) {
-		Position = 0;
-		putchar('\n');
-	}
-	Word[WordSize]=0;
-	printf("%s",Word);
-	WordSize--;
-	Position += WordSize;
-	}
-	va_end(Arguments);
+	
+	unsigned int CurrentWidth = 0;
+	for(unsigned int Index = 0; Index < OutputBufferSize; Index++) {
+		if(CurrentWidth + CurrentPos > TerminalWidth) {
+			printf("\n");
+			CurrentPos = 0;
+		}
+		switch(OutputBuffer[Index]) {
+			case '\n':
+				CurrentPos = 0;
+				break;
+			case ' '
+		}
+	}*/
 }
