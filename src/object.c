@@ -25,7 +25,7 @@ uzword getObjectAddress(uzword Object) {
 		logMessage(MFatal, "getObjectAddress()", Message);
 		exit(1);
 	}
-	// Revision 4 and later have 16**4 objects, so no check needed.
+	// Revision 4 and later have 2^16-1 objects, so no check needed.
 
 	// The address we are going to return.
 	uzword Address = objectTable();
@@ -45,8 +45,9 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 	if((getZRev() < 4 && Flag > 31) || (getZRev() >= 4 && Flag > 47)) {
 		// An invalid flag has been chosen.
 		char Message[256];
-		sprintf(
+		snprintf(
 			Message,
+			256,
 			"An invalid flag number of %u was read.\n"
 			"There are %u flags.",
 			Flag,
@@ -60,7 +61,7 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 	// The flags are a series of bytes at the beggining of the object in
 	// the format 0.1.2.3.4 ...
 	uzbyte ByteAddress = getByte(ObjectAddress+(Flag/8)); //calculate the flag byte.
-	return ((ByteAddress>>(7 - (Flag%8))&1));
+	return (ByteAddress>> (7 - (Flag%8)) )&1;
 }
 
 // Set a flag on an object.
@@ -77,13 +78,14 @@ void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 		);
 		logMessage(MFatal, "setObjectFlag()", Message);
 	}
-	// See getObjectFlag.
+	// Get the address of the object.
 	uzword ObjectAddress = getObjectAddress(Object);
-	uzbyte Address = ObjectAddress+Flag/8;
-	uzbyte Mask = 1<<(7 - (Flag%8));
-	uzbyte CurrentFlags = getByte(Address) & (~Mask);
-	CurrentFlags += Mask;
-	CurrentFlags &= Value<<(7-(Flag&8));
+	// The flags are a series of bytes at the beggining of the object in
+	// the format 0.1.2.3.4 ...
+	uzbyte Address = ObjectAddress+(Flag/8); //calculate the flag byte.
+	uzbyte Mask = ~(1<<(7 - (Flag%8)));
+	uzbyte CurrentFlags = getByte(Address) & Mask;
+	CurrentFlags |= Value << (7 - (Flag%8));
 	setByte(Address, CurrentFlags);
 }
 
@@ -107,6 +109,10 @@ void setPSC(uzword Object, uzword Value, int PSC) {
 	// Get the object address and skip over the flags.
 	uzword Address = getObjectAddress(Object) + 4;
 	if(getZRev() > 3) { // Revision 4 and higher have an extra two bytes of flags.
+		Address += 2;
+		// Revision 4 and higher have 2 bytes for location properties.
+		setWord(Address + 2*PSC, Value);
+	} else {
 		// Check if a bad value was passed.
 		if(Value > 0xFF) {
 			char Message[256];
@@ -117,10 +123,6 @@ void setPSC(uzword Object, uzword Value, int PSC) {
 			);
 			logMessage(MFatal, "setPSC()", Message);
 		}
-		Address += 2;
-		// Revision 4 and higher have 2 bytes for location properties.
-		setWord(Address + 2*PSC, Value);
-	} else {
 		// Revision 3 and lower have 1 bytes for location properties.
 		setByte(Address + PSC,Value&0xFF);
 	}
@@ -154,20 +156,22 @@ uzword getSibling(uzword Object) {
 // Get the property table address of an object.
 uzword getPropertyTableAddress(uzword Object) {
 	uzword Address = getObjectAddress(Object);
-	Address += 7; // Add property offset.
-	if(getZRev() > 3)
-		Address += 5; // Property offset is larger in v4+ games.
+	Address += (getZRev() < 4 ? 7 : 12); // Add property offset.
 	return getWord(Address); // Return the last word of the object (the address of its property table).
 }
 
 uzword propertyAddress(uzword Object, uzword Property) {
+	if(!Property) {
+		logMessage(MFatal, "propertyAddress()", "Tried to get property address of property 0.");
+		exit(1);
+	}
 	uzword Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
 	uzword Size = 0; // Holds the size of the current property.
 	uzbyte HeaderTextSize = getByte(Address); // Get the size header.
 	Address += 1+2*HeaderTextSize; // Skip the header, getting to the properties.
 	uzword PropertyNumber;
 	if(getZRev() < 4) {
-		PropertyNumber = 0xFFFF;
+		PropertyNumber = 0;
 		while(PropertyNumber != Property) {
 			Address += Size; // Skip last property scanned
 			uzbyte Cell = getByte(Address); // Get the property size.
@@ -179,15 +183,18 @@ uzword propertyAddress(uzword Object, uzword Property) {
 			Size = (Cell>>5)+2; // Get size of this property
 		}
 	} else {
-		PropertyNumber = 0 - 1;
+		PropertyNumber = 0;
 		while(PropertyNumber != Property) {
 			Address += Size;
 			uzword PropertyData = getByte(Address);
 			PropertyNumber = PropertyData&63;
-			if(Address>>7) 
-				Size = getByte(++Address)&63;
-			else
-				Size = ((PropertyData>>6)&1)+1;
+			if(Address>>7) {
+				Size = (getByte(++Address)&63)+2;
+				if(Size == 2)
+					Size = 66;
+			} else {
+				Size = ((PropertyData>>6)&1)+2;
+			}
 			if(PropertyNumber < Property) { // Check if the property we are looking for doesn't seem to exist on this object.
 				PropertyNumber = Property; // Terminate the loop.
 				Address = 0; // Return 0 to signify the property does not exist.
@@ -222,7 +229,10 @@ uzword getPropertySize(uzword Object, uzword Property) {
 	} else {
 		uzword PropertyData = getByte(Address);
 		if(Address>>7) {
-			return getByte(++Address)&63;
+			zword Size = getByte(++Address)&63;
+			if(!Size)
+				Size = 64;
+			return Size;
 		} else {
 			return ((PropertyData>>6)&1)+1;
 		}
@@ -243,5 +253,5 @@ uzword getPropertyValueAddress(uzword Object, uzword Property) {
 }
 
 uzword getDefaultPropertyValue(uzword Property) {
-	return getWord(objectTable() + (2*Property));
+	return getWord(objectTable() + (2*(Property - 1)));
 }
