@@ -11,24 +11,24 @@
 
 void opJe() {
 	switch(CurrentZFrame->PassedArgs) {
-	case 1:
-		break;
-	case 4:
-		if(Operand[0] == Operand[3]) {
-			zBranch(1);
-			return;
-		}
-	case 3:
-		if(Operand[0] == Operand[2]) {
-			zBranch(1);
-			return;
-		}
-	case 2:
-		if(Operand[0] == Operand[1]) {
-			zBranch(1);
-			return;
-		}
-		break;
+		case 1:
+			break;
+		case 4:
+			if(Operand[0] == Operand[3]) {
+				zBranch(1);
+				return;
+			}
+		case 3:
+			if(Operand[0] == Operand[2]) {
+				zBranch(1);
+				return;
+			}
+		case 2:
+			if(Operand[0] == Operand[1]) {
+				zBranch(1);
+				return;
+			}
+			break;
 	}
 	zBranch(0);
 }

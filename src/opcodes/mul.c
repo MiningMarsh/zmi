@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include "zint.h"
 #include "routine.h"
 #include "command.h"
+#include "log.h"
 
 /*********************************
  * 2OP:22 16 mul a b -> (result) *
@@ -11,5 +13,25 @@
 void opMul() {
 	zword Multiple = zSign(Operand[0]);
 	zword Multiplied = zSign(Operand[1]);
-	zStore(zUnsign(Multiple * Multiplied));
+	zlong Result = Multiple*Multiplied;
+	static bool AlreadyWarned = false;
+	if(!AlreadyWarned) {
+		if(Result < -32768 || Result > 32767) {
+			// Log the warning message.
+			char Message[256];
+			sprintf(
+				Message,
+				"%s detected. This is undefined behavior.\n"
+				"Operands of %i and %i with result of %i.\n"
+				"This is only reported once.",
+				(char*)(Result > 32767 ? "Overflow" : "Underflow"),
+				Multiple,
+				Multiplied,
+				Result
+			);
+			logMessage(MWarning, "mul", Message);
+			AlreadyWarned = true;
+		}
+	}
+	zStore(zUnsign(Result));
 }

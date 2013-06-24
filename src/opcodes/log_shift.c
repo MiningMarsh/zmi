@@ -17,8 +17,14 @@ void opLogShift() {
 	if(Places > 0) {
 		Number = Number << Places;
 	} else if (Places < 0) {
-		Number = Number >> (Places*(-1));
-		Number = Number&0x7FFF;
+		// Shift right.
+		for(; Places < 0; Places++) {
+			// Get the sign bit.
+			unsigned int Sign = 0;
+			Number = Number>>1;
+			// Restore the sign bit.
+			Number = Number|(Sign<<15);
+		}
 	}
 	zStore(zUnsign(Number));
 }

@@ -39,8 +39,8 @@ void initOpCodes() {
 			CallOpCode[25+32*I] = &opCall;
 		if(getZRev() >= 5)
 			CallOpCode[26+32*I] = &opCallVN;
-		if(getZRev() == 5 || getZRev() == 6)
-			CallOpCode[28+32*I] = &opThrow;
+		//if(getZRev() == 5 || getZRev() == 6)
+		//	CallOpCode[28+32*I] = &opThrow;
 	}
 	for(int I = 0; I  < 32; I++) {
 		CallOpCode[I+32*4] = &opNonexistant;

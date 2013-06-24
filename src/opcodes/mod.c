@@ -18,5 +18,5 @@ void opMod() {
 		logMessage(MFatal, "mod", "Modulus by zero.");
 		exit(1);
 	}
-	zStore(zUnsign((Base % Dividend)&0xFFFF));
+	zStore(zUnsign(Base % Dividend));
 }

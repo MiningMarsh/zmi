@@ -12,6 +12,6 @@
  *************************************************************************/
  
 void opPull() {
-	setZVar(Operand[0],popZStack());
+	setZVar(Operand[0], popZStack());
 }
 

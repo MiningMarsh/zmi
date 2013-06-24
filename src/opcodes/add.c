@@ -16,11 +16,11 @@ void opAdd() {
 	// The second number to add, casted from its unsigned form in memory.
 	zword Number2 = zSign(Operand[1]);
 	// Result, 32bit to check for over/underflows which are undefined 
-	// behavior that is commonly defined as modulo 10000.
+	// behavior that is commonly defined as modulo 0x10000.
 	zlong Result = (zlong)(Number1 + Number2);
 	// Did we over/underflow?
 	static bool AlreadyWarned = false;
-	if(!AlreadyWarned)
+	if(!AlreadyWarned) {
 		if(Result < -32768 || Result > 32767) {
 			// Log the warning message.
 			char Message[256];
@@ -37,6 +37,7 @@ void opAdd() {
 			logMessage(MWarning, "add", Message);
 			AlreadyWarned = true;
 		}
+	}
 	// Store the result.
-	zStore(zUnsign((Number1 + Number2)));
+	zStore(zUnsign(Number1 + Number2));
 }

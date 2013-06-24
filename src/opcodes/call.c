@@ -60,7 +60,7 @@ void opCall() {
 	CurrentZFrame->Locals = calloc(sizeof(uzword), NumberLocals+1);
 	CurrentZFrame->Locals[0] = NumberLocals;
 	// Special handling for revision 3 and lower.
-	if(getZRev() < 4)
+	if(getZRev() < 4) {
 		// Revision 3 and lower define default values for all routine
 		// arguments. Get them and assign them here. revisions 4 and up 
 		// use 0 for all default values.
@@ -68,10 +68,13 @@ void opCall() {
 			CurrentZFrame->Locals[(int)I] = getWord(CurrentZFrame->PC);
 			CurrentZFrame->PC += 2;
 		}
+	}
 	// Pass the supplied arguments to the routine being called
 	// by putting them on the stack frame.
-	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs - 1; I++)
-		if(NumberLocals >= I)
+	for(char I = 1; I <= CurrentZFrame->OldFrame->PassedArgs - 1; I++) {
+		if(NumberLocals >= I) {
 			CurrentZFrame->Locals[(int)I] = Operand[(int)(I)];
+		}
+	}
 }
 

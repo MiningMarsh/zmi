@@ -10,5 +10,5 @@
  *************************************************************************/
 
 void opLoadb() {
-	zStore(getByte(Operand[0]+Operand[1]));
+	zStore(getByte(Operand[0]+Operand[1])&0xFF);
 }

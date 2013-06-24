@@ -18,5 +18,5 @@ void opDiv() {
 		logMessage(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
-	zStore(zUnsign((Operator / Dividend)));
+	zStore(zUnsign(Operator / Dividend));
 }
