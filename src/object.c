@@ -253,5 +253,6 @@ uzword getPropertyValueAddress(uzword Object, uzword Property) {
 }
 
 uzword getDefaultPropertyValue(uzword Property) {
+	// Each default property is 2 bytes long, and index by 1.
 	return getWord(objectTable() + (2*(Property - 1)));
 }
