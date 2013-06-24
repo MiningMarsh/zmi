@@ -8,7 +8,7 @@
  *************************************************************************/
 
 void opClearAttr() {
-	// Set the specified flg to 0.
+	// Set the specified flag to 0.
 	setObjectFlagValue(Operand[0], Operand[1], 0);
 }
 

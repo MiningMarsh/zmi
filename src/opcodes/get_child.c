@@ -13,12 +13,17 @@
  *************************************************************************/
 
 void opGetChild() {
+	
+	// Getting the child of object 0 is illegal.
 	if(!Operand[0]) {
-		logMessage(MFatal, "get_child", "Tried to get object in object 0.");
+		logMessage(MFatal, "get_child", "Tried to get child of object 0.");
 		exit(1);
 	}
-	uzword Address = getChild(Operand[0]);
+	
 	// Get the address of the child.
-	zStore(Address);
-	zBranch(Address);
+	uzword Object = getChild(Operand[0]);
+	
+	// Branch based on it.
+	zStore(Object);
+	zBranch(Object);
 }

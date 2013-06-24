@@ -19,12 +19,13 @@
 // Get a property of an object.
 void opGetNextProp() {
 	uzword PropertyNumber = Operand[1];
-	if(PropertyNumber)
-		if(!propertyExists(Operand[0], PropertyNumber)) {
+	if(PropertyNumber) {
+		if(!propertyExists(Operand[0], PropertyNumber++)) {
 			logMessage(MFatal, "get_next_prop", "Tried to get next property of nonexistant property.");
 			exit(1);
 		}
-	for(PropertyNumber++; PropertyNumber <= (getZRev() < 4 ? 0xFF : 0xFFFF); PropertyNumber++) {
+	}
+	for(; PropertyNumber <= (getZRev() < 4 ? 0xFF : 0xFFFF); PropertyNumber++) {
 		if(propertyExists(Operand[0], PropertyNumber)) {
 			zStore(PropertyNumber);
 			return;

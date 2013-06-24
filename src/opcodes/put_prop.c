@@ -25,7 +25,7 @@ void opPutProp() {
 		// If it existed, find its size.
 		uzbyte Size = getPropertySize(Operand[0], Operand[1]);
 		if(Size == 1) {
-			setByte(Address, Operand[2]);
+			setByte(Address, Operand[2]&0xFF);
 		} else if(Size == 2) {
 			setWord(Address, Operand[2]);
 		} else {

@@ -16,6 +16,6 @@ void opGetParent() {
 		logMessage(MFatal, "get_parent", "Tried to get parent of object 0.");
 		exit(1);
 	}
-	uzword Address = getParent(Operand[0]);
-	zStore(Address);
+	uzword Object = getParent(Operand[0]);
+	zStore(Object);
 }

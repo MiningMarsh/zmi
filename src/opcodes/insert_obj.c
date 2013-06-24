@@ -14,8 +14,13 @@
  *************************************************************************/
  
 void opInsertObj() {
+	// It never says to keep sanity of where O moved from, so lets not assume
+	// anything quite yet.
+	/*
 	uzword Child = getChild(Operand[1]);
 	opRemoveObj();
+	*/
+	uzword Child = getChild(Operand[1]);
 	setSibling(Operand[0], Child);
 	setParent(Operand[0], Operand[1]);
 	setChild(Operand[1], Operand[0]);

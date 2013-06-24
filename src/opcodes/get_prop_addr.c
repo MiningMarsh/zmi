@@ -14,7 +14,7 @@
 void opGetPropAddr() {
 	if(!propertyExists(Operand[0], Operand[1])) {
 		zStore(0);
-		return;
+	} else {
+		zStore(getPropertyValueAddress(Operand[0], Operand[1]));
 	}
-	zStore(getPropertyValueAddress(Operand[0], Operand[1]));
 }
