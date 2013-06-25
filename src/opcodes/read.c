@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include "input.h"
+#include "output.h"
 
 /*********************************************************
  * VAR:228 4 1 sread text parse                          *
@@ -84,5 +86,6 @@
  *************************************************************************/
  
 void opRead() {
+	zPrint(NULL);
 	readString(0);
 }

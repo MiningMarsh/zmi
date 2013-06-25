@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "command.h"
+#include "output.h"
 
 /**********************************************
  * VAR:229 5 print_char output-character-code *
@@ -11,5 +12,8 @@
 
 void opPrintChar() {
 	// TODO: Make this operation standard compliant.
-	printf("%c",Operand[0]);
+	char Buffer[2];
+	Buffer[0] = Operand[0];
+	Buffer[1] = 0;
+	zPrint(Buffer);
 }

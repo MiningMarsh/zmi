@@ -19,9 +19,9 @@
 #endif
 
 // Holds the terminal's width.
-unsigned int TerminalWidth;
+int TerminalWidth;
 // Holds the terminal's height.
-unsigned int TerminalHeight;
+int TerminalHeight;
 
 void initOutput() {
 	// Default terminal size, if it can't be extracted.
@@ -32,8 +32,8 @@ void initOutput() {
 #	ifdef PLATFORM_LINUX
 	struct winsize TerminalSize;
 	ioctl(STDIN_FILENO, TIOCGWINSZ, &TerminalSize);
-	TerminalWidth = TerminalSize.ws_row;
-	TerminalHeight = TerminalSize.ws_col;
+	TerminalHeight = TerminalSize.ws_row;
+	TerminalWidth = TerminalSize.ws_col;
 #	endif
 #	ifdef PLATFORM_WINDOWS
 	CONSOLE_SCREEN_BUFFER_INFO ConsoleInfo;
@@ -50,10 +50,20 @@ void zPrint(char* String) {
 	// Holds the current output being buffered.
 	static char* OutputBuffer = NULL;
 	// Holds the size of the buffer.
-	static unsigned int OutputBufferSize = 0;
+	static int OutputBufferSize = 0;
 	// Holds the current line position on screen.
-	static unsigned int CurrentPos = 0;
+	static int CurrentPos = 0;
 	
+	// NULL string means to flush output.
+	if(!String) {
+		printf("%s", OutputBuffer);
+		CurrentPos += strlen(OutputBuffer);
+		free(OutputBuffer);
+		OutputBuffer = NULL;
+		OutputBufferSize = 0;
+		return;
+	}
+
 	// If no output buffer has been allocated yet, we need to allocate a new one.
 	if(!OutputBuffer) {
 		// The size of the buffer is going to be the same as the passed string.
@@ -64,10 +74,11 @@ void zPrint(char* String) {
 		if(!OutputBuffer) {
 			OutputBufferSize = 0;
 			printf("%s", String);
+			CurrentPos += OutputBufferSize;
 			OutputBufferSize = 0;
-			CurrentPos = 0;
 			return;
 		}
+		strcpy(OutputBuffer, String);
 		// Null terminate the buffer.
 		OutputBuffer[OutputBufferSize] = 0;
 	} else {
@@ -83,15 +94,17 @@ void zPrint(char* String) {
 			printf("%s", String);
 			free(OutputBuffer);
 			OutputBuffer = NULL;
+			CurrentPos += OutputBufferSize;
 			OutputBufferSize = 0;
-			CurrentPos = 0;
 			return;
 		}
+		// Reassign to the new pointer if we successfully re-allocated the buffer.
 		OutputBuffer = NewOutputBuffer;
+		// Copy the new string onto the buffer.
 		strcpy(OutputBuffer + CopyAddress, String);
 	}
 	
-	for(unsigned int Index = 0; Index < OutputBufferSize; Index++) {
+	for(int Index = 0; Index < OutputBufferSize; Index++) {
 		if(Index + CurrentPos > TerminalWidth) {
 			printf("\n");
 			CurrentPos = 0;
@@ -108,11 +121,11 @@ void zPrint(char* String) {
 				OutputBuffer[Index] = 0;
 				char* NewOutputBuffer = malloc((OutputBufferSize - (Index+1))*sizeof(char));
 				if(!NewOutputBuffer) {
-					printf("%s\n", OutputBuffer);
+					printf("%s", OutputBuffer);
 					free(OutputBuffer);
 					OutputBuffer = NULL;
+					CurrentPos += OutputBufferSize;
 					OutputBufferSize = 0;
-					CurrentPos = 0;
 					return;
 				}
 				OutputBufferSize -= Index+1;
@@ -123,9 +136,10 @@ void zPrint(char* String) {
 					putchar(' ');
 				free(OutputBuffer);
 				OutputBuffer = NewOutputBuffer;
-				CurrentPos = 0;
+				CurrentPos += Index;
 				if(Newline) {
 					putchar('\n');
+					CurrentPos = 0;
 				}
 				break; }
 		}
