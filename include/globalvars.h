@@ -33,7 +33,7 @@ extern unsigned int g_MaxStorySize;
 extern char* g_ProgramName;
 
 #define d_VersionMajor 0
-#define d_VersionMinor 6
+#define d_VersionMinor 7
 
 #define d_StandardMajor 1
 #define d_StandardMinor 0
