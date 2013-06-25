@@ -1,6 +1,8 @@
 #include "command.h"
 #include "memory.h"
 #include "routine.h"
+#include "globalvars.h"
+#include "log.h"
 
 /***********************
  * 1OP:139 B ret value *
@@ -9,5 +11,8 @@
  *************************************************************************/
 
 void opRet() {
+	if(g_VerboseDebug > 5) {
+		logMessage(MNull, "opRet()", "Returning from routine.");
+	}
 	zReturn(Operand[0]);
 }
