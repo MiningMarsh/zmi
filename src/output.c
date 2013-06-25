@@ -115,7 +115,7 @@ void zPrint(char* String) {
 					Newline = 1;
 				}
 				OutputBuffer[Index] = 0;
-				char* NewOutputBuffer = malloc((OutputBufferSize - (Index+1))*sizeof(char));
+				char* NewOutputBuffer = malloc((OutputBufferSize - (Index+1))*sizeof(char)+sizeof(char));
 				if(!NewOutputBuffer) {
 					printf("%s", OutputBuffer);
 					free(OutputBuffer);
