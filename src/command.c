@@ -56,8 +56,6 @@ void initZM() {
 
 	// By this time, should be okay to clear the screen.
 	printf("%c[2J,%c[0;0H",27,27);
-	for(int I = 0; I < 200; I++)
-		putchar('\n');
 }
 
 // Execute an instruction begininng where the PC is currently pointing.
