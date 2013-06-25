@@ -61,8 +61,9 @@ void initZM() {
 // Execute an instruction begininng where the PC is currently pointing.
 void execNextInstruction() {
 	// Display a debug message.
-	if(g_VerboseDebug >= 5)
+	if(g_VerboseDebug >= 5) {
 		logMessage(MNull, "Main loop", "Operation started.");
+	}
 	
 	// Clean the operands by setting them all to omitted.
 	uzbyte OperandType[8] = {
@@ -81,8 +82,9 @@ void execNextInstruction() {
 
 	// Print the operation in debug mode.
 	if(g_VerboseDebug >= 10) {
-		char Message[256];
-		sprintf(Message,"PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
+		int MessageSize = snprintf("", 0, "PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
+		char Message[MessageSize+1];
+		sprintf(Message, "PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
 		logMessage(MNull,"", Message);
 	}
 
