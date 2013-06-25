@@ -2,7 +2,7 @@
 #include "globalvars.h"
 
 // Are we in debug mode?
-char g_VerboseDebug = 0;
+unsigned int g_VerboseDebug = 0;
 
 // Should we show string pointers in <>?
 bool g_StrIndirection = 0;

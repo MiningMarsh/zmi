@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 // Are we in debug mode?
-extern char g_VerboseDebug;
+extern unsigned int g_VerboseDebug;
 
 // Should we show string pointers in <>?
 extern bool g_StrIndirection;

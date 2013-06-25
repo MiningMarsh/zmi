@@ -119,8 +119,8 @@ int main(int ArgCount, char** Arguments) {
 					"Options:\n"
 					"-i,--string-indirection  Show pointer indirection in Z-Strings by\n"
 					"                         surrounding them like <this>.\n"
-					"-h,--help                Display this message.\n"
-					"-d,--debug=#             Set the verboseness.\n"
+					"-h,--help                Display this message. \n"
+					"-d,--debug=#,max,off     Set the verboseness. (defualt: off)\n"
 					"-l,--log=<file>          File to log interpreter messages to.\n"
 					"                         Use 'stderr' to log to stderr.\n"
 					"                         Use 'stdout' to log to stdout.\n"
@@ -135,9 +135,17 @@ int main(int ArgCount, char** Arguments) {
 
 			// Turn on debug messages.
 			case 'd':
+				if(!strcmp(Value, "max")) {
+					g_VerboseDebug = ~0;
+					break;
+				}
+				if(!strcmp(Value, "off")) {
+					g_VerboseDebug = 0;
+					break;
+				}
 				g_VerboseDebug = atoi(Value);
 				if(!g_VerboseDebug) {
-					fputs("--debug expects a non-zero integer value.\n", stderr);
+					fputs("--debug expects a non-zero integer value, the string 'max', or the string 'off'.\n", stderr);
 					exit(1);
 				}
 				break;
