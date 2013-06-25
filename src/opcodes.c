@@ -62,12 +62,12 @@ void initOpCodes() {
 		CallOpCode[141+16*I] = &opPrintPaddr;
 		if(getZRev() <= 4)
 			CallOpCode[143+16*I] = &opNot;
-		CallOpCode[176+16*I] = &opRtrue;
-		CallOpCode[177+16*I] = &opRfalse;
-		CallOpCode[178+16*I] = &opPrint;
-		CallOpCode[184+16*I] = &opRetPopped;
-		CallOpCode[187+16*I] = &opNewLine;
 	}
+	CallOpCode[176] = &opRtrue;
+	CallOpCode[177] = &opRfalse;
+	CallOpCode[178] = &opPrint;
+	CallOpCode[184] = &opRetPopped;
+	CallOpCode[187] = &opNewLine;
 	CallOpCode[224] = &opCall;
 	CallOpCode[225] = &opStorew;
 	CallOpCode[226] = &opStoreb;
