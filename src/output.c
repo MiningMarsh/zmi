@@ -19,9 +19,9 @@
 #endif
 
 // Holds the terminal's width.
-int TerminalWidth;
+unsigned int TerminalWidth;
 // Holds the terminal's height.
-int TerminalHeight;
+unsigned int TerminalHeight;
 
 void initOutput() {
 	// Default terminal size, if it can't be extracted.
@@ -47,39 +47,48 @@ void cleanOutput() {
 }
 
 void zPrint(char* String) {
+	// Holds the current output being buffered.
 	static char* OutputBuffer = NULL;
-	static char* OutputBufferSize = 0;
+	// Holds the size of the buffer.
+	static unsigned int OutputBufferSize = 0;
+	// Holds the current line position on screen.
 	static unsigned int CurrentPos = 0;
-
+	
+	// If no output buffer has been allocated yet, we need to allocate a new one.
 	if(!OutputBuffer) {
+		// The size of the buffer is going to be the same as the passed string.
 		OutputBufferSize = strlen(String);
-		OutputBuffer = malloc(sizeof(char)*OutputBufferSize + 1);
+		// Allocate the buffer with an extra cell for null termination.
+		OutputBuffer = malloc(sizeof(char)*OutputBufferSize + 1*sizeof(char));
+		// If we failed, recover by just printing the string and resetting values.
 		if(!OutputBuffer) {
 			OutputBufferSize = 0;
 			printf("%s", String);
-			OutputBuffer = NULL;
 			OutputBufferSize = 0;
 			CurrentPos = 0;
 			return;
 		}
+		// Null terminate the buffer.
 		OutputBuffer[OutputBufferSize] = 0;
 	} else {
+		// The address to append the String to.	
 		unsigned long long int CopyAddress = OutputBufferSize;
+		// The buffer is going to be grown to accomadate string.
 		OutputBufferSize += strlen(String);
-		char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize+1);
+		// Grow the buffer, including null terminating cell.
+		char* NewOutputBuffer = realloc(OutputBuffer, (OutputBufferSize+1)*sizeof(char));
+		// If we failed to allocate the buffer, recover.
 		if(!NewOutputBuffer) {
 			printf("%s", OutputBuffer);
-			printf("%s\n", String);
+			printf("%s", String);
 			free(OutputBuffer);
 			OutputBuffer = NULL;
 			OutputBufferSize = 0;
 			CurrentPos = 0;
 			return;
 		}
-		strcpy(NewOutputBuffer, OutputBuffer);
-		strcpy(NewOutputBuffer + CopyAddress, String);
-		free(OutputBuffer);
 		OutputBuffer = NewOutputBuffer;
+		strcpy(OutputBuffer + CopyAddress, String);
 	}
 	
 	for(unsigned int Index = 0; Index < OutputBufferSize; Index++) {
@@ -97,8 +106,8 @@ void zPrint(char* String) {
 					Newline = 1;
 				}
 				OutputBuffer[Index] = 0;
-				char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize - (Index+1));
-				if(!NewOuputBuffer) {
+				char* NewOutputBuffer = malloc((OutputBufferSize - (Index+1))*sizeof(char));
+				if(!NewOutputBuffer) {
 					printf("%s\n", OutputBuffer);
 					free(OutputBuffer);
 					OutputBuffer = NULL;
@@ -109,7 +118,7 @@ void zPrint(char* String) {
 				OutputBufferSize -= Index+1;
 				strcpy(NewOutputBuffer, OutputBuffer+Index+1);
 				OutputBuffer[Index] = 0;
-				printf("%s", OutputBuffer[Index]);
+				printf("%s", OutputBuffer);
 				if(!Newline)
 					putchar(' ');
 				free(OutputBuffer);
@@ -119,8 +128,6 @@ void zPrint(char* String) {
 					putchar('\n');
 				}
 				break; }
-			defualt:
-				break;
 		}
 	}
 }
