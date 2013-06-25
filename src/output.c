@@ -143,6 +143,7 @@ void zPrint(char* String) {
 				free(OutputBuffer);
 				OutputBuffer = NewOutputBuffer;
 				CurrentPos += Index;
+				Index = 0;
 				if(Newline) {
 					putchar('\n');
 					CurrentPos = 0;
