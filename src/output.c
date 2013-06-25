@@ -105,10 +105,6 @@ void zPrint(char* String) {
 	}
 	
 	for(int Index = 0; Index < OutputBufferSize; Index++) {
-		if(Index + CurrentPos > TerminalWidth) {
-			printf("\n");
-			CurrentPos = 0;
-		}
 		switch(OutputBuffer[Index]) {
 			case '\r':
 				CurrentPos = 0;
@@ -131,6 +127,16 @@ void zPrint(char* String) {
 				OutputBufferSize -= Index+1;
 				strcpy(NewOutputBuffer, OutputBuffer+Index+1);
 				OutputBuffer[Index] = 0;
+				if(CurrentPos + Index >= TerminalWidth-5)
+				for(int i = Index; i > 0 ; i--)
+				{
+					if(OutputBuffer[i] == ' ')
+					{
+						OutputBuffer[i] = '\n';
+						CurrentPos = Index-i;
+						break;
+					}
+				}
 				printf("%s", OutputBuffer);
 				if(!Newline)
 					putchar(' ');
