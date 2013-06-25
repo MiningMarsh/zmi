@@ -47,17 +47,13 @@ void cleanOutput() {
 }
 
 void zPrint(char* String) {
-	if(!String) {
-		return;
-	}
-	printf("%s", String);
-	/*static char* OutputBuffer = NULL;
+	static char* OutputBuffer = NULL;
 	static char* OutputBufferSize = 0;
 	static unsigned int CurrentPos = 0;
-	
-	if(OutputBuffer = NULL) {
+
+	if(!OutputBuffer) {
 		OutputBufferSize = strlen(String);
-		OutputBuffer = malloc(sizeof(char)*OutputBufferSize);
+		OutputBuffer = malloc(sizeof(char)*OutputBufferSize + 1);
 		if(!OutputBuffer) {
 			OutputBufferSize = 0;
 			printf("%s", String);
@@ -66,9 +62,11 @@ void zPrint(char* String) {
 			CurrentPos = 0;
 			return;
 		}
+		OutputBuffer[OutputBufferSize] = 0;
 	} else {
+		unsigned long long int CopyAddress = OutputBufferSize;
 		OutputBufferSize += strlen(String);
-		char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize);
+		char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize+1);
 		if(!NewOutputBuffer) {
 			printf("%s", OutputBuffer);
 			printf("%s\n", String);
@@ -78,19 +76,51 @@ void zPrint(char* String) {
 			CurrentPos = 0;
 			return;
 		}
+		strcpy(NewOutputBuffer, OutputBuffer);
+		strcpy(NewOutputBuffer + CopyAddress, String);
+		free(OutputBuffer);
+		OutputBuffer = NewOutputBuffer;
 	}
 	
-	unsigned int CurrentWidth = 0;
 	for(unsigned int Index = 0; Index < OutputBufferSize; Index++) {
-		if(CurrentWidth + CurrentPos > TerminalWidth) {
+		if(Index + CurrentPos > TerminalWidth) {
 			printf("\n");
 			CurrentPos = 0;
 		}
 		switch(OutputBuffer[Index]) {
-			case '\n':
+			case '\r':
 				CurrentPos = 0;
+			case ' ':
+			case '\n': {
+				int Newline = 0;
+				if(OutputBuffer[Index] == '\n') {
+					Newline = 1;
+				}
+				OutputBuffer[Index] = 0;
+				char* NewOutputBuffer = realloc(OutputBuffer, OutputBufferSize - (Index+1));
+				if(!NewOuputBuffer) {
+					printf("%s\n", OutputBuffer);
+					free(OutputBuffer);
+					OutputBuffer = NULL;
+					OutputBufferSize = 0;
+					CurrentPos = 0;
+					return;
+				}
+				OutputBufferSize -= Index+1;
+				strcpy(NewOutputBuffer, OutputBuffer+Index+1);
+				OutputBuffer[Index] = 0;
+				printf("%s", OutputBuffer[Index]);
+				if(!Newline)
+					putchar(' ');
+				free(OutputBuffer);
+				OutputBuffer = NewOutputBuffer;
+				CurrentPos = 0;
+				if(Newline) {
+					putchar('\n');
+				}
+				break; }
+			defualt:
 				break;
-			case ' '
 		}
-	}*/
+	}
 }
