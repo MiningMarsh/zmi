@@ -15,17 +15,13 @@ uzword zUnsign(zword Input) {
 
 zword zSignBase(uzword Input, unsigned int Base) {
 	uzword Converter = 1;
-	uzword Limit = 1;
-	uzword HalfBase = Base/2;
+	uzword Limit = (1<<(Base-1));
 	while(--Base) {
 		Converter = (Converter<<1)|1;
 	}
-	while(--HalfBase) {
-		Limit = (Limit<<1)|1;
-	}
-	if(Input <= Limit)
-		return Input;
-	return -(Converter - Input + 1);
+	if(Input&Limit)
+		return -(Converter - Input + 1);
+	return Input;
 }
 
 uzword zUnsignBase(zword Input, unsigned int Base) {
