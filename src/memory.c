@@ -11,15 +11,12 @@ uzbyte* RAM = NULL; // Holds the file.
 void loadRAM(const char* const Filename) {
 	
 	// The prefix all log messages will have.
-	char* LogPrefix = "loadRAM()";
-	// The location to store the text for log messages.
-	char Message[512];
 
 	// Check if the ram is already been initilized. 
 	if(RAM != NULL) {
 		logMessage(
 			MFatal, 
-			LogPrefix, 
+			"loadRAM()", 
 			"Tried to load file while RAM is already initialized.\n"
 			"This should NEVER happen, there is something seriously wrong."
 		);
@@ -46,29 +43,30 @@ void loadRAM(const char* const Filename) {
 
 	// Check if we ran out of memory allocating RAM.
 	if(!RAM) {
-		sprintf(
-			Message, 
+		logMessage(
+			MFatal, 
+			"loadRAM()", 
 			"Failed to allocate enough RAM to hold the story file.\n"
 			"%u bytes are needed.",
 			(unsigned int)sizeof(uzbyte)*g_RAMSize
 		);
-		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
 
 	// Read the file into the RAM.
 	if(fread(RAM, sizeof(uzbyte), g_StorySize, StoryFile) != g_StorySize) {
-			logMessage(MFatal, LogPrefix, "Failed to read file.");
+			logMessage(MFatal, "loadRAM()", "Failed to read file.");
 			exit(1);
 	}
 	
 	// There is no standard above revision 8.
 	if(getZRev() > 8) {
-		sprintf(Message, 
+		logMessage(
+			MFatal, 
+			"loadRAM()", 
 			"Bad Z-Revision: %u.",
 			getZRev()
 		);
-		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
 
@@ -95,13 +93,14 @@ void loadRAM(const char* const Filename) {
 	g_MaxStorySize *= 1024;
 	// Check actual story size against max story size.
 	if(g_StorySize > g_MaxStorySize) {
-		sprintf(Message, 
+		logMessage(
+			MFatal, 
+			"loadRAM()", 
 			"File is too large.\n"
 			"Story is %ukb. Max size is %ukb.",
 			g_StorySize / 1024,
 			g_MaxStorySize / 1024
 		);
-		logMessage(MFatal, LogPrefix, Message);
 		exit (1);
 	}
 	// We no longer need access to the file.
@@ -112,15 +111,14 @@ void loadRAM(const char* const Filename) {
 uzword getWord(const unsigned int Address) {
 	// The address is out of bounds of RAM.
 	if(Address+1 > g_RAMSize) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"getWord()",
 			"Tried to grab word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
 			g_RAMSize
 		);
-		logMessage(MFatal,"getWord()",Message);
 		exit(1);
 	}
 	return RAM[Address+1]|(RAM[Address]<<8);
@@ -130,15 +128,14 @@ uzword getWord(const unsigned int Address) {
 uzbyte getByte(const unsigned int Address) {
 	// Error is the address is out of bounds of RAM.
 	if(Address > g_RAMSize) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"getWord()",
 			"Tried to grab byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
 			g_RAMSize
 		);
-		logMessage(MFatal,"getWord()",Message);
 		exit(1);
 	}
 	return RAM[Address];
@@ -152,24 +149,22 @@ uzbyte getZRev() {
 // Set the word beginning at ram address adr to value.
 void setWord(const unsigned int Address, const uzword Value) {
 	if(!Address) {
-		char  Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"setWord()",
 			"Tried to set word 0 (Z-Revision) to %u.",
 			Value
 		);
-		logMessage(MFatal,"setWord()",Message);
 		exit(1);
 	} else if(Address+1 > g_RAMSize) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"setWord()",
 			"Tried to set word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
 			g_RAMSize
 		);
-		logMessage(MFatal,"setWord()",Message);
 		exit(1);
 	}
 	RAM[Address+1] = Value&0xFF;
@@ -179,24 +174,22 @@ void setWord(const unsigned int Address, const uzword Value) {
 // Set the byte beginning at ram address adr to value.
 void setByte(const unsigned int Address, const uzbyte Value) {
 	if(!Address) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"setWord()",
 			"Tried to set byte 0 (Z-Revision) to %u.",
 			Value
 		);
-		logMessage(MFatal,"setWord()",Message);
 		exit(1);
 	} else if(Address > g_RAMSize) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal,
+			"setWord()",
 			"Tried to set byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
 			g_RAMSize
 		);
-		logMessage(MFatal,"setWord()",Message);
 		exit(1);
 	}
 	RAM[Address] = Value&0xFF;
@@ -226,7 +219,11 @@ uzword expandPaddedAddress(const uzword PaddedAddress) {
 // Pop from the Stack.
 uzword popZStack() {
 	if(CurrentZFrame->Stack == NULL || CurrentZFrame->Stack[0] < 1) {
-		logMessage(MFatal, "popZStack()", "Tried to POP an empty stack.");
+		logMessage(
+			MFatal, 
+			"popZStack()", 
+			"Tried to POP an empty stack."
+		);
 		exit(1);
 	}
 	CurrentZFrame->Stack[0]--;
@@ -235,11 +232,27 @@ uzword popZStack() {
 
 // Push to the Stack.
 void pushZStack(const uzword Value) {
+	
+	// If there is no stack allocated yet, allocate one.
 	if(CurrentZFrame->Stack == NULL) {
+		// For speed, we have a hard limit of 1024 bytes on the stack. Other
+		// interpreters implement this already, and we will increase it if it
+		// ever becomes a problem. Or just make an unlimited size stack.
 		CurrentZFrame->Stack = malloc(sizeof(uzword)*1024);
-		CurrentZFrame->Stack[0] = 0;
+		if(CurrentZFrame->Stack) {
+			// Init stack.
+			CurrentZFrame->Stack[0] = 0;
+			
+		}
+	
+	// If we already have a stack, check to make sure we are not overflowing 
+	// it.
+	} else if(CurrentZFrame->Stack[0] >= 1023) {
+		free(CurrentZFrame->Stack);
+		CurrentZFrame->Stack = NULL;
 	}
-	CurrentZFrame->Stack[0]++;
+
+	// Check to make sure stack is sane.
 	if(CurrentZFrame->Stack == NULL) {
 		logMessage(
 			MFatal, 
@@ -248,6 +261,9 @@ void pushZStack(const uzword Value) {
 		);
 		exit(1);
 	}
+
+	// Put the passed value on the stack.
+	CurrentZFrame->Stack[0]++;
 	CurrentZFrame->Stack[CurrentZFrame->Stack[0]] = Value;
 }
 
@@ -323,46 +339,17 @@ void traceZStack() {
 	);
 	stackframe_t* Frame = CurrentZFrame;
 	while(Frame != NULL) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MNull, 
+			NULL,
 			"   Frame %u",
-			zFrameNumber(Frame)
-		);
-		logMessage(
-			MNull, 
-			NULL,
-			Message
-		);
-		sprintf(
-			Message, 
 			"      PC: %u",
-			Frame->PC
-		);
-		logMessage(
-			MNull,
-			NULL,
-			Message
-		);
-		sprintf(
-			Message, 
 			"      Arguments passed: %u",
-			Frame->PassedArgs
-		);
-		logMessage(
-			MNull,
-			NULL,
-			Message
-		);
-		sprintf(
-			Message, 
 			"      Return: %s.", 
+			zFrameNumber(Frame),
+			Frame->PC,
+			Frame->PassedArgs,
 			Frame->ReturnVar ? "Yes" : "No"
-		);
-		logMessage(
-			MNull, 
-			NULL, 
-			Message
 		);
 		if(!(Frame->Stack == NULL || Frame->Stack[0] < 1)) {
 			unsigned int Count = 1;
@@ -372,16 +359,12 @@ void traceZStack() {
 				"      Stack:"
 			);
 			for(uzword Cell = Frame->Stack[0]; Cell > 0; Cell--) {
-				sprintf(
-					Message, 
-					"         %04u: %u", 
-					Count++, 
-					Frame->Stack[Cell]
-				);
 				logMessage(
 					MNull, 
 					NULL, 
-					Message
+					"         %04u: %u", 
+					Count++, 
+					Frame->Stack[Cell]
 				);
 			}
 		} else {
@@ -398,16 +381,12 @@ void traceZStack() {
 				"      Locals:"
 			);
 			for(uzword Cell = 1; Cell <= Frame->Locals[0]; Cell++) {
-				sprintf(
-					Message, 
-					"          %01u: %u", 
-					Cell, 
-					Frame->Locals[Cell]
-				);
 				logMessage(
 					MNull, 
 					NULL, 
-					Message
+					"         %02u: %u", 
+					Cell, 
+					Frame->Locals[Cell]
 				);
 			}
 		} else {

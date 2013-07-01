@@ -11,6 +11,7 @@
 #define LOG_H_ 1
 
 #include <stdbool.h>
+#include <stdarg.h>
 
 // Types of messages available.
 enum log_message_type {
@@ -22,7 +23,7 @@ enum log_message_type {
 };
 
 // Logs a message.
-bool logMessage(const unsigned char Type, const char* const Prefix, const char* const Message);
+bool logMessage(const unsigned char Type, const char* const PrefixFormat, const char* const Format, ...);
 
 // Opens a log.
 bool logOpen(const char* const FileName);

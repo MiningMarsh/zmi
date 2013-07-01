@@ -82,10 +82,14 @@ void execNextInstruction() {
 
 	// Print the operation in debug mode.
 	if(g_VerboseDebug >= 10) {
-		int MessageSize = snprintf("", 0, "PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
-		char Message[MessageSize+1];
-		sprintf(Message, "PC: %u (%p) OP: %u (%p)", CurrentZFrame->PC - 1, (void*)(long)CurrentZFrame->PC - 1, Operation, (void*)(long)Operation);
-		logMessage(MNull,"", Message);
+		logMessage(
+			MNull, 
+			NULL, 
+			"PC: %u (%p) OP: %u (%p)", 
+			CurrentZFrame->PC - 1, 
+			(void*)(long)CurrentZFrame->PC - 1, 
+			Operation, (void*)(long)Operation
+		);
 	}
 
    	// Extract argument types based on the opcode.
@@ -152,18 +156,26 @@ void execNextInstruction() {
 				Operand[I] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
 				if(g_VerboseDebug >= 10) {
-					char Message[256];
-					sprintf(Message,"Large: %u (%p)", Operand[I], (void*)(long)Operand[I]);
-					logMessage(MNull,"Operand", Message);
+					logMessage(
+						MNull, 
+						"Operand", 
+						"Large: %u (%p)", 
+						Operand[I], 
+						(void*)(long)Operand[I]
+					);
 				}
 				break;
 			case SmallConstant:
 				// Small constants are bytes.
 				Operand[I] = getByte(CurrentZFrame->PC++);
 				if(g_VerboseDebug >= 10) {
-					char Message[256];
-					sprintf(Message,"Small: %u (%p)", Operand[I], (void*)(long)Operand[I]);
-					logMessage(MNull,"Operand", Message);
+					logMessage(
+						MNull,
+						"Operand",
+						"Small: %u (%p)", 
+						Operand[I], 
+						(void*)(long)Operand[I]
+					);
 				}
 				break;
 			case Variable: {
@@ -171,9 +183,15 @@ void execNextInstruction() {
 				uint8_t Variable = getByte(CurrentZFrame->PC++);
 				Operand[I] = getZVar(Variable);
 				if(g_VerboseDebug >= 10) {
-					char Message[256];
-					sprintf(Message, "Var %u (%p): %u (%p)", Variable, (void*)(long)Variable, Operand[I], (void*)(long)Operand[I]);
-					logMessage(MNull,"Operand", Message);
+					logMessage(
+						MNull,
+						"Operand",
+						"Var %u (%p): %u (%p)", 
+						Variable, 
+						(void*)(long)Variable, 
+						Operand[I], 
+						(void*)(long)Operand[I]
+					);
 				}
 				break; }
 		}

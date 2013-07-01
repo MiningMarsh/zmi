@@ -22,10 +22,9 @@ void opAdd() {
 	static bool AlreadyWarned = false;
 	if(!AlreadyWarned) {
 		if(Result < -32768 || Result > 32767) {
-			// Log the warning message.
-			char Message[256];
-			sprintf(
-				Message,
+			logMessage(
+				MWarning, 
+				"add",
 				"%s detected. This is undefined behavior.\n"
 				"Operands of %i and %i with result of %i.\n"
 				"This is only reported once.",
@@ -34,7 +33,6 @@ void opAdd() {
 				Number2,
 				Result
 			);
-			logMessage(MWarning, "add", Message);
 			AlreadyWarned = true;
 		}
 	}

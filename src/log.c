@@ -16,13 +16,41 @@ char logMessages[][30] = {
 };
 
 // Log a message into the current log file/stream. If none is open, the message is thrown away.
-bool logMessage(const unsigned char Type, const char* const Prefix, const char* const Message) {
-	// Return if no log is open.
-	if(!Log)
-		return false;
+bool logMessage(const unsigned char Type, const char* const PrefixFormat, const char* const Format, ...) {
+	
+	va_list Args;
+	va_start(Args, Format);
+	va_list ArgsCopy;
+	va_copy(ArgsCopy, Args);
+	
+	char* Prefix = NULL;
+	int PrefixLength;
+	
+	if(PrefixFormat) {
+		PrefixLength = vsnprintf(NULL, 0, PrefixFormat, Args);
+		char NewPrefix[PrefixLength + 2];
+		vsnprintf(NewPrefix, PrefixLength + 1, PrefixFormat, ArgsCopy);
+		
+		Prefix = malloc(sizeof(char)*(strlen(NewPrefix) + 1));
+		if(Prefix)
+			strcpy(Prefix, NewPrefix);
+	}
+	
+	unsigned int MessageLength = vsnprintf(NULL, 0, Format, Args);
+	char Message[MessageLength + 2];
+	vsnprintf(Message, MessageLength + 1, Format, ArgsCopy);
+	
+	va_end(Args);
+	va_end(ArgsCopy);
 
-	// Holds the lngth of the message prefix.
-	int PrefixLength = 0;
+	vsnprintf(NULL, 0, Format, Args);
+	// Return if no log is open.
+	if(!Log) {
+		free(Prefix);
+		return false;
+	}
+
+	PrefixLength = 0;
 
 	// Prints the Message type, if it exists.
 	if(strlen(logMessages[(const unsigned int)Type])) {
@@ -60,6 +88,7 @@ bool logMessage(const unsigned char Type, const char* const Prefix, const char* 
 	fputs("\n", Log);
 	// Flush the message.
 	fflush(Log);
+	free(Prefix);
 	return true;
 }
 

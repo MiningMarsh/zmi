@@ -29,32 +29,28 @@ void opCall() {
 	// Check if it is out of memory range.
 	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > g_RAMSize ) {
 		// Log an error message if it is.
-		char Message[1024];
-		snprintf(
-			Message,
-			1023,
+		logMessage(
+			MFatal, 
+			"call",
 			"Address %u expands to %u, which is out of memory range.\n"
 			"Memory size is: %u",
 			Operand[0],
 			CurrentZFrame->PC,
 			g_RAMSize
 		);
-		logMessage(MFatal, "call", Message);
 		exit(1);
 	}
 	// Get the number of local variables the routine has.
 	uzbyte NumberLocals = getByte(CurrentZFrame->PC++);
 	// Allocate room for the locals.
 	if(NumberLocals > 15) {
-		char Message[1024];
-		snprintf(
-			Message, 
-			1024,
+		logMessage(
+			MFatal, 
+			"call",
 			"Invalid number of locals to routine: %u\n"
 			"Only up to 15 locals are allowed.",
 			NumberLocals
 		);
-		logMessage(MFatal, "call", Message);
 		exit(1);
 	}
 	CurrentZFrame->Locals = calloc(sizeof(uzword), NumberLocals+1);

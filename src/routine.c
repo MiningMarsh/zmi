@@ -17,14 +17,13 @@ void zReturn(uzword Value) {
 void zStore(uzword Value) {
 	uzbyte Variable = getByte(CurrentZFrame->PC++);
 	if(g_VerboseDebug >= 20) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MNull, 
+			"zStore()", 
 			"Storing %u into var %u.",
 			Value,
 			Variable
 		);
-		logMessage(MNull, "zStore()", Message);
 	}
 	setZVar(Variable, Value);
 }
@@ -46,9 +45,9 @@ void zBranch(bool Condition) {
 	// The jump offset is the lower 5 bits.
 	uzword Offset = BranchData&63;
 	if(g_VerboseDebug >= 40) {
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MNull, 
+			"zBranch()",
 			"Condition passed is %u.\n"
 			"Success condition is %u.\n"
 			"Branch offset is %i.",
@@ -56,19 +55,17 @@ void zBranch(bool Condition) {
 			(BranchData>>7)&1,
 			zSignBase(Offset, 14)
 		);
-		logMessage(MNull, "zBranch()", Message);
 	}
 	// The next byte in the stream could be appended to the jump offset.
 	if(!((BranchData>>6)& 1)) {
 		Offset = (Offset<<8)|(getByte(CurrentZFrame->PC++));
 		if(g_VerboseDebug >= 40) {
-			char Message[256];
-			sprintf(
-				Message,
+			logMessage(
+				MNull, 
+				"zBranch()",
 				"Extended branch offset is %i.",
 				zSignBase(Offset, 14)
 			);
-			logMessage(MNull, "zBranch()", Message);
 		}
 	}
 

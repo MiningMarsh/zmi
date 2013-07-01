@@ -14,15 +14,14 @@ uzword getObjectAddress(uzword Object) {
 
 	// Revision 3 and down only have 255 objects.
 	if(getZRev() < 4 && Object > 255) {
-		char Message[256];
-		sprintf(
-			Message, 
+		logMessage(
+			MFatal, 
+			"getObjectAddress()",
 			"Getting address of bad object %u.\n"
 			"Only 255 objects supported in\n"
 			"revision 3 and below.",
 			Object
 		);
-		logMessage(MFatal, "getObjectAddress()", Message);
 		exit(1);
 	}
 	// Revision 4 and later have 2^16-1 objects, so no check needed.
@@ -44,16 +43,14 @@ uzword getObjectAddress(uzword Object) {
 bool getObjectFlag(uzword Object, uzword Flag) {
 	if((getZRev() < 4 && Flag > 31) || (getZRev() >= 4 && Flag > 47)) {
 		// An invalid flag has been chosen.
-		char Message[256];
-		snprintf(
-			Message,
-			256,
+		logMessage(
+			MFatal, 
+			"getObjectFlag()", 
 			"An invalid flag number of %u was read.\n"
 			"There are %u flags.",
 			Flag,
 			getZRev() >= 4 ? 48:32
 		);
-		logMessage(MFatal, "getObjectFlag()", Message);
 	}
 
 	// Get the address of the object.
@@ -68,15 +65,14 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 	if((getZRev() < 4 && Flag > 31) || (getZRev() >= 4 && Flag > 47)) {
 		// An invalid flag has been chosen.
-		char Message[256];
-		sprintf(
-			Message,
+		logMessage(
+			MFatal, 
+			"setObjectFlag()",
 			"An invalid flag number of %u was set.\n"
 			"There are %u flags.",
 			Flag,
 			getZRev() >= 4 ? 48:32
 		);
-		logMessage(MFatal, "setObjectFlag()", Message);
 	}
 	// Get the address of the object.
 	uzword ObjectAddress = getObjectAddress(Object);
@@ -115,13 +111,12 @@ void setPSC(uzword Object, uzword Value, int PSC) {
 	} else {
 		// Check if a bad value was passed.
 		if(Value > 0xFF) {
-			char Message[256];
-			sprintf(
-				Message,
+			logMessage(
+				MFatal, 
+				"setPSC()", 
 				"Tried to set parent, child, sibling to invalid object %u.",
 				Value
 			);
-			logMessage(MFatal, "setPSC()", Message);
 		}
 		// Revision 3 and lower have 1 bytes for location properties.
 		setByte(Address + PSC,Value&0xFF);
