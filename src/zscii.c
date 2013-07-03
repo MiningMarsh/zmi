@@ -52,7 +52,7 @@ char* zCharsToZSCII(uint32_t* buffer)
 		exit(1);
 	}
 	static bool recurseabr = 0; // The standard bans recursive string redirection, so we track it,
-	if(recurseabr > 1)			// and spit an error if it is more than 1 recursion.
+	if(recurseabr > 1)          // and spit an error if it is more than 1 recursion.
 	{
 		fputs("Nested abbreviation detected.\n",stderr);
 		exit(1);
@@ -205,11 +205,13 @@ char* zCharsToZSCII(uint32_t* buffer)
 						}
 						// There was a mathematical equation for the conversion, but it was failing miserably.
 						// This lookup table does the job though, and as a plus, is character set independent! :D
-						char ltable[] = {' ','\n','0','1','2','3','4',
-										'5','6','7','8','9','.',
-										',','!','?','_','#','\'',
-										'"','/','\\','-',':','(',
-										')'};
+						char ltable[] = {
+						                 ' ','\n','0','1','2','3','4',
+						                 '5','6','7','8','9','.',
+						                 ',','!','?','_','#','\'',
+						                 '"','/','\\','-',':','(',
+						                 ')'
+						                };
 						n = ltable[zchar - 6];
 						if(adr)
 							n = getByte(adr + (zchar+26 + 26 - 6));
@@ -223,7 +225,6 @@ char* zCharsToZSCII(uint32_t* buffer)
 	}
 	free(buffer);
 	// See above.
-	/* zscii = realloc(zscii,ptr*sizeof(char)+1); */
 	zscii[ptr]=0; // Null termiante the converted ascii string.
 	return zscii;
 }
