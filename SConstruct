@@ -17,12 +17,12 @@ class color:
 
 # Environment initialization
 env = Environment(
-		CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +'] ' + color.endc + '$SOURCES',
-                SHCXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +'] ' + color.endc + '$SOURCES',
-                CXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +'] ' + color.endc + '$SOURCES',
-                SHCCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +'] ' + color.endc + '$SOURCES',
-                SHLINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan + '] ' + color.endc + '$TARGET',
-                LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan + '] ' + color.endc + '$TARGET'
+		CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+		SHCXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+		CXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+		SHCCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+		SHLINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
+		LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
 )
 
 HeaderDirectory = "include"
