@@ -49,7 +49,6 @@ void opCall() {
 		);
 		exit(1);
 	}
-	logMessage(MNull, "call", "Local offset: %u (%p)\n", CurrentZFrame->PC, (void*)(long)CurrentZFrame->PC);
 	// Get the number of local variables the routine has.
 	uzbyte NumberLocals = getByte(CurrentZFrame->PC++);
 	// Allocate room for the locals.
