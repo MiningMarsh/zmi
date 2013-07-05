@@ -86,6 +86,7 @@
  *************************************************************************/
  
 void opRead() {
+	// Flush the output buffer since we are fixing to read in input.
 	zPrint(NULL);
 	readString(0);
 }
