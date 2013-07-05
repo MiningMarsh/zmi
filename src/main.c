@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "memory.h"
 #include "command.h"
 #include "globalvars.h"
@@ -8,6 +9,9 @@
 
 
 int main(int ArgCount, char** Arguments) {
+
+	assert(ArgCount > 0);
+	assert(Arguments);
 
 	// We need to grab these from the program arguments.
 	char* Filename = NULL;

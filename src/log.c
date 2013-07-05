@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "log.h"
 
 FILE* Log = NULL;
@@ -17,7 +18,9 @@ char logMessages[][30] = {
 
 // Log a message into the current log file/stream. If none is open, the message is thrown away.
 bool logMessage(const unsigned char Type, const char* const PrefixFormat, const char* const Format, ...) {
-	
+
+	assert(Format);
+
 	va_list Args;
 	va_start(Args, Format);
 	va_list ArgsCopy;

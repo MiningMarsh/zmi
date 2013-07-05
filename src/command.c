@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include "memory.h"
 #include "input.h"
 #include "output.h"
@@ -60,6 +61,9 @@ void initZM() {
 
 // Execute an instruction begininng where the PC is currently pointing.
 void execNextInstruction() {
+	
+	assert(CurrentZFrame->PC <= RAMSize);
+
 	// Display a debug message.
 	if(VerboseDebug >= 5) {
 		logMessage(MNull, "Main loop", "Operation started.");
@@ -196,6 +200,9 @@ void execNextInstruction() {
 				break; }
 		}
 	}
+	
+	assert(CallOpCode[Operation]);
+	
 	// Execute the operation.
 	CallOpCode[Operation]();
 	if(VerboseDebug >= 5)

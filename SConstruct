@@ -146,6 +146,8 @@ if(GetOption('fast')):
 if(GetOption('lto')):
 	env.Append(CCFLAGS='-flto')
 	env.Append(LINKFLAGS='-flto')
+if(not GetOption('debug')):
+	env.Append(CCFLAGS='-DNDEBUG')
 
 #install
 env.Install('/usr/bin', Install)
