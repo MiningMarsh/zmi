@@ -52,17 +52,20 @@ int main(int ArgCount, char** Arguments) {
 			*Value = 0;	
 			Value++;
 		}
-
-		// A lookup table mapping long options to flags.
-		#define MaxLookupSize 20
-		const char const LookupTable[][MaxLookupSize] = {
-			"help","h",
-			"string-indirection","i",
-			"debug","d",
-			"log-file","l"
-			"piracy","p"
+		
+		// Matches long options to flags.
+		struct {
+			const char Flag;
+			const char* const LongOption;
+		} Options[] = {
+			{'h', "help"},
+			{'i', "string-indirection"},
+			{'d', "debug"},
+			{'l',"log-file"},
+			{'p',"piracy"},
+			{0, NULL}
 		};
-		int LookupTableSize = sizeof(LookupTable)/(sizeof(char)*MaxLookupSize);
+
 		switch(ArgType) {
 			// We are dealing with a flag.
 			case 1:
@@ -87,13 +90,12 @@ int main(int ArgCount, char** Arguments) {
 					ArgCount = 1;
 					continue;
 				}
-				int LookupIndex = 0;
+				
 				// The table is null terminated.
-				while(LookupIndex < LookupTableSize) {
-					if(!strcmp(Key,LookupTable[LookupIndex])) {
-						Flag = LookupTable[1+LookupIndex][0];
+				for(int LookupIndex = 0; Options[LookupIndex].LongOption != NULL; ++LookupIndex) {
+					if(!strcmp(Key, Options[LookupIndex].LongOption)) {
+						Flag = Options[LookupIndex].Flag;
 					}
-					LookupIndex += 2;
 				}
 				break; }
 
