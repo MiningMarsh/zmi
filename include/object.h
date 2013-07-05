@@ -14,10 +14,10 @@
 #include "zint.h"
 
 // Get the address of a property on an object. This function does not check to see if the object is 0.
-uzword getPropertyAddress(uzword Object, uzword Property);
+zaddress getPropertyAddress(uzword Object, uzword Property);
 
 // Get the addrress of the value of a property in Z-Machine memory.
-uzword getPropertyValueAddress(uzword Object, uzword Property);
+zaddress getPropertyValueAddress(uzword Object, uzword Property);
 
 // Get the size of a property.
 uzword getPropertySize(uzword Object, uzword Property);
@@ -50,7 +50,7 @@ uzword getChild(uzword Object);
 uzword getSibling(uzword Object);
 
 // Get the property table address of an object. This is a bit useless outside of the other object functions.
-uzword getPropertyTableAddress(uzword Object);
+zaddress getPropertyTableAddress(uzword Object);
 
 // Get the default value of a property to be used if it does not exist.
 uzword getDefaultPropertyValue(uzword Property);

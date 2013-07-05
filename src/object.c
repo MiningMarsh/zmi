@@ -7,10 +7,10 @@
 
 // The address of the object table. While this is in the header, 
 // I am pretty sure this address can be dynamically modified. 
-uzword objectTable() { return getWord(0x0a); }
+zaddress objectTable() { return getWord(0x0a); }
 
 // Get the memory address of an object
-uzword getObjectAddress(uzword Object) {
+zaddress getObjectAddress(uzword Object) {
 
 	// Revision 3 and down only have 255 objects.
 	if(getZRev() < 4 && Object > 255) {
@@ -27,7 +27,7 @@ uzword getObjectAddress(uzword Object) {
 	// Revision 4 and later have 2^16-1 objects, so no check needed.
 
 	// The address we are going to return.
-	uzword Address = objectTable();
+	zaddress Address = objectTable();
 	if(getZRev() > 3)
 		// Revisions <= 4 have a 63 word object defaults table, and each 
 		// object after that is 14 bytes.
@@ -54,10 +54,10 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 	}
 
 	// Get the address of the object.
-	uzword ObjectAddress = getObjectAddress(Object);
+	zaddress ObjectAddress = getObjectAddress(Object);
 	// The flags are a series of bytes at the beggining of the object in
 	// the format 0.1.2.3.4 ...
-	uzbyte ByteAddress = getByte(ObjectAddress+(Flag/8)); //calculate the flag byte.
+	zaddress ByteAddress = getByte(ObjectAddress+(Flag/8)); //calculate the flag byte.
 	return (ByteAddress>> (7 - (Flag%8)) )&1;
 }
 
@@ -75,10 +75,10 @@ void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 		);
 	}
 	// Get the address of the object.
-	uzword ObjectAddress = getObjectAddress(Object);
+	zaddress ObjectAddress = getObjectAddress(Object);
 	// The flags are a series of bytes at the beggining of the object in
 	// the format 0.1.2.3.4 ...
-	uzbyte Address = ObjectAddress+(Flag/8); //calculate the flag byte.
+	zaddress Address = ObjectAddress+(Flag/8); //calculate the flag byte.
 	uzbyte Mask = ~(1<<(7 - (Flag%8)));
 	uzbyte CurrentFlags = getByte(Address) & Mask;
 	CurrentFlags |= Value << (7 - (Flag%8));
@@ -88,7 +88,7 @@ void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 uzword getPSC(uzword Object, int PSC) {
 
 	// Get the object address and skip over the flags.
-	uzword Address = getObjectAddress(Object) + 4;
+	zaddress Address = getObjectAddress(Object) + 4;
 
 	if(getZRev() > 3) { // Revision 4 and higher have an extra two bytes of flags.
 		Address += 2;
@@ -103,7 +103,7 @@ uzword getPSC(uzword Object, int PSC) {
 void setPSC(uzword Object, uzword Value, int PSC) {
 	
 	// Get the object address and skip over the flags.
-	uzword Address = getObjectAddress(Object) + 4;
+	zaddress Address = getObjectAddress(Object) + 4;
 	if(getZRev() > 3) { // Revision 4 and higher have an extra two bytes of flags.
 		Address += 2;
 		// Revision 4 and higher have 2 bytes for location properties.
@@ -149,18 +149,18 @@ uzword getSibling(uzword Object) {
 }
 
 // Get the property table address of an object.
-uzword getPropertyTableAddress(uzword Object) {
-	uzword Address = getObjectAddress(Object);
+zaddress getPropertyTableAddress(uzword Object) {
+	zaddress Address = getObjectAddress(Object);
 	Address += (getZRev() < 4 ? 7 : 12); // Add property offset.
 	return getWord(Address); // Return the last word of the object (the address of its property table).
 }
 
-uzword propertyAddress(uzword Object, uzword Property) {
+zaddress propertyAddress(uzword Object, uzword Property) {
 	if(!Property) {
 		logMessage(MFatal, "propertyAddress()", "Tried to get property address of property 0.");
 		exit(1);
 	}
-	uzword Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
+	zaddress Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
 	uzword Size = 0; // Holds the size of the current property.
 	uzbyte HeaderTextSize = getByte(Address); // Get the size header.
 	Address += 1+2*HeaderTextSize; // Skip the header, getting to the properties.
@@ -200,8 +200,8 @@ uzword propertyAddress(uzword Object, uzword Property) {
 }
 
 // A small wrapper meant to error out if an object doesn't exist instead of returning 0.
-uzword getPropertyAddress(uzword Object, uzword Property) {
-	uzword Address = propertyAddress(Object, Property);
+zaddress getPropertyAddress(uzword Object, uzword Property) {
+	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
 		logMessage(MFatal, "getPropertyAddress()", "Tried to get property address of nonexisting property.");
 		exit(1);
@@ -214,7 +214,7 @@ bool propertyExists(uzword Object, uzword Property) {
 }
 
 uzword getPropertySize(uzword Object, uzword Property) {
-	uzword Address = propertyAddress(Object, Property);
+	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
 		logMessage(MFatal, "getPropertySize()", "Tried to get property size of nonexisting property.");
 		exit(1);
@@ -234,8 +234,8 @@ uzword getPropertySize(uzword Object, uzword Property) {
 	}
 }
 
-uzword getPropertyValueAddress(uzword Object, uzword Property) {
-	uzword Address = propertyAddress(Object, Property);
+zaddress getPropertyValueAddress(uzword Object, uzword Property) {
+	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
 		logMessage(MFatal, "getPropertyValueAddress()", "Tried to get property value address of nonexisting property.");
 		exit(1);
