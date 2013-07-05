@@ -19,13 +19,22 @@
 void opCall() {
 	// Create a new blank stack frame.
 	pushZFrame();
+	
+	// Expand the padded address to get the routine location.
+	CurrentZFrame->PC = expandPaddedAddress(Operand[0]);
+	
+	// There is an extra routine offset for version 6 and 7 that we must append.
+	if(getZRev() == 6 || getZRev() == 7) {
+		// This offset is stored at offset 0x28 in the header.
+		CurrentZFrame->PC += 8*getWord(0x28);
+	}
+	
 	// If address 0 is called, we instantly return 0 and nothing happens.
-	if(!Operand[0]) {
+	if(!CurrentZFrame->PC) {
 		zReturn(0);
 		return;
 	}
-	// Expand the padded address to get the routine location.
-	CurrentZFrame->PC = expandPaddedAddress(Operand[0]);
+
 	// Check if it is out of memory range.
 	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > g_RAMSize ) {
 		// Log an error message if it is.
@@ -40,6 +49,7 @@ void opCall() {
 		);
 		exit(1);
 	}
+	logMessage(MNull, "call", "Local offset: %u (%p)\n", CurrentZFrame->PC, (void*)(long)CurrentZFrame->PC);
 	// Get the number of local variables the routine has.
 	uzbyte NumberLocals = getByte(CurrentZFrame->PC++);
 	// Allocate room for the locals.
@@ -56,7 +66,7 @@ void opCall() {
 	CurrentZFrame->Locals = calloc(sizeof(uzword), NumberLocals+1);
 	CurrentZFrame->Locals[0] = NumberLocals;
 	// Special handling for revision 3 and lower.
-	if(getZRev() < 4) {
+	if(getZRev() <= 3) {
 		// Revision 3 and lower define default values for all routine
 		// arguments. Get them and assign them here. revisions 4 and up 
 		// use 0 for all default values.

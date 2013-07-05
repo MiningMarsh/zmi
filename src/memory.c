@@ -196,7 +196,7 @@ void setByte(const unsigned int Address, const uzbyte Value) {
 }
 
 // Return the expanded packed address depending on the machine.
-uzword expandPaddedAddress(const uzword PaddedAddress) {
+unsigned long long int expandPaddedAddress(const uzword PaddedAddress) {
 	switch(getZRev()) {
 		case 1:
 		case 2:

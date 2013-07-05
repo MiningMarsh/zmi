@@ -113,9 +113,9 @@ int main(int ArgCount, char** Arguments) {
 			// Print a help message.
 			case 'h':
 				printf(
-					"MM's and Triclops200's Z-Machine Interpreter.\n"
+					"MiningMarsh's and Triclops200's Z-Machine Interpreter.\n"
 					"Version %i.%i\n"
-					"Compliant with standard %i.%i\n"
+					"Compliant with standard %i.%i (Haha what a funny joke.)\n"
 					"Arguments take form as:  -<flag>=<value>\n"
 					"                         --<key>=<value>\n"
 					"Options:\n"

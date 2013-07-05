@@ -16,7 +16,7 @@
 // and return information for routine handling.
 struct stackframe { // Holds the current routine state.
 	struct stackframe* OldFrame;
-	unsigned int PC;
+	unsigned long long int PC;
 	uzword* Locals;
 	uzword* Stack;
 	uzbyte ReturnVar;
@@ -34,7 +34,7 @@ void loadRAM(const char* const FileName);
 void traceZStack();
 
 // Expand a padded address.
-uzword expandPaddedAddress(const uzword PaddedAddress);
+unsigned long long int expandPaddedAddress(const uzword PaddedAddress);
 
 // Get a word from a ram address.
 uzword getWord(const unsigned int Address);
