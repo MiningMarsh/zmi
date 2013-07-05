@@ -21,7 +21,7 @@
 void opPutProp() {
 	// Get the property address.
 	if(propertyExists(Operand[0], Operand[1])) {
-		uzword Address = getPropertyValueAddress(Operand[0], Operand[1]);
+		zaddress Address = getPropertyValueAddress(Operand[0], Operand[1]);
 		// If it existed, find its size.
 		uzbyte Size = getPropertySize(Operand[0], Operand[1]);
 		if(Size == 1) {
