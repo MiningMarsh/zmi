@@ -30,6 +30,9 @@ typedef int32_t zlong;
 // An unsigned Z-Machine long.
 typedef uint32_t uzlong;
 
+// Should be large enough to hold any valid address in memory.
+typedef uint64_t zaddress;
+
 // Convert a uzword to zword.
 zword zSign(uzword Input);
 

@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "memory.h"
+#include "zscii.h"
 #include "globalvars.h"
 
 const uint32_t default_string_size = 64;
 
 // Return a buffer of z-characters, read from a series of compressed character packets at adr.
-uint32_t* getZChars(uint16_t Address)
+uint32_t* getZChars(zaddress Address)
 {
 	uint32_t size = default_string_size; // Default size of the string buffer is 1kb.
 	uint32_t* buffer = malloc(sizeof(uint32_t)*size); // Get the string buffer.

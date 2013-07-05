@@ -108,7 +108,7 @@ void loadRAM(const char* const Filename) {
 }
 
 // Get the word beginning at ram address adr.
-uzword getWord(const unsigned int Address) {
+uzword getWord(const zaddress Address) {
 	// The address is out of bounds of RAM.
 	if(Address+1 > g_RAMSize) {
 		logMessage(
@@ -125,7 +125,7 @@ uzword getWord(const unsigned int Address) {
 }
 
 // Get the byte beginning at ram address adr.
-uzbyte getByte(const unsigned int Address) {
+uzbyte getByte(const zaddress Address) {
 	// Error is the address is out of bounds of RAM.
 	if(Address > g_RAMSize) {
 		logMessage(
@@ -147,7 +147,7 @@ uzbyte getZRev() {
 }
 
 // Set the word beginning at ram address adr to value.
-void setWord(const unsigned int Address, const uzword Value) {
+void setWord(const zaddress Address, const uzword Value) {
 	if(!Address) {
 		logMessage(
 			MFatal,
@@ -172,7 +172,7 @@ void setWord(const unsigned int Address, const uzword Value) {
 }
 
 // Set the byte beginning at ram address adr to value.
-void setByte(const unsigned int Address, const uzbyte Value) {
+void setByte(const zaddress Address, const uzbyte Value) {
 	if(!Address) {
 		logMessage(
 			MFatal,
@@ -196,7 +196,7 @@ void setByte(const unsigned int Address, const uzbyte Value) {
 }
 
 // Return the expanded packed address depending on the machine.
-unsigned long long int expandPaddedAddress(const uzword PaddedAddress) {
+zaddress expandPaddedAddress(const uzword PaddedAddress) {
 	switch(getZRev()) {
 		case 1:
 		case 2:
