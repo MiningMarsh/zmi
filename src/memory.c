@@ -27,19 +27,19 @@ void loadRAM(const char* const Filename) {
 	FILE* StoryFile;
 	StoryFile = fopen(Filename, "rb");
 	if(StoryFile == NULL) {
-		fputs(g_ProgramName, stderr);
+		fputs(ProgramName, stderr);
 		fputs(": ", stderr);
 		perror(Filename);
 		exit (1);
 	}
 	// Read the story file size.
 	fseek(StoryFile, 0, SEEK_END);
-	g_StorySize = ftell(StoryFile);
+	StorySize = ftell(StoryFile);
 	rewind(StoryFile);
 
 	// Allocate the ram.
-	RAM = (uzbyte*)malloc(sizeof(uzbyte)*g_StorySize);
-	g_RAMSize = g_StorySize;
+	RAM = (uzbyte*)malloc(sizeof(uzbyte)*StorySize);
+	RAMSize = StorySize;
 
 	// Check if we ran out of memory allocating RAM.
 	if(!RAM) {
@@ -48,13 +48,13 @@ void loadRAM(const char* const Filename) {
 			"loadRAM()", 
 			"Failed to allocate enough RAM to hold the story file.\n"
 			"%u bytes are needed.",
-			(unsigned int)sizeof(uzbyte)*g_RAMSize
+			(unsigned int)sizeof(uzbyte)*RAMSize
 		);
 		exit (1);
 	}
 
 	// Read the file into the RAM.
-	if(fread(RAM, sizeof(uzbyte), g_StorySize, StoryFile) != g_StorySize) {
+	if(fread(RAM, sizeof(uzbyte), StorySize, StoryFile) != StorySize) {
 			logMessage(MFatal, "loadRAM()", "Failed to read file.");
 			exit(1);
 	}
@@ -75,31 +75,31 @@ void loadRAM(const char* const Filename) {
 		case 1:
 		case 2:
 		case 3:
-			g_MaxStorySize = 128;
+			MaxStorySize = 128;
 			break;
 		case 4:
 		case 5:
-			g_MaxStorySize = 256;
+			MaxStorySize = 256;
 			break;
 		case 7:
-			g_MaxStorySize = 320;
+			MaxStorySize = 320;
 			break;
 		case 6:
 		case 8:
-			g_MaxStorySize = 512;
+			MaxStorySize = 512;
 			break;
 	}
 	// The size is in KiB, convert into bytes.
-	g_MaxStorySize *= 1024;
+	MaxStorySize *= 1024;
 	// Check actual story size against max story size.
-	if(g_StorySize > g_MaxStorySize) {
+	if(StorySize > MaxStorySize) {
 		logMessage(
 			MFatal, 
 			"loadRAM()", 
 			"File is too large.\n"
 			"Story is %ukb. Max size is %ukb.",
-			g_StorySize / 1024,
-			g_MaxStorySize / 1024
+			StorySize / 1024,
+			MaxStorySize / 1024
 		);
 		exit (1);
 	}
@@ -110,14 +110,14 @@ void loadRAM(const char* const Filename) {
 // Get the word beginning at ram address adr.
 uzword getWord(const zaddress Address) {
 	// The address is out of bounds of RAM.
-	if(Address+1 > g_RAMSize) {
+	if(Address+1 > RAMSize) {
 		logMessage(
 			MFatal,
 			"getWord()",
 			"Tried to grab word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
-			g_RAMSize
+			RAMSize
 		);
 		exit(1);
 	}
@@ -127,14 +127,14 @@ uzword getWord(const zaddress Address) {
 // Get the byte beginning at ram address adr.
 uzbyte getByte(const zaddress Address) {
 	// Error is the address is out of bounds of RAM.
-	if(Address > g_RAMSize) {
+	if(Address > RAMSize) {
 		logMessage(
 			MFatal,
 			"getWord()",
 			"Tried to grab byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
-			g_RAMSize
+			RAMSize
 		);
 		exit(1);
 	}
@@ -156,14 +156,14 @@ void setWord(const zaddress Address, const uzword Value) {
 			Value
 		);
 		exit(1);
-	} else if(Address+1 > g_RAMSize) {
+	} else if(Address+1 > RAMSize) {
 		logMessage(
 			MFatal,
 			"setWord()",
 			"Tried to set word outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
-			g_RAMSize
+			RAMSize
 		);
 		exit(1);
 	}
@@ -181,14 +181,14 @@ void setByte(const zaddress Address, const uzbyte Value) {
 			Value
 		);
 		exit(1);
-	} else if(Address > g_RAMSize) {
+	} else if(Address > RAMSize) {
 		logMessage(
 			MFatal,
 			"setWord()",
 			"Tried to set byte outside of memory: %u\n"
 			"RAM is %u bytes.\n",
 			Address,
-			g_RAMSize
+			RAMSize
 		);
 		exit(1);
 	}

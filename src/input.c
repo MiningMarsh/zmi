@@ -76,7 +76,7 @@ void readString() {
 	maxsz--;
 	if(getZRev() < 5)
 		maxsz--;
-	if(g_VerboseDebug >=4)
+	if(VerboseDebug >=4)
 		printf("maxsz is %u\n",maxsz);
 	char* line = NULL;
 	line = calloc(sizeof(char), maxsz+ 2);

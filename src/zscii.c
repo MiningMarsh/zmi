@@ -2,230 +2,329 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "zint.h"
 #include "memory.h"
 #include "zscii.h"
 #include "globalvars.h"
+#include "log.h"
 
-const uint32_t default_string_size = 64;
+const uint32_t DefaultStringSize = 64;
 
-// Return a buffer of z-characters, read from a series of compressed character packets at adr.
-uint32_t* getZChars(zaddress Address)
-{
-	uint32_t size = default_string_size; // Default size of the string buffer is 1kb.
-	uint32_t* buffer = malloc(sizeof(uint32_t)*size); // Get the string buffer.
-	if(buffer == NULL)
-	{ // No memory.
-		fputs("No memory to get ZSCII characters.\n",stderr);
+// Return a buffer of z-characters, read from a series of compressed character packets at Address.
+uint32_t* getZChars(zaddress Address) {
+
+	uint32_t BufferSize = DefaultStringSize;
+	
+	// Allocate a buffer to hold the string.
+	uint32_t* Buffer = malloc(sizeof(uint32_t) * BufferSize);
+	if(Buffer == NULL) {
+		// No memory.
+		logMessage(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
 		exit(1);
 	}
-	buffer[0] = 0; // Size of the buffer.
-	uint16_t cell = 0; // Holds the current character packet.
-	while(!(cell&32768)) // Read until the end of stream flag is set in a cahracter packet.
-	{
-		buffer[0] +=3; // There are 3 characters per packet.
-		if(buffer[0] +1 > size)
-		{
-			size *= 2; // Double the size of the buffer if it runs out (this plays nice with malloc).
-			buffer = realloc(buffer, sizeof(uint32_t)*size);
-			if(buffer == NULL)
-			{ // No memory.
-				fputs("No memory to get ZSCII characters.\n",stderr);
+	
+	// Stores how many characters have been read into the buffer.
+	Buffer[0] = 0;
+	
+	// Holds the current character packet.
+	uzword Cell = 0;
+	
+	// Keep reading packets until we hit an end of stream flag.
+	while(!(Cell&32768)) {
+		
+		// There are 3 characters per packet.
+		Buffer[0] += 3;
+		
+		if(Buffer[0] +1 > BufferSize) {
+			BufferSize *= 2; // Double the size of the buffer if it runs out (this plays nice with malloc).
+			Buffer = realloc(Buffer, sizeof(uint32_t) * BufferSize);
+			if(Buffer == NULL) {
+				// No memory.
+				logMessage(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
+				free(Buffer);
 				exit(1);
 			}
 		}
-		cell = getWord(Address); // A character packet is the size of a word.
-		buffer[buffer[0] - 2] = (cell>>10)&31; // Extract the three compressed characters from the packet.
-		buffer[buffer[0] - 1] = (cell>>5)&31;
-		buffer[buffer[0]] = cell&31;
+		
+		Cell = getWord(Address); // A character packet is the size of a word.
+		
+		Buffer[Buffer[0] - 2] = (Cell>>10)&31; // Extract the three compressed characters from the packet.
+		Buffer[Buffer[0] - 1] = (Cell>>5)&31;
+		Buffer[Buffer[0]] = Cell&31;
+		
 		Address += 2; // Advance the stream location by a word.
 	}
-	// Next line would save a tiny bit of memory for a few seconds, but ommiting it helps against memory fragmentation.
-	/* buffer = realloc(buffer,(buffer[0]+1)*sizeof(uint32_t)); */
-	return buffer;
+	// We could resize the buffer to optimal size, buts lets avoid a possible 
+	// reallocation failure and avoid extra fragmentation.
+	return Buffer;
 }
 
-char* zCharsToZSCII(uint32_t* buffer)
-{
-	if(buffer == NULL)
-	{ // Null buffer passed.
-		fputs("tried to get ASCII characters from NULL stream.\n",stderr);
-		free(buffer);
+// I am truly sorry to anyone reading through this function, I should get 
+// lynched for how crap this is. But it does work. I think. Trust me on this.
+char* zCharsToZSCII(uint32_t* Buffer) {
+
+	if(Buffer == NULL) {
+		// Null buffer passed.
+		logMessage(MFatal, "zCharsToZSCII", "Tried to convert NULL buffer into ZSCII.\n");
 		exit(1);
 	}
-	static bool recurseabr = 0; // The standard bans recursive string redirection, so we track it,
-	if(recurseabr > 1)          // and spit an error if it is more than 1 recursion.
-	{
-		fputs("Nested abbreviation detected.\n",stderr);
+	
+	// Recursive string indirection is banned, detect it here.
+	static unsigned int Recursion = 0;
+	if(Recursion > 1) {
+		logMessage(MFatal, "zCharsToZSCII", "Nested abbreviation detected.\n");
 		exit(1);
 	}
-	uint32_t buffc = buffer[0]; // Total size of the buffer.
-	uint32_t size = default_string_size;
-	while(size < buffc)
-		size *= 2;
-	uint8_t lalpha = 0; // Locked alpha mode.
-	uint8_t nalpha = 0; // Next alpha mode.
-	char* zscii = malloc(sizeof(char)*size); // Holds the converted ascii characters.
-	if(zscii == NULL)
-	{ // No memory.
-		fputs("Not enough memory to convert zscii string.\n",stderr);
-		free(buffer);
+	
+	// BufferCount holds how many characters are in the buffer.
+	uint32_t BufferCount = Buffer[0];
+	
+	// Allocate a new character buffer to hold the ascii characters, but make 
+	// it a power of two to help stop fragmentation.
+	uint32_t BufferSize = DefaultStringSize;
+	while(BufferSize < BufferCount) {
+		BufferSize *= 2;
+	}
+	
+	// Are we in locked alpha mode?
+	unsigned char LockedAlpha = 0; // Locked alpha mode.
+	// What us the next alpha mode?
+	unsigned char NextAlpha = 0; // Next alpha mode.
+	
+	char* Zscii = malloc(sizeof(char) * BufferSize); // Holds the converted ascii characters.
+	if(Zscii == NULL) {
+		// No memory.
+		logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+		free(Buffer);
 		exit(1);
 	}
-	uint32_t ptr= 0; // Pointer to the next free cell in the ascii buffer.
-	while(buffer[0] != 0) // Loop until all the buffer had ben read.
-	{
-		uint8_t calpha = nalpha; // Set the current alpha to the next alpha mode in line.
-		nalpha = lalpha; // Next alpha is locked alpha.
-		uint8_t zchar = buffer[buffc - buffer[0] + 1]; // Get the next zcharacter to convert.
-		buffer[0]--; // decrease the buffer size by one.
-		if(ptr + 5 >= size) {
-			size *= 2;
-			zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
-			if(zscii == NULL)
-			{ // No memory.
-				fputs("Not enough memory to convert zscii string.\n",stderr);
-				free(buffer);
+	
+	// Index into the Zscii buffer.
+	unsigned long long int Index = 0;
+	
+	// Loop until the source buffer is empty.
+	while(Buffer[0]) {
+		
+		// Advance the alpha mode
+		unsigned char CurrentAlpha = NextAlpha;
+		// By default the next alpha mode is locked.
+		NextAlpha = LockedAlpha; 
+
+		// Get the next character to convert.
+		char ZChar = Buffer[BufferCount - Buffer[0] + 1];
+
+		// We just handled one character in the buffer.
+		--Buffer[0];
+		
+		// TODO: Figure out this magic number 5.
+		if(Index + 5 >= BufferSize) {
+			BufferSize *= 2;
+			
+			// Holds the converted ascii characters.
+			Zscii = realloc(Zscii, sizeof(char) * BufferSize); 
+			if(Zscii == NULL) {
+				// No memory.
+				logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+				free(Buffer);
+				free(Zscii);
 				exit(1);
 			}
 		}
-		switch(zchar)
-		{
-			case 0: // 0 is actually space
-				zscii[ptr++] = ' ';
+
+		// Convert the character.
+
+		// TODO: Figure out what the fuck I was talking about with 1, 2, and 3 
+		// shifting. I see no such code logic.
+		switch(ZChar) {
+			// 0 is space.
+			case 0:
+				Zscii[Index++] = ' ';
 				break;
-			case 1: // 1 is newline in version 1, in 2 it changes the shift mode.
-				if(getZRev() == 1)
-				{
-					zscii[ptr++] = '\n';
+			
+			// 1 is newline in revision 1, else it changes shift mode.
+			case 1:
+				if(getZRev() == 1) {
+					Zscii[Index++] = '\n';
 					break;
 				}
-				/* no break */
-			case 2: // In versions 1 and 2 this changes the shift mode.
-				if(getZRev() < 3 && zchar == 2) // Needs the '&& zchar == 2' because of the missing 'break;'
-				{
-					nalpha = (calpha + 1)%3;
+				// No break is on purpose, case 2 also shifts mode, so we handle both at 
+				// once.
+			
+			// In versions 1 and 2 this changes the shift mode.
+			case 2: 
+				// Needs the '&& zchar == 2' because of the missing 'break;'
+				if(getZRev() <= 2 && ZChar == 2) {
+					// Math to shift alpha mode. Modes wrap from 0..1..2..0 etc. This 
+					// increases shift mode by 1.
+					NextAlpha = (CurrentAlpha + 1)%3;
 					break;
 				}
-				/* no break */
+				// No break is on purpose, case 3 also shifts mode, so we handle both at 
+				// once.
+				
 			case 3:
-				if(getZRev() < 3 && zchar == 3) // see case 2.
-				{
-					nalpha = (calpha + 2)%3;
+				// see case 2.
+				if(getZRev() <= 2 && ZChar == 3) {
+					// Same as before but we increase case mode by 2.
+					NextAlpha = (CurrentAlpha + 2)%3;
 					break;
 				}
-				// If there is no shift to apply, we engage a string indirection.
-				if(buffer[0]) // Check if
-				{
-					if(g_StrIndirection) // Check if we print string indirection sequences.
-						zscii[ptr++] = '<';
-					uint16_t adr = 32*(zchar-1)
-						+ buffer[buffc - buffer[0]-- + 1];
-					adr = getWord(getWord(0x18) + adr*2)*2;
-					recurseabr++;
-					char* append = zCharsToZSCII(getZChars(adr));
-					int sz = 0;
-					while(append[sz])
-						sz++;
-					if(ptr + 2 + sz >= size) {
-						while(ptr + 2 + sz >= size)
-							size *= 2;
-						zscii = realloc(zscii,sizeof(char)*size); // Holds the converted ascii characters.
-						if(zscii == NULL)
-						{ // No memory.
-							fputs("Not enough memory to convert zscii string.\n",stderr);
-							free(buffer);
+				
+				// In other versions this is string indirection, because they finally got sane.
+				if(Buffer[0]) {
+					
+					// Check if we print <> around string indirection sequences.
+					if(StringIndirection) {
+						Zscii[Index++] = '<';
+					}
+					
+					// TODO: I don't even?
+					zaddress Address = 32*(ZChar-1) + Buffer[BufferCount - Buffer[0]-- + 1];
+
+
+					Address = getWord(getWord(0x18) + Address*2)*2;
+					
+					// Increase recursion count.
+					++Recursion;
+					
+					// Character buffer holding the indirected string, that we are going to append.
+					char* Append = zCharsToZSCII(getZChars(Address));
+					
+					int IndirectedBufferSize = 0;
+					while(Append[IndirectedBufferSize]) {
+						IndirectedBufferSize++;
+					}
+
+					if(Index + 2 + IndirectedBufferSize >= BufferSize) {
+						
+						while(Index + 2 + IndirectedBufferSize >= BufferSize) {
+							BufferSize *= 2;
+						}
+
+						Zscii = realloc(Zscii, sizeof(char) * BufferSize); 
+						// Check for out of memory.
+						if(Zscii == NULL) {
+							logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+							free(Buffer);
+							free(Zscii);
 							exit(1);
 						}
 					}
-					int i = 0;
-					while(append[i])
-						zscii[ptr++] = append[i++];
-					free(append);
-					if(g_StrIndirection)
-						zscii[ptr++] = '>';
-					recurseabr--;
+					
+					// Basically strcpy.
+					unsigned long long int AppendIndex = 0;
+					while(Append[AppendIndex]) {
+						Zscii[Index++] = Append[AppendIndex++];
+					}
+					
+					// We are done with the new buffer.
+					free(Append);
+					
+					if(StringIndirection) {
+						Zscii[Index++] = '>';
+					}
+					
+					// Decrease recursion count.
+					Recursion--;
 				}
 				break;
-			case 4: // Alpha lock in version 1-2, otherwise an alpha shift.
-				if(getZRev() < 3)
-				{
-					lalpha = (calpha + 2)%3;
-					nalpha = lalpha;
+			
+			// Alpha lock in version 1-2, otherwise an alpha shift.
+			case 4: 
+				if(getZRev() <= 2) {
+					LockedAlpha = (CurrentAlpha + 2)%3;
+					NextAlpha = LockedAlpha;
 					break;
 				}
-				nalpha = 1;
+				NextAlpha = 1;
 				break;
-			case 5: // Alpha lock in version 1-2, otherwise an alpha shift.
-				if(getZRev() < 3)
+			
+			// Alpha lock in version 1-2, otherwise an alpha shift.
+			case 5: 
+				if(getZRev() <= 2)
 				{
-					lalpha = (calpha + 2)%3;
-					nalpha = lalpha;
+					LockedAlpha = (CurrentAlpha + 2)%3;
+					NextAlpha = LockedAlpha;
 					break;
 				}
-				nalpha = 2;
+				NextAlpha = 2;
 				break;
-			default: // No special characters, now we do a standard conversion.
-			{
-				char n = 0;
-				uint16_t adr;
-				adr = 0;
-				if(getZRev() >= 5)
-					adr = getWord(0x34);
-				switch(calpha)
-				{
+			
+			// No special characters, now we do a standard conversion.
+			default: {
+				char Next = 0;
+				
+				// Get an alternate char table if it exists. 
+				zaddress Address = 0;
+				if(getZRev() >= 5) {
+					Address = getWord(0x34);
+				}
+				
+				// OH NOES NESTED SWITCH. /me dies.
+				switch(CurrentAlpha) {
+					// It is a lower case character.
 					case 0:
-						n = 'a' + zchar-6;
-						if(adr)
-							n = getByte(adr + (zchar-6));
+						Next = 'a' + ZChar-6;
+						if(Address) {
+							Next = getByte(Address + (ZChar-6));
+						}
 						break;
+
+					// It is an uppercase character.
 					case 1:
-						n = 'A' + zchar-6;
-						if(adr)
-							n = getByte(adr + (zchar+20));
+						Next = 'A' + ZChar-6;
+						if(Address)
+							Next = getByte(Address + (ZChar+20));
 						break;
-					case 2:
-					{
-						if(zchar == 6)
-						{
-							if(buffer[0] < 2)
-							{
-								buffer[0] = 0;
-								n = ' ';
+
+					// Else... I don't fucking know anymore, man!
+					case 2: {
+						if(ZChar == 6) {
+							if(Buffer[0] < 2) {
+								Buffer[0] = 0;
+								Next = ' ';
 								break;
 							}
-							n= (buffer[buffc
-							- buffer[0] + 1]*32)
-							+ buffer[buffc - buffer[0]];
-							buffer[0] -= 2;
+							// What the fuck?
+							Next = (Buffer[BufferCount
+							- Buffer[0] + 1]*32)
+							+ Buffer[BufferCount - Buffer[0]];
+							Buffer[0] -= 2;
 							break;
 						}
-						if(zchar == 7)
-						{
-							n = '\n';
+						
+						// 7 is newline.
+						if(ZChar == 7) {
+							Next = '\n';
 							break;
 						}
+
 						// There was a mathematical equation for the conversion, but it was failing miserably.
 						// This lookup table does the job though, and as a plus, is character set independent! :D
-						char ltable[] = {
+						char CharacterTable[] = {
 						                 ' ','\n','0','1','2','3','4',
 						                 '5','6','7','8','9','.',
 						                 ',','!','?','_','#','\'',
 						                 '"','/','\\','-',':','(',
 						                 ')'
 						                };
-						n = ltable[zchar - 6];
-						if(adr)
-							n = getByte(adr + (zchar+26 + 26 - 6));
+						Next = CharacterTable[ZChar - 6];
+						if(Address) {
+							Next = getByte(Address + (ZChar+26 + 26 - 6));
+						}
 						break;
 					}
 				}
-				zscii[ptr++] = n;
+				
+				// Set next cell in the buffer to the converted character.
+				Zscii[Index++] = Next;
 				break;
 			}
 		}
 	}
-	free(buffer);
-	// See above.
-	zscii[ptr]=0; // Null termiante the converted ascii string.
-	return zscii;
+	// We are done with the source buffer.
+	free(Buffer);
+	// Null termiante the converted ascii string.
+	Zscii[Index] = 0; 
+	return Zscii;
 }

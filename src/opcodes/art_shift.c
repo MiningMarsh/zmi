@@ -9,7 +9,7 @@
  * Does an arithmetic shift of _number_ by the given number of _places_, *
  * shifting left (i.e. increasing), right if negative. In a right shift, *
  * the sign bit is preserved as well as being shifted on down. (The      *
- * alternative behavior is 'log_shift'.)                                 *
+ * alternative behavior is 'loshift'.)                                 *
  *************************************************************************/
 
 void opArtShift() {

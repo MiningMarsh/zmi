@@ -36,7 +36,7 @@ void opCall() {
 	}
 
 	// Check if it is out of memory range.
-	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > g_RAMSize ) {
+	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > RAMSize ) {
 		// Log an error message if it is.
 		logMessage(
 			MFatal, 
@@ -45,7 +45,7 @@ void opCall() {
 			"Memory size is: %u",
 			Operand[0],
 			CurrentZFrame->PC,
-			g_RAMSize
+			RAMSize
 		);
 		exit(1);
 	}

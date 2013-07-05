@@ -13,24 +13,24 @@
 #include <stdbool.h>
 
 // Are we in debug mode?
-extern unsigned int g_VerboseDebug;
+extern unsigned int VerboseDebug;
 
 // Should we show string pointers in <>?
-extern bool g_StrIndirection;
+extern bool StringIndirection;
 
 // Do we trip the piracy opcode?
-extern bool g_TripPiracy;
+extern bool TripPiracy;
 
 // Size of the game file we are working with, in bytes.
-extern unsigned int g_StorySize;
+extern unsigned int StorySize;
 
 // Size of the RAM the Z-Machine has.
-extern unsigned int g_RAMSize;
+extern unsigned int RAMSize;
 
 // Not quite sure...
-extern unsigned int g_MaxStorySize;
+extern unsigned int MaxStorySize;
 
-extern char* g_ProgramName;
+extern char* ProgramName;
 
 #define d_VersionMajor 0
 #define d_VersionMinor 7

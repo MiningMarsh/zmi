@@ -12,15 +12,7 @@ int main(int ArgCount, char** Arguments) {
 	// We need to grab these from the program arguments.
 	char* Filename = NULL;
 	
-	// By default print no debug messages.
-	g_VerboseDebug = 0;
-	// Don't print <> around string pointers.
-	g_StrIndirection = 0;
-	// Don't be a pirate. Too bad, bein' a pirate of the seven seas
-	// be for me. Yaaarrr!
-	g_TripPiracy = false;
-
-	g_ProgramName = Arguments[0];
+	ProgramName = Arguments[0];
 
 	// Loop through all the arguments.
 	int CurArg = 0;
@@ -138,15 +130,15 @@ int main(int ArgCount, char** Arguments) {
 			// Turn on debug messages.
 			case 'd':
 				if(!strcmp(Value, "max")) {
-					g_VerboseDebug = ~0;
+					VerboseDebug = ~0;
 					break;
 				}
 				if(!strcmp(Value, "off")) {
-					g_VerboseDebug = 0;
+					VerboseDebug = 0;
 					break;
 				}
-				g_VerboseDebug = atoi(Value);
-				if(!g_VerboseDebug) {
+				VerboseDebug = atoi(Value);
+				if(!VerboseDebug) {
 					fputs("--debug expects a non-zero integer value, the string 'max', or the string 'off'.\n", stderr);
 					exit(1);
 				}
@@ -154,7 +146,7 @@ int main(int ArgCount, char** Arguments) {
 
 			// Turn on string indirection printing.
 			case 'i':
-				g_StrIndirection = 1;
+				StringIndirection = 1;
 				break;
 
 			// Open the log file
@@ -164,7 +156,7 @@ int main(int ArgCount, char** Arguments) {
 
 			// Yaarr!
 			case 'p':
-				g_TripPiracy = true;
+				TripPiracy = true;
 				break;
 
 			// A bad flag has been passed.
@@ -184,8 +176,8 @@ int main(int ArgCount, char** Arguments) {
 		printf(
 			"Usage: %s <filename> [options]\n"
 			"To see a list of options, use: %s --help\n",
-			g_ProgramName,
-			g_ProgramName
+			ProgramName,
+			ProgramName
 		);
 		exit(1);
 	}
@@ -195,7 +187,8 @@ int main(int ArgCount, char** Arguments) {
 	fflush(stdout);
 	// Execute each command. I intend to make execNextInstruction
 	// recursive and make this loop obsolete.
-	while(1)
+	while(1) {
 		execNextInstruction();
+	}
 }
 

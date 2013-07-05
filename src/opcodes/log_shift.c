@@ -3,7 +3,7 @@
 #include "command.h"
 
 /*************************************************
- * EXT:2 2 5 log_shift number places -> (result) *
+ * EXT:2 2 5 loshift number places -> (result) *
  *************************************************************************
  * Does a logical shift of number by the given number of places,         *
  * shifting left (i.e. increasing) if places is positive, right if       *

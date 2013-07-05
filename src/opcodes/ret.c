@@ -11,7 +11,7 @@
  *************************************************************************/
 
 void opRet() {
-	if(g_VerboseDebug > 5) {
+	if(VerboseDebug > 5) {
 		logMessage(MNull, "opRet()", "Returning from routine.");
 	}
 	zReturn(Operand[0]);

@@ -13,7 +13,7 @@
  *************************************************************************/
 
 void opPiracy() {
-	if(g_VerboseDebug >= 5 && g_TripPiracy)
+	if(VerboseDebug >= 5 && TripPiracy)
 		logMessage(MNull, "piracy", "Yarr, ye scurvy dog! Swab the deck!");
-	zBranch(g_TripPiracy);
+	zBranch(TripPiracy);
 }

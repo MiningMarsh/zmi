@@ -61,7 +61,7 @@ void initZM() {
 // Execute an instruction begininng where the PC is currently pointing.
 void execNextInstruction() {
 	// Display a debug message.
-	if(g_VerboseDebug >= 5) {
+	if(VerboseDebug >= 5) {
 		logMessage(MNull, "Main loop", "Operation started.");
 	}
 	
@@ -81,7 +81,7 @@ void execNextInstruction() {
 	uzword Operation = getByte(CurrentZFrame->PC++);
 
 	// Print the operation in debug mode.
-	if(g_VerboseDebug >= 10) {
+	if(VerboseDebug >= 10) {
 		logMessage(
 			MNull, 
 			NULL, 
@@ -155,7 +155,7 @@ void execNextInstruction() {
 				// Large constants are words.
 				Operand[I] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
-				if(g_VerboseDebug >= 10) {
+				if(VerboseDebug >= 10) {
 					logMessage(
 						MNull, 
 						"Operand", 
@@ -168,7 +168,7 @@ void execNextInstruction() {
 			case SmallConstant:
 				// Small constants are bytes.
 				Operand[I] = getByte(CurrentZFrame->PC++);
-				if(g_VerboseDebug >= 10) {
+				if(VerboseDebug >= 10) {
 					logMessage(
 						MNull,
 						"Operand",
@@ -182,7 +182,7 @@ void execNextInstruction() {
 				// Variable values are grabbed from memory.
 				uint8_t Variable = getByte(CurrentZFrame->PC++);
 				Operand[I] = getZVar(Variable);
-				if(g_VerboseDebug >= 10) {
+				if(VerboseDebug >= 10) {
 					logMessage(
 						MNull,
 						"Operand",
@@ -198,6 +198,6 @@ void execNextInstruction() {
 	}
 	// Execute the operation.
 	CallOpCode[Operation]();
-	if( g_VerboseDebug >= 5)
+	if(VerboseDebug >= 5)
 		logMessage(MNull, "Main loop", "Operation finished.\n");
 }

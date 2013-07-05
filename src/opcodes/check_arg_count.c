@@ -3,7 +3,7 @@
 #include "memory.h"
 
 /************************************************
- * VAR:255 1F 5 check_arg_count argument-number *
+ * VAR:255 1F 5 check_arcount argument-number *
  *************************************************************************
  * Branch if a given argument number (couting by 1) has been provided by *
  * the routine call to the current routine. (This allows routines in     *
