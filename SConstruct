@@ -1,7 +1,7 @@
 #imports
 import sys, os, fnmatch, shutil
 
-# Needed for coloured output.
+# Needed for colored output.
 
 class color:
 	escape = '\033['
@@ -15,15 +15,34 @@ class color:
 	white = '\033[37m'
 	endc = '\033[0m'
 
-# Environment initialization
-env = Environment(
-		CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
-		SHCXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
-		CXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
-		SHCCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
-		SHLINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
-		LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
+AddOption(
+	'--no-color', 
+	dest='nocolor', 
+	action='store_true', 
+	default=False, 
+	help='Disable colored build.'
 )
+
+# Environment initialization
+env = 0;
+if GetOption('nocolor'):
+	env = Environment(
+			CCCOMSTR='[CC] $SOURCES',
+			SHCXXCOMSTR='[CXX] $SOURCES',
+			CXXCOMSTR='[CXX] $SOURCES',
+			SHCCCOMSTR='[CC] $SOURCES',
+			SHLINKCOMSTR='[LD] $TARGET',
+			LINKCOMSTR='[LD] $TARGET'
+	)
+else:
+	env = Environment(
+			CCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+			SHCXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+			CXXCOMSTR= color.cyan + '[' + color.green + 'CXX' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+			SHCCCOMSTR= color.cyan + '[' + color.green + 'CC' + color.cyan +']' + color.endc + ' ' + '$SOURCES',
+			SHLINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
+			LINKCOMSTR= color.cyan + '[' + color.cyan + 'LD' + color.cyan +']' + color.endc + ' ' + '$TARGET',
+	)
 
 HeaderDirectory = "include"
 SourceDirectory = "src"
@@ -32,7 +51,7 @@ DefaultVariant = "generic"
 BuildPrefix = os.path.join("build", ".objects")
 
 # Compile flags.
-Flags = '--std=c99 -pipe'
+Flags = '-std=c99 -pipe'
 
 # Options
 AddOption(
@@ -47,14 +66,14 @@ AddOption(
 	'--debugging', 
 	dest='debug', 
 	action='store_true', 
-	default=True, 
+	default=False, 
 	help='Compile a debug release'
 )
 
 AddOption('--strict', 
 	dest='strict', 
 	action='store_true', 
-	default=True, 
+	default=False, 
 	help='Stop compiling whenever the compiler issues a warning.'
 )
 
@@ -82,7 +101,6 @@ AddOption(
 	action='store', 
 	metavar='TOOL', 
 	help='tool prefix'
-
 )
 
 AddOption(
@@ -124,15 +142,8 @@ Headers = [HeaderDirectory]
 env.Append(CCFLAGS=Flags)
 env.Append(CPPPATH=Headers)
 if(GetOption('tool-prefix')):
-	env['CC']=GetOption('tool-prefix')+'-gcc'
-	env['CXX']=GetOption('tool-prefix')+'-g++'
-	env['LD']=GetOption('tool-prefix')+'-ld'
-else:
-	env['CC']='gcc'
-	env['CXX']='g++'
-	env['LD']='ld'
-
-Install = env.Program(Executable, Sources, LIBS=Libraries)
+	env['CC']=GetOption('tool-prefix')+'-'+env['CC']
+	env['CXX']=GetOption('tool-prefix')+'-'+env['CXX']
 
 #option reading
 if(GetOption('debug')):
@@ -148,6 +159,9 @@ if(GetOption('lto')):
 	env.Append(LINKFLAGS='-flto')
 if(not GetOption('debug')):
 	env.Append(CCFLAGS='-DNDEBUG')
+Install = env.Program(Executable, Sources, LIBS=Libraries)
+
+
 
 #install
 env.Install('/usr/bin', Install)
