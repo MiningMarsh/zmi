@@ -16,7 +16,7 @@ void opAnd();
 void opArtShift();
 void opCall();
 void opCallVN();
-//void opCatch();
+void opCatch();
 void opCheckArgCount();
 void opCheckUnicode();
 void opClearAttr();
@@ -74,7 +74,7 @@ void opStorew();
 void opSub();
 void opTest();
 void opTestAttr();
-//void opThrow();
+void opThrow();
 
 // Table of opcodes.
 void (*CallOpCode[256+30])(void);
