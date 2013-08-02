@@ -31,6 +31,29 @@
 #undef PLATFORM_32BIT
 #undef PLATFORM_64BIT
 #undef PLATFORM_GNU
+#undef PLATFORM_DEBUG
+#undef PLATFORM_FREESTANDING
+#undef PLATFORM_HOSTED
+
+/* 
+ * Standard freestanding check.
+ */
+#if __STDC_HOSTED__ == 1
+#	undef PLATFORM_HOSTED
+#	define PLATFORM_HOSTED 1
+#else
+#	undef PLATFORM_FREESTANDING
+#	define PLATFORM_FREESTANDING 1
+#endif
+
+
+/*
+ * Debug checking is super easy.
+ */
+#if !defined(NDEBUUG)
+#	undef PLATFORM_DEBUG
+#	define PLATFORM_DEBUG 1
+#endif
 
 /* 
  * Check for various C standards. This should handle every C compiler, as it is
@@ -41,7 +64,6 @@
 #	if defined(__STDC__)
 #		undef PLATFORM_C89
 #		undef PLATFORM_C
-#		define PLATFORM_C89 = 1
 #		define PLATFORM_C89 = 1
 #		define PLATFORM_C = 89
 #	endif
