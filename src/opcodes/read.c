@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "input.h"
 #include "output.h"
+#include "dictionary.h"
 
 /*********************************************************
  * VAR:228 4 1 sread text parse                          *
@@ -88,5 +89,11 @@
 void opRead() {
 	// Flush the output buffer since we are fixing to read in input.
 	zPrint(NULL);
-	readString(0);
+
+	// TODO: Replace this with real input handling, for now we are going to use
+	// a static input.
+	const static char* String = "n";
+
+	char Tokenised = tokenise(dictionaryAddress(), String);
+
 }
