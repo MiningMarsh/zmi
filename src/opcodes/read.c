@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "input.h"
 #include "output.h"
-#include "dictionary.h"
+//#include "dictionary.h"
 
 /*********************************************************
  * VAR:228 4 1 sread text parse                          *
@@ -94,6 +94,6 @@ void opRead() {
 	// a static input.
 	const static char* String = "n";
 
-	char Tokenised = tokenise(dictionaryAddress(), String);
-
+//	char Tokenised = tokenise(dictionaryAddress(), String);
+	exit(0);
 }
