@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "input.h"
 #include "output.h"
 #include "memory.h"
@@ -49,4 +50,5 @@ void clean() {
 	
 	// Close the log file.
 	logClose();
+	printf("\n");
 }
