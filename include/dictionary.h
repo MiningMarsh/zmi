@@ -21,6 +21,6 @@ bool isSeperator(zaddress Dictionary, char Character);
 
 zaddress dictionaryLookup(zaddress Dictionary, const char* String);
 
-char* tokenise(zaddress Dictionary, const char* String); 
+char** tokenise(zaddress Dictionary, const char* String); 
 
 #endif /* DICTIONARY_H_ */
