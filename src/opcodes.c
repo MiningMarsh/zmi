@@ -51,6 +51,7 @@ void initOpCodes() {
 		CallOpCode[129+16*I] = &opGetSibling;
 		CallOpCode[130+16*I] = &opGetChild;
 		CallOpCode[131+16*I] = &opGetParent;
+		CallOpCode[132+16*I] = &opGetPropLen;
 		CallOpCode[133+16*I] = &opInc;
 		CallOpCode[134+16*I] = &opDec;
 		CallOpCode[135+16*I] = &opPrintAddr;
@@ -81,6 +82,8 @@ void initOpCodes() {
 	CallOpCode[232] = &opPush;
 	CallOpCode[233] = &opPull;
 	CallOpCode[241] = &opSetTextStyle;
-	if(getZRev() > 4)
+	if(getZRev() > 4) {
 		CallOpCode[248] = &opNot;
+		CallOpCode[249] = &opCallVN;
+	}
 }

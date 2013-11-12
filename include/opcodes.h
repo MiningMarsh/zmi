@@ -29,6 +29,7 @@ void opGetChild();
 void opGetNextProp();
 void opGetParent();
 void opGetProp();
+void opGetPropLen();
 void opGetPropAddr();
 void opGetSibling();
 void opInc();
