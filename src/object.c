@@ -157,25 +157,40 @@ zaddress getPropertyTableAddress(uzword Object) {
 
 zaddress propertyAddress(uzword Object, uzword Property) {
 	if(!Property) {
-		logMessage(MFatal, "propertyAddress()", "Tried to get property address of property 0.");
+		logMessage(
+			MFatal, 
+			"propertyAddress()", 
+			"Tried to get property address of property 0."
+		);
 		exit(1);
 	}
-	zaddress Address = getPropertyTableAddress(Object); // Get the property table address of an object.	
-	uzword Size = 0; // Holds the size of the current property.
-	uzbyte HeaderTextSize = getByte(Address); // Get the size header.
-	Address += 1+2*HeaderTextSize; // Skip the header, getting to the properties.
+	// Get the property table address of an object.	
+	zaddress Address = getPropertyTableAddress(Object); 
+	// Holds the size of the current property.
+	uzword Size = 0; 
+	// Get the size of the header text.
+	uzbyte HeaderTextSize = getByte(Address); 
+	// Skip the header, getting to the properties.
+	Address += 1+2*HeaderTextSize; 
 	uzword PropertyNumber;
 	if(getZRev() < 4) {
 		PropertyNumber = 0;
 		while(PropertyNumber != Property) {
-			Address += Size; // Skip last property scanned
-			uzbyte Cell = getByte(Address); // Get the property size.
-			PropertyNumber = Cell&31; // Get the property number.
-			if(PropertyNumber < Property) { // Check if the property we are looking for doesn't seem to exist on this object.
-				PropertyNumber = Property; // Terminate the loop.
-				Address = 0; // Return 0 to signify the property does not exist.
+			// Skip last property scanned
+			Address += Size; 
+			// Get the property size.
+			uzbyte Cell = getByte(Address); 
+			// Get the property number.
+			PropertyNumber = Cell&31; 
+			// Check if the property we are looking for doesn't seem to exist on this object.
+			if(PropertyNumber < Property) { 
+				// Terminate the loop.
+				PropertyNumber = Property; 
+				// Return 0 to signify the property does not exist.
+				Address = 0; 
 			}
-			Size = (Cell>>5)+2; // Get size of this property
+			// Get size of this property
+			Size = (Cell>>5)+2; 
 		}
 	} else {
 		PropertyNumber = 0;
@@ -183,16 +198,19 @@ zaddress propertyAddress(uzword Object, uzword Property) {
 			Address += Size;
 			uzword PropertyData = getByte(Address);
 			PropertyNumber = PropertyData&63;
-			if(Address>>7) {
+			if((PropertyData>>7)&1) {
 				Size = (getByte(++Address)&63)+2;
-				if(Size == 2)
+				if(!Size)
 					Size = 66;
 			} else {
 				Size = ((PropertyData>>6)&1)+2;
 			}
-			if(PropertyNumber < Property) { // Check if the property we are looking for doesn't seem to exist on this object.
-				PropertyNumber = Property; // Terminate the loop.
-				Address = 0; // Return 0 to signify the property does not exist.
+			// Check if the property we are looking for doesn't seem to exist on this object.
+			if(PropertyNumber < Property) { 
+				// Terminate the loop.
+				PropertyNumber = Property; 
+				// Return 0 to signify the property does not exist.
+				Address = 0; 
 			}
 		}
 	}
@@ -210,7 +228,7 @@ zaddress getPropertyAddress(uzword Object, uzword Property) {
 }
 
 bool propertyExists(uzword Object, uzword Property) {
-	return propertyAddress(Object, Property);
+	return propertyAddress(Object, Property) != 0;
 }
 
 uzword getPropertySize(uzword Object, uzword Property) {
@@ -221,17 +239,18 @@ uzword getPropertySize(uzword Object, uzword Property) {
 	}
 	if(getZRev() < 4) {
 		return (getByte(Address)>>5) + 1;
+	} 
+	
+	uzword Size = 0;
+	uzword PropertyData = getByte(Address);
+	if((PropertyData>>7)&1) {
+		Size = (getByte(++Address)&63);
+		if(!Size)
+			Size = 64;
 	} else {
-		uzword PropertyData = getByte(Address);
-		if(Address>>7) {
-			zword Size = getByte(++Address)&63;
-			if(!Size)
-				Size = 64;
-			return Size;
-		} else {
-			return ((PropertyData>>6)&1)+1;
-		}
+		Size = ((PropertyData>>6)&1)+1;
 	}
+	return Size;
 }
 
 zaddress getPropertyValueAddress(uzword Object, uzword Property) {
