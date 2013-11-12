@@ -83,16 +83,18 @@ void execNextInstruction() {
 
 	// Get the next operation and advance the PC.
 	uzword Operation = getByte(CurrentZFrame->PC++);
-
+	
 	// Print the operation in debug mode.
 	if(VerboseDebug >= 10) {
+		printf("OP %u\n", Operation);
 		logMessage(
 			MNull, 
 			NULL, 
 			"PC: %u (%p) OP: %u (%p)", 
 			CurrentZFrame->PC - 1, 
 			(void*)(long)CurrentZFrame->PC - 1, 
-			Operation, (void*)(long)Operation
+			Operation,
+		   	(void*)(long)Operation
 		);
 	}
 

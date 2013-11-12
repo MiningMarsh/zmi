@@ -80,6 +80,7 @@ void initOpCodes() {
 	CallOpCode[231] = &opRandom;
 	CallOpCode[232] = &opPush;
 	CallOpCode[233] = &opPull;
+	CallOpCode[241] = &opSetTextStyle;
 	if(getZRev() > 4)
 		CallOpCode[248] = &opNot;
 }

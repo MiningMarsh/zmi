@@ -69,6 +69,7 @@ void opRetPopped();
 void opRfalse();
 void opRtrue();
 void opSetAttr();
+void opSetTextStyle();
 void opStore();
 void opStoreb();
 void opStorew();
