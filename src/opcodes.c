@@ -62,6 +62,8 @@ void initOpCodes() {
 		CallOpCode[141+16*I] = &opPrintPaddr;
 		if(getZRev() <= 4)
 			CallOpCode[143+16*I] = &opNot;
+		else
+			CallOpCode[143+16*I] = &opCall1N;
 	}
 	CallOpCode[176] = &opRtrue;
 	CallOpCode[177] = &opRfalse;

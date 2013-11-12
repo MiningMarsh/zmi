@@ -16,6 +16,7 @@ void opAnd();
 void opArtShift();
 void opCall();
 void opCallVN();
+void opCall1N();
 void opCatch();
 void opCheckArgCount();
 void opCheckUnicode();
