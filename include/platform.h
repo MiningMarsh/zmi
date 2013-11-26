@@ -154,17 +154,17 @@
  * Check whether 64bit or 32bit.
  */ 
 #if __WORDSIZE == 64
-#   undef PLATFORM_BIT
-#   undef PLATFORM_16BIT
-#   undef PLATFORM_32BIT
-#   undef PLATFORM_64BIT
+#	undef PLATFORM_BIT
+#	undef PLATFORM_16BIT
+#	undef PLATFORM_32BIT
+#	undef PLATFORM_64BIT
 #	define PLATFORM_BIT 64
 #	define PLATFORM_64BIT
 #else
-#   undef PLATFORM_BIT
-#   undef PLATFORM_16BIT
-#   undef PLATFORM_32BIT
-#   undef PLATFORM_64BIT
+#	undef PLATFORM_BIT
+#	undef PLATFORM_16BIT
+#	undef PLATFORM_32BIT
+#	undef PLATFORM_64BIT
 #	define PLATFORM_BIT 32
 #	define PLATFORM_32BIT
 #endif
