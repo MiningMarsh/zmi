@@ -12,7 +12,7 @@
 
 void opJin() {
 	if(!Operand[0]) {
-		logMessage(MFatal, "jin", "Tried to get parent of object 0.");
+		log_Message(MFatal, "jin", "Tried to get parent of object 0.");
 		exit(1);
 	}
 	zBranch(getParent(Operand[0]) == Operand[1]);

@@ -13,7 +13,7 @@
 
  void opGetSibling() {
 	if(!Operand[0]) {
-		logMessage(MFatal, "get_sibling", "Tried to get sibling of object 0.");
+		log_Message(MFatal, "get_sibling", "Tried to get sibling of object 0.");
 		exit(1);
 	}
 	uzword Object = getSibling(Operand[0]);

@@ -21,7 +21,7 @@ void opGetNextProp() {
 	uzword PropertyNumber = Operand[1];
 	if(PropertyNumber) {
 		if(!propertyExists(Operand[0], PropertyNumber++)) {
-			logMessage(MFatal, "get_next_prop", "Tried to get next property of nonexistant property.");
+			log_Message(MFatal, "get_next_prop", "Tried to get next property of nonexistant property.");
 			exit(1);
 		}
 	}

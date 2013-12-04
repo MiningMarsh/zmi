@@ -34,7 +34,7 @@ void initZM() {
 	// Create the initial Stack frame.
 	CurrentZFrame = malloc(sizeof(stackframe_t));
 	if(CurrentZFrame == NULL) {
-		logMessage(MFatal,"Initlization", "Not enough memory to create stack frame.");
+		log_Message(MFatal,"Initlization", "Not enough memory to create stack frame.");
 		exit(1);
 	}
 
@@ -66,7 +66,7 @@ void execNextInstruction() {
 
 	// Display a debug message.
 	if(VerboseDebug >= 5) {
-		logMessage(MNull, "Main loop", "Operation started.");
+		log_Message(MNull, "Main loop", "Operation started.");
 	}
 	
 	// Clean the operands by setting them all to omitted.
@@ -87,7 +87,7 @@ void execNextInstruction() {
 	// Print the operation in debug mode.
 	if(VerboseDebug >= 10) {
 		printf("OP %u\n", Operation);
-		logMessage(
+		log_Message(
 			MNull, 
 			NULL, 
 			"PC: %u (%p) OP: %u (%p)", 
@@ -162,7 +162,7 @@ void execNextInstruction() {
 				Operand[I] = getWord(CurrentZFrame->PC);
 				CurrentZFrame->PC += 2;
 				if(VerboseDebug >= 10) {
-					logMessage(
+					log_Message(
 						MNull, 
 						"Operand", 
 						"Large: %u (%p)", 
@@ -175,7 +175,7 @@ void execNextInstruction() {
 				// Small constants are bytes.
 				Operand[I] = getByte(CurrentZFrame->PC++);
 				if(VerboseDebug >= 10) {
-					logMessage(
+					log_Message(
 						MNull,
 						"Operand",
 						"Small: %u (%p)", 
@@ -189,7 +189,7 @@ void execNextInstruction() {
 				uint8_t Variable = getByte(CurrentZFrame->PC++);
 				Operand[I] = getZVar(Variable);
 				if(VerboseDebug >= 10) {
-					logMessage(
+					log_Message(
 						MNull,
 						"Operand",
 						"Var %u (%p): %u (%p)", 
@@ -208,5 +208,5 @@ void execNextInstruction() {
 	// Execute the operation.
 	CallOpCode[Operation]();
 	if(VerboseDebug >= 5)
-		logMessage(MNull, "Main loop", "Operation finished.\n");
+		log_Message(MNull, "Main loop", "Operation finished.\n");
 }

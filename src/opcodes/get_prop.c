@@ -28,7 +28,7 @@ void opGetProp() {
 		} else if(Size == 2) {
 			zStore(getWord(Address));
 		} else {
-			logMessage(MFatal, "get_prop", "Property size is greater then 2.");
+			log_Message(MFatal, "get_prop", "Property size is greater then 2.");
 			exit(1);
 		}
 	} else {

@@ -15,7 +15,7 @@ void opMod() {
 	zword Base = zSign(Operand[0]);
 	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
-		logMessage(MFatal, "mod", "Modulus by zero.");
+		log_Message(MFatal, "mod", "Modulus by zero.");
 		exit(1);
 	}
 	zStore(zUnsign(Base % Dividend));

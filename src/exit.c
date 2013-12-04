@@ -9,18 +9,18 @@
 // Clean things instead of letting the OS do it.
 void clean() {
 	const char* const Prefix = "clean()";
-	logMessage(MNull, "", "");
-	logMessage(MNull, Prefix, "Begin cleanup.");
+	log_Message(MNull, "", "");
+	log_Message(MNull, Prefix, "Begin cleanup.");
 
 	if(VerboseDebug)
-		logMessage(MNull, Prefix, "Reverting IO modes.");
+		log_Message(MNull, Prefix, "Reverting IO modes.");
 	// Revert input.
 	cleanInput();
 	// Revert output.
 	cleanOutput();
 	
 	if(VerboseDebug) {
-		logMessage(MNull, Prefix, "Cleaning RAM.");
+		log_Message(MNull, Prefix, "Cleaning RAM.");
 	}
 
 	// Free the storyfile from ram.
@@ -36,12 +36,12 @@ void clean() {
 	if(CurrentZFrame) {
 		while(CurrentZFrame->OldFrame != NULL) {
 			if(VerboseDebug)
-				logMessage(MNull, Prefix, "Cleaning frame.");
+				log_Message(MNull, Prefix, "Cleaning frame.");
 			popZFrame();
 		}
 		// Pop the final frame manually. (popframe() wont let us.)
 		if(VerboseDebug) {
-			logMessage(MNull, Prefix, "Cleaning final frame.");
+			log_Message(MNull, Prefix, "Cleaning final frame.");
 		}
 		free(CurrentZFrame->Locals);
 		free(CurrentZFrame->Stack);
@@ -49,6 +49,6 @@ void clean() {
 	}
 	
 	// Close the log file.
-	logClose();
+	log_Close();
 	printf("\n");
 }

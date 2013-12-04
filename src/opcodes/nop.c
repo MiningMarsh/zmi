@@ -11,7 +11,7 @@
  
 void opNop() {
 	// This is "probably" standard compliant.
-	logMessage(MWarning, "nop", 
+	log_Message(MWarning, "nop", 
 		"Nop wastes both cpu cycles, and is\n"
 		"not fully defined in the standard,\n"
 		"and is therefore undefined\n"

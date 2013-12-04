@@ -12,7 +12,7 @@
 
 void opRet() {
 	if(VerboseDebug > 5) {
-		logMessage(MNull, "opRet()", "Returning from routine.");
+		log_Message(MNull, "opRet()", "Returning from routine.");
 	}
 	zReturn(Operand[0]);
 }

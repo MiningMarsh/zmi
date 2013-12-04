@@ -17,7 +17,7 @@ void zReturn(uzword Value) {
 void zStore(uzword Value) {
 	uzbyte Variable = getByte(CurrentZFrame->PC++);
 	if(VerboseDebug >= 20) {
-		logMessage(
+		log_Message(
 			MNull, 
 			"zStore()", 
 			"Storing %u into var %u.",
@@ -45,7 +45,7 @@ void zBranch(bool Condition) {
 	// The jump offset is the lower 5 bits.
 	uzword Offset = BranchData&63;
 	if(VerboseDebug >= 40) {
-		logMessage(
+		log_Message(
 			MNull, 
 			"zBranch()",
 			"Condition passed is %u.\n"
@@ -60,7 +60,7 @@ void zBranch(bool Condition) {
 	if(!((BranchData>>6)& 1)) {
 		Offset = (Offset<<8)|(getByte(CurrentZFrame->PC++));
 		if(VerboseDebug >= 40) {
-			logMessage(
+			log_Message(
 				MNull, 
 				"zBranch()",
 				"Extended branch offset is %i.",
@@ -74,16 +74,16 @@ void zBranch(bool Condition) {
 		if(Offset > 1) {
 			CurrentZFrame->PC += zSignBase(Offset, 14) - 2;
 			if(VerboseDebug >= 40)
-				logMessage(MNull, "zBranch()", "Jumping by offset.");
+				log_Message(MNull, "zBranch()", "Jumping by offset.");
 
 		// We are returning instead of jumping.
 		} else {
 			zReturn(Offset);
 			if(VerboseDebug >= 40)
-				logMessage(MNull, "zBranch()", "Returning offset.");
+				log_Message(MNull, "zBranch()", "Returning offset.");
 		}
 	} else {
 		if(VerboseDebug >= 40)
-			logMessage(MNull, "zBranch()", "Not jumping.");
+			log_Message(MNull, "zBranch()", "Not jumping.");
 	}
 }

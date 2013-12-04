@@ -13,7 +13,7 @@
  
 void opRemoveObj() {
 	if(!Operand[0]) {
-		logMessage(MFatal, "remove_obj", "Tried to remove object 0 from the object tree.");
+		log_Message(MFatal, "remove_obj", "Tried to remove object 0 from the object tree.");
 		exit(1);
 	}
 	// Get the objects parent.

@@ -14,7 +14,7 @@ zaddress getObjectAddress(uzword Object) {
 
 	// Revision 3 and down only have 255 objects.
 	if(getZRev() < 4 && Object > 255) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"getObjectAddress()",
 			"Getting address of bad object %u.\n"
@@ -43,7 +43,7 @@ zaddress getObjectAddress(uzword Object) {
 bool getObjectFlag(uzword Object, uzword Flag) {
 	if((getZRev() < 4 && Flag > 31) || (getZRev() >= 4 && Flag > 47)) {
 		// An invalid flag has been chosen.
-		logMessage(
+		log_Message(
 			MFatal, 
 			"getObjectFlag()", 
 			"An invalid flag number of %u was read.\n"
@@ -65,7 +65,7 @@ bool getObjectFlag(uzword Object, uzword Flag) {
 void setObjectFlagValue(uzword Object, uzword Flag, bool Value) {
 	if((getZRev() < 4 && Flag > 31) || (getZRev() >= 4 && Flag > 47)) {
 		// An invalid flag has been chosen.
-		logMessage(
+		log_Message(
 			MFatal, 
 			"setObjectFlag()",
 			"An invalid flag number of %u was set.\n"
@@ -111,7 +111,7 @@ void setPSC(uzword Object, uzword Value, int PSC) {
 	} else {
 		// Check if a bad value was passed.
 		if(Value > 0xFF) {
-			logMessage(
+			log_Message(
 				MFatal, 
 				"setPSC()", 
 				"Tried to set parent, child, sibling to invalid object %u.",
@@ -157,7 +157,7 @@ zaddress getPropertyTableAddress(uzword Object) {
 
 zaddress propertyAddress(uzword Object, uzword Property) {
 	if(!Property) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"propertyAddress()", 
 			"Tried to get property address of property 0."
@@ -221,7 +221,7 @@ zaddress propertyAddress(uzword Object, uzword Property) {
 zaddress getPropertyAddress(uzword Object, uzword Property) {
 	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
-		logMessage(MFatal, "getPropertyAddress()", "Tried to get property address of nonexisting property.");
+		log_Message(MFatal, "getPropertyAddress()", "Tried to get property address of nonexisting property.");
 		exit(1);
 	}
 	return Address;
@@ -234,7 +234,7 @@ bool propertyExists(uzword Object, uzword Property) {
 uzword getPropertySize(uzword Object, uzword Property) {
 	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
-		logMessage(MFatal, "getPropertySize()", "Tried to get property size of nonexisting property.");
+		log_Message(MFatal, "getPropertySize()", "Tried to get property size of nonexisting property.");
 		exit(1);
 	}
 	if(getZRev() < 4) {
@@ -256,7 +256,7 @@ uzword getPropertySize(uzword Object, uzword Property) {
 zaddress getPropertyValueAddress(uzword Object, uzword Property) {
 	zaddress Address = propertyAddress(Object, Property);
 	if(!Address) {
-		logMessage(MFatal, "getPropertyValueAddress()", "Tried to get property value address of nonexisting property.");
+		log_Message(MFatal, "getPropertyValueAddress()", "Tried to get property value address of nonexisting property.");
 		exit(1);
 	}
 	if(getZRev() < 4)

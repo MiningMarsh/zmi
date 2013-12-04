@@ -22,7 +22,7 @@ void opAdd() {
 	static bool AlreadyWarned = false;
 	if(!AlreadyWarned) {
 		if(Result < -32768 || Result > 32767) {
-			logMessage(
+			log_Message(
 				MWarning, 
 				"add",
 				"%s detected. This is undefined behavior.\n"

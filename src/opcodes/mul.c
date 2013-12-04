@@ -18,7 +18,7 @@ void opMul() {
 	if(!AlreadyWarned) {
 		if(Result < -32768 || Result > 32767) {
 			// Log the warning message.
-			logMessage(
+			log_Message(
 				MWarning, 
 				"mul", 
 				"%s detected. This is undefined behavior.\n"

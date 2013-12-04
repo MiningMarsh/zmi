@@ -19,7 +19,7 @@ uint32_t* getZChars(zaddress Address) {
 	uint32_t* Buffer = malloc(sizeof(uint32_t) * BufferSize);
 	if(Buffer == NULL) {
 		// No memory.
-		logMessage(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
+		log_Message(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
 		exit(1);
 	}
 	
@@ -40,7 +40,7 @@ uint32_t* getZChars(zaddress Address) {
 			Buffer = realloc(Buffer, sizeof(uint32_t) * BufferSize);
 			if(Buffer == NULL) {
 				// No memory.
-				logMessage(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
+				log_Message(MFatal, "getZChars", "No memory to get ZSCII characters.\n");
 				free(Buffer);
 				exit(1);
 			}
@@ -65,14 +65,14 @@ char* zCharsToZSCII(uint32_t* Buffer) {
 
 	if(Buffer == NULL) {
 		// Null buffer passed.
-		logMessage(MFatal, "zCharsToZSCII", "Tried to convert NULL buffer into ZSCII.\n");
+		log_Message(MFatal, "zCharsToZSCII", "Tried to convert NULL buffer into ZSCII.\n");
 		exit(1);
 	}
 	
 	// Recursive string indirection is banned, detect it here.
 	static unsigned int Recursion = 0;
 	if(Recursion > 1) {
-		logMessage(MFatal, "zCharsToZSCII", "Nested abbreviation detected.\n");
+		log_Message(MFatal, "zCharsToZSCII", "Nested abbreviation detected.\n");
 		exit(1);
 	}
 	
@@ -94,7 +94,7 @@ char* zCharsToZSCII(uint32_t* Buffer) {
 	char* Zscii = malloc(sizeof(char) * BufferSize); // Holds the converted ascii characters.
 	if(Zscii == NULL) {
 		// No memory.
-		logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+		log_Message(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
 		free(Buffer);
 		exit(1);
 	}
@@ -124,7 +124,7 @@ char* zCharsToZSCII(uint32_t* Buffer) {
 			Zscii = realloc(Zscii, sizeof(char) * BufferSize); 
 			if(Zscii == NULL) {
 				// No memory.
-				logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+				log_Message(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
 				free(Buffer);
 				free(Zscii);
 				exit(1);
@@ -204,7 +204,7 @@ char* zCharsToZSCII(uint32_t* Buffer) {
 						Zscii = realloc(Zscii, sizeof(char) * BufferSize); 
 						// Check for out of memory.
 						if(Zscii == NULL) {
-							logMessage(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
+							log_Message(MFatal, "zCharsToZSCII", "Ran out of memory.\n");
 							free(Buffer);
 							free(Zscii);
 							exit(1);

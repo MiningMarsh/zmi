@@ -9,7 +9,7 @@
  *************************************************************************/
 
 void opNonexistant() {
-	logMessage(MFatal, "opNonexistant()", "Tried to execute nonexistant opcode!");
+	log_Message(MFatal, "opNonexistant()", "Tried to execute nonexistant opcode!");
 	exit(1);
 }
 

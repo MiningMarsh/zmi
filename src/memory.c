@@ -14,7 +14,7 @@ void loadRAM(const char* const Filename) {
 
 	// Check if the ram is already been initilized. 
 	if(RAM != NULL) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"loadRAM()", 
 			"Tried to load file while RAM is already initialized.\n"
@@ -43,7 +43,7 @@ void loadRAM(const char* const Filename) {
 
 	// Check if we ran out of memory allocating RAM.
 	if(!RAM) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"loadRAM()", 
 			"Failed to allocate enough RAM to hold the story file.\n"
@@ -55,13 +55,13 @@ void loadRAM(const char* const Filename) {
 
 	// Read the file into the RAM.
 	if(fread(RAM, sizeof(uzbyte), StorySize, StoryFile) != StorySize) {
-			logMessage(MFatal, "loadRAM()", "Failed to read file.");
+			log_Message(MFatal, "loadRAM()", "Failed to read file.");
 			exit(1);
 	}
 	
 	// There is no standard above revision 8.
 	if(getZRev() > 8) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"loadRAM()", 
 			"Bad Z-Revision: %u.",
@@ -93,7 +93,7 @@ void loadRAM(const char* const Filename) {
 	MaxStorySize *= 1024;
 	// Check actual story size against max story size.
 	if(StorySize > MaxStorySize) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"loadRAM()", 
 			"File is too large.\n"
@@ -111,7 +111,7 @@ void loadRAM(const char* const Filename) {
 uzword getWord(const zaddress Address) {
 	// The address is out of bounds of RAM.
 	if(Address+1 > RAMSize) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"getWord()",
 			"Tried to grab word outside of memory: %u\n"
@@ -128,7 +128,7 @@ uzword getWord(const zaddress Address) {
 uzbyte getByte(const zaddress Address) {
 	// Error is the address is out of bounds of RAM.
 	if(Address > RAMSize) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"getWord()",
 			"Tried to grab byte outside of memory: %u\n"
@@ -149,7 +149,7 @@ uzbyte getZRev() {
 // Set the word beginning at ram address adr to value.
 void setWord(const zaddress Address, const uzword Value) {
 	if(!Address) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"setWord()",
 			"Tried to set word 0 (Z-Revision) to %u.",
@@ -157,7 +157,7 @@ void setWord(const zaddress Address, const uzword Value) {
 		);
 		exit(1);
 	} else if(Address+1 > RAMSize) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"setWord()",
 			"Tried to set word outside of memory: %u\n"
@@ -174,7 +174,7 @@ void setWord(const zaddress Address, const uzword Value) {
 // Set the byte beginning at ram address adr to value.
 void setByte(const zaddress Address, const uzbyte Value) {
 	if(!Address) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"setWord()",
 			"Tried to set byte 0 (Z-Revision) to %u.",
@@ -182,7 +182,7 @@ void setByte(const zaddress Address, const uzbyte Value) {
 		);
 		exit(1);
 	} else if(Address > RAMSize) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"setWord()",
 			"Tried to set byte outside of memory: %u\n"
@@ -219,7 +219,7 @@ zaddress expandPaddedAddress(const uzword PaddedAddress) {
 // Pop from the Stack.
 uzword popZStack() {
 	if(CurrentZFrame->Stack == NULL || CurrentZFrame->Stack[0] < 1) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"popZStack()", 
 			"Tried to POP an empty stack."
@@ -254,7 +254,7 @@ void pushZStack(const uzword Value) {
 
 	// Check to make sure stack is sane.
 	if(CurrentZFrame->Stack == NULL) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"pushZStack()", 
 			"Ran out of memory while PUSHing to the stack"
@@ -294,7 +294,7 @@ void setZVar(const uzbyte Variable, const uzword Value) {
 void pushZFrame() {
 	stackframe_t* NewFrame = malloc(sizeof(stackframe_t));
 	if(NewFrame == NULL) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"pushZFrame()", 
 			"Ran out of memory while PUSHing a new stack frame."
@@ -312,7 +312,7 @@ void pushZFrame() {
 // Pop a Stack frame.
 void popZFrame() {
 	if(CurrentZFrame->OldFrame == NULL) {
-		logMessage(MFatal, "popZFrame()", "Tried to POP the main stack frame.");
+		log_Message(MFatal, "popZFrame()", "Tried to POP the main stack frame.");
 		exit(1);
 	}
 	free(CurrentZFrame->Locals);
@@ -332,14 +332,14 @@ uzword zFrameNumber(const stackframe_t* Frame) {
 // Log a stack trace.
 void traceZStack() {
 	char* Prefix = "tZS()";
-	logMessage(
+	log_Message(
 		MNull, 
 		Prefix, 
 		"Begin Stacktrace."
 	);
 	stackframe_t* Frame = CurrentZFrame;
 	while(Frame != NULL) {
-		logMessage(
+		log_Message(
 			MNull, 
 			NULL,
 			"   Frame %u",
@@ -353,13 +353,13 @@ void traceZStack() {
 		);
 		if(!(Frame->Stack == NULL || Frame->Stack[0] < 1)) {
 			unsigned int Count = 1;
-			logMessage(
+			log_Message(
 				MNull, 
 				NULL, 
 				"      Stack:"
 			);
 			for(uzword Cell = Frame->Stack[0]; Cell > 0; Cell--) {
-				logMessage(
+				log_Message(
 					MNull, 
 					NULL, 
 					"         %04u: %u", 
@@ -368,20 +368,20 @@ void traceZStack() {
 				);
 			}
 		} else {
-			logMessage(
+			log_Message(
 				MNull, 
 				NULL,
 				"      Empty Stack."
 			);
 		}
 		if(!(Frame->Locals == NULL || Frame->Locals[0] < 1)) {
-			logMessage(
+			log_Message(
 				MNull, 
 				NULL, 
 				"      Locals:"
 			);
 			for(uzword Cell = 1; Cell <= Frame->Locals[0]; Cell++) {
-				logMessage(
+				log_Message(
 					MNull, 
 					NULL, 
 					"         %02u: %u", 
@@ -390,7 +390,7 @@ void traceZStack() {
 				);
 			}
 		} else {
-			logMessage(
+			log_Message(
 				MNull, 
 				NULL, 
 				"      No local variables."
@@ -398,7 +398,7 @@ void traceZStack() {
 		}
 		Frame = Frame->OldFrame;
 	}
-	logMessage(
+	log_Message(
 		MNull, 
 		Prefix, 
 		"End Stacktrace."

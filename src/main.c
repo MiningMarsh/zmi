@@ -155,7 +155,7 @@ int main(int ArgCount, char** Arguments) {
 
 			// Open the log file
 			case 'l':
-				logOpen(Value);
+				log_Open(Value);
 				break;
 
 			// Yaarr!

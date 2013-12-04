@@ -15,7 +15,7 @@
 
 void opThrow() {
 	if(Operand[1] > zFrameNumber(CurrentZFrame)) {
-		logMessage(MFatal, "opThrow()", "Tried to throw bad frame pointer");
+		log_Message(MFatal, "opThrow()", "Tried to throw bad frame pointer");
 		exit(1);
 	}
 	while(Operand[1] < zFrameNumber(CurrentZFrame))

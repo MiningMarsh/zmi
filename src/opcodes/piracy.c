@@ -14,6 +14,6 @@
 
 void opPiracy() {
 	if(VerboseDebug >= 5 && TripPiracy)
-		logMessage(MNull, "piracy", "Yarr, ye scurvy dog! Swab the deck!");
+		log_Message(MNull, "piracy", "Yarr, ye scurvy dog! Swab the deck!");
 	zBranch(TripPiracy);
 }

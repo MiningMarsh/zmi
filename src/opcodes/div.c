@@ -15,7 +15,7 @@ void opDiv() {
 	zword Operator = zSign(Operand[0]);
 	zword Dividend = zSign(Operand[1]);
 	if(Dividend == 0) {
-		logMessage(MFatal, "div", "Divide by zero.");
+		log_Message(MFatal, "div", "Divide by zero.");
 		exit(1);
 	}
 	zStore(zUnsign(Operator / Dividend));

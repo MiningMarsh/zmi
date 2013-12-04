@@ -17,7 +17,7 @@
 
 void opGetPropLen() {
 	if(!propertyExists(Operand[0], Operand[1])) {
-		logMessage(
+		log_Message(
 			MFatal,
 			"get_prop_len",
 			"Tried to get length of nonexistant property."

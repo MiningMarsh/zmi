@@ -38,7 +38,7 @@ void opCall() {
 	// Check if it is out of memory range.
 	if(CurrentZFrame->PC > 0xFFFFFFF || CurrentZFrame->PC > RAMSize ) {
 		// Log an error message if it is.
-		logMessage(
+		log_Message(
 			MFatal, 
 			"call",
 			"Address %u expands to %u, which is out of memory range.\n"
@@ -53,7 +53,7 @@ void opCall() {
 	uzbyte NumberLocals = getByte(CurrentZFrame->PC++);
 	// Allocate room for the locals.
 	if(NumberLocals > 15) {
-		logMessage(
+		log_Message(
 			MFatal, 
 			"call",
 			"Invalid number of locals to routine: %u\n"

@@ -16,7 +16,7 @@ void opGetChild() {
 	
 	// Getting the child of object 0 is illegal.
 	if(!Operand[0]) {
-		logMessage(MFatal, "get_child", "Tried to get child of object 0.");
+		log_Message(MFatal, "get_child", "Tried to get child of object 0.");
 		exit(1);
 	}
 	

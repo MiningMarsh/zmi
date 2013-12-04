@@ -13,7 +13,7 @@
 
 void opGetParent() {
 	if(!Operand[0]) {
-		logMessage(MFatal, "get_parent", "Tried to get parent of object 0.");
+		log_Message(MFatal, "get_parent", "Tried to get parent of object 0.");
 		exit(1);
 	}
 	uzword Object = getParent(Operand[0]);

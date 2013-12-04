@@ -29,11 +29,11 @@ void opPutProp() {
 		} else if(Size == 2) {
 			setWord(Address, Operand[2]);
 		} else {
-			logMessage(MFatal, "put_prop", "Property size is greater then 2.");
+			log_Message(MFatal, "put_prop", "Property size is greater then 2.");
 			exit(1);
 		}
 	} else {
-		logMessage(MFatal, "put_prop", "Tried to set nonexistant property.");
+		log_Message(MFatal, "put_prop", "Tried to set nonexistant property.");
 		exit(1);
 	}
 }
