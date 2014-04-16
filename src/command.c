@@ -86,7 +86,6 @@ void execNextInstruction() {
 	
 	// Print the operation in debug mode.
 	if(VerboseDebug >= 10) {
-		printf("OP %u\n", Operation);
 		log_Message(
 			MNull, 
 			NULL, 
