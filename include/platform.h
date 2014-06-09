@@ -7,8 +7,6 @@
  * This file is meant to be compatible with as many compilers as possible.
  * Because of this, classic comments have been used throughout the file.
  *
- *  Created on: March 31, 2013
- *      Author: Joshua Songy
  */
 
 #ifndef PLATFORM_H_
