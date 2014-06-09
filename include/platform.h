@@ -48,7 +48,7 @@
 /*
  * Debug checking is super easy.
  */
-#if !defined(NDEBUUG)
+#if !defined(NDEBUG)
 #	undef PLATFORM_DEBUG
 #	define PLATFORM_DEBUG 1
 #endif
